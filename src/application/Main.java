@@ -18,8 +18,12 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 
@@ -72,8 +76,8 @@ class Score implements Serializable{
         return score;
     }
 
-    public Date getDate() {
-        return date;
+    public String getDate() {
+    	return date.toString().substring(0, 19);
     }
 
     public void setDate(Date date) {
@@ -231,20 +235,40 @@ public class Main extends Application {
 		
 		Scene leaderboardScene = null;
 		
-		VBox leadTable = new VBox();
-        
+		VBox root = new VBox();
+		Text heading = new Text("Leaderboards");
+		heading.setFill(Color.WHITE);
+		heading.setFont(Font.font("Courier New", FontWeight.BOLD, 30));
+		root.getChildren().add(heading);
+		
+		Text labels = new Text("Rank Score Date");
+		labels.setFill(Color.WHITE);
+		labels.setFont(Font.font("Courier New", FontWeight.BOLD, 22));
+		root.getChildren().add(labels);
+		
+		VBox scoreLines = new VBox();
+		
 		for(int i = 0; i < leaderboards.size(); i++) {
-			Text score = new Text(i+1 + "	" + leaderboards.get(i).getScore() + "	" + leaderboards.get(i).getDate());
-			leadTable.getChildren().add(score);
+			Text scoreText = new Text((i+1) + " " + leaderboards.get(i).getScore() + " " + leaderboards.get(i).getDate());
+			scoreText.setFill(Color.WHITE);
+			scoreText.setFont(Font.font("Courier New", 22));
+			scoreLines.getChildren().add(scoreText);
 		}
 		
-		leaderboardScene = new Scene(leadTable, sceneWidth, sceneHeight);
+		scoreLines.setAlignment(Pos.CENTER);
+		
+		root.getChildren().add(scoreLines);
+		
+		root.setAlignment(Pos.TOP_CENTER);
+		root.setStyle("-fx-background-color: #000;");
+        
+		leaderboardScene = new Scene(root, sceneWidth, sceneHeight);
  
         leaderboardScene.getStylesheets().add(
         		getClass().getResource("application.css").toExternalForm()
         	);
-        		
-        return leaderboardScene;
+       
+		return leaderboardScene;
 	
 	}
 	
