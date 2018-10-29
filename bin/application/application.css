@@ -1,5 +1,10 @@
-.btn {
-	-fx-font: 16px "Serif";
-    -fx-padding: 10;
-    -fx-background-color: #CCFF99;
+.menuBtn {
+	-fx-font: 18px "Courier New";
+    -fx-padding: 15;
+    -fx-pref-width: 300px;
+    -fx-text-fill: #fff;
+    -fx-background-color: #000;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+    -fx-border-color: white;
 }
