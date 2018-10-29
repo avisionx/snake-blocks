@@ -2,37 +2,88 @@ package application;
 	
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.Serializable;
+import java.util.*;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
-class GameScene extends Thread{
-	
-	public void run() {
-		try
-        { 
-            // Displaying the thread that is running 
-            System.out.println ("Thread " + 
-                  Thread.currentThread().getId() + 
-                  " is running"); 
-  
-        } 
-        catch (Exception e) 
-        { 
-            // Throwing an exception 
-            System.out.println ("Exception is caught"); 
-        } 
-	}
-	
+
+class Leaderboard implements Serializable {
+
+    PriorityQueue<Score> scoreList = new PriorityQueue<>(new Comparator<Score>() {
+        
+    	@Override
+        public int compare(Score o1, Score o2) {
+    		return o2.getScore() - o1.getScore();
+        }
+        
+    });
+
+    public void addScore(Score score){
+        scoreList.add(score);
+    }
+
+    public ArrayList<Score> getLeaderboard(){
+
+        ArrayList<Score> top10 = new ArrayList<>();
+        int l = scoreList.size();
+        
+        for(int i = 0; i < Math.min(10, l); i++){
+            top10.add(scoreList.poll());
+        }
+
+        for(int i = 0; i < top10.size(); i++){
+        	
+            scoreList.add(top10.get(i));
+        
+        }
+        
+        return top10;
+    }
+
+}
+ 
+class Score implements Serializable{
+
+	private int score;
+    private Date date;
+
+    public Score(int score, Date date) {
+    	this.score = score;
+    	this.date = date;
+    }
+    
+    public int getScore() {
+        return score;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
 }
 
 class menuButton extends Button{
@@ -48,8 +99,9 @@ public class Main extends Application {
 	
 	private static final int sceneWidth = 400;
 	private static final int sceneHeight = 600;
+	private Stage stage;
 	
-	private Scene createMainScreen(Stage primaryStage) {
+	private Scene createMainScene() {
 		
 		VBox root = new VBox();
 		Image menuImage = null;
@@ -76,19 +128,19 @@ public class Main extends Application {
 		Button exitBtn = new menuButton("Exit");
 		
 		playBtn.setOnAction(e -> {
-			System.out.println("Play new game!");
+			stage.setScene(createGameScene());
 		});
 		
 		resumeBtn.setOnAction(e -> {
-			System.out.println("Resume game!");
+			stage.setScene(resumeGameScene());
 		});
 		
 		leaderBoardBtn.setOnAction(e -> {
-			System.out.println("Show leaderboard!");
+			stage.setScene(showLeaderboardScene());
 		});
 		
 		exitBtn.setOnAction(e -> {
-			System.out.println("Exit game!");
+			System.exit(0);
 		});
 		
 		if(menuImage != null) {
@@ -100,20 +152,109 @@ public class Main extends Application {
 		
 		root.setAlignment(Pos.CENTER);
 		root.setStyle("-fx-background-color: #000;");
+		Scene menuScene = new Scene(root, sceneWidth, sceneHeight);
 		
-		return new Scene(root, sceneWidth, sceneHeight);
+		menuScene.getStylesheets().add(
+				getClass().getResource("application.css").toExternalForm()
+			);
+		
+		return menuScene;
+	
+	}
+	
+	protected Scene createGameScene() {
+		
+		Scene gameScene = null;
+		
+		VBox root = new VBox();
+        
+		Button createAccountButton = new menuButton("create account");
+		createAccountButton.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				stage.setScene(createMainScene());
+			}   
+        });
+		root.getChildren().addAll(createAccountButton);
+        root.setStyle("-fx-background-color: #000;");
+        
+        gameScene = new Scene(root, sceneWidth, sceneHeight);
+        gameScene.getStylesheets().add(
+        		getClass().getResource("application.css").toExternalForm()
+        	);
+        		
+        return gameScene;
+	
+	}
+	
+	protected Scene resumeGameScene() {
+		
+		Scene gameScene = null;
+		
+		VBox root = new VBox();
+        
+		Button createAccountButton = new menuButton("create account");
+		createAccountButton.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				stage.setScene(createMainScene());
+			}   
+        });
+		root.getChildren().addAll(createAccountButton);
+        root.setStyle("-fx-background-color: #000;");
+        
+        gameScene = new Scene(root, sceneWidth, sceneHeight);
+        gameScene.getStylesheets().add(
+        		getClass().getResource("application.css").toExternalForm()
+        	);
+        		
+        return gameScene;
+	
+	}
+
+	
+	protected Scene showLeaderboardScene() {
+		
+//		Some Static Random LeaderBoard Data
+		Leaderboard l = new Leaderboard();
+		Score s1 = new Score(6, new Date());
+		Score s2 = new Score(2, new Date());
+		Score s3 = new Score(7, new Date());
+		Score s4 = new Score(9, new Date());
+		Score s5 = new Score(10, new Date());
+		l.addScore(s1);
+		l.addScore(s2);
+		l.addScore(s3);
+		l.addScore(s4);
+		l.addScore(s5);
+		
+//		Final LeaderBoard Array
+		ArrayList<Score> leaderboards = l.getLeaderboard();
+		
+		Scene leaderboardScene = null;
+		
+		VBox leadTable = new VBox();
+        
+		for(int i = 0; i < leaderboards.size(); i++) {
+			Text score = new Text(i+1 + "	" + leaderboards.get(i).getScore() + "	" + leaderboards.get(i).getDate());
+			leadTable.getChildren().add(score);
+		}
+		
+		leaderboardScene = new Scene(leadTable, sceneWidth, sceneHeight);
+ 
+        leaderboardScene.getStylesheets().add(
+        		getClass().getResource("application.css").toExternalForm()
+        	);
+        		
+        return leaderboardScene;
 	
 	}
 	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			Scene scene = createMainScreen(primaryStage);
-			scene.getStylesheets().add(
-				getClass().getResource("application.css").toExternalForm()
-			);
+			this.stage = primaryStage;
+			Scene scene = createMainScene();
 			primaryStage.setScene(scene);
-			primaryStage.setTitle("HomeScreen");
+	        primaryStage.setTitle("Sanke VS Blocks");
 			primaryStage.setResizable(false);
 			primaryStage.show();
 		} catch(Exception e) {
