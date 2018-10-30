@@ -8,3 +8,20 @@
     -fx-background-insets: 10px;
     -fx-border-color: white;
 }
+
+.backBtn {
+    -fx-background-image: url("./../../img/backBtn.png") ;
+    -fx-background-repeat: no-repeat;   
+    -fx-background-size: 35px 35px;
+    -fx-min-height: 50px;
+    -fx-min-width: 50px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 0;
+    -fx-background-color: transparent;
+    -fx-background-position: center center; 
+}
+
+.placeholderText {
+	-fx-font: 30px "Courier New";
+}

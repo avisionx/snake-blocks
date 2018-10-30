@@ -8,18 +8,14 @@ import java.util.*;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -27,6 +23,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 
+@SuppressWarnings("serial")
 class Leaderboard implements Serializable {
 
     PriorityQueue<Score> scoreList = new PriorityQueue<>(new Comparator<Score>() {
@@ -62,6 +59,7 @@ class Leaderboard implements Serializable {
 
 }
  
+@SuppressWarnings("serial")
 class Score implements Serializable{
 
 	private int score;
@@ -90,6 +88,14 @@ class Score implements Serializable{
 
 }
 
+class Snake extends Node{
+	
+	public Snake() {
+		super();
+	}	
+	
+}
+
 class menuButton extends Button{
 	
 	public menuButton(String name){
@@ -99,11 +105,42 @@ class menuButton extends Button{
 	
 }
 
+class GameScene extends Scene{
+	
+	private static Pane root = new Pane();
+	
+	public GameScene(int scenewidth, int sceneheight) {
+		super(root, scenewidth, sceneheight);
+		
+	}
+	
+}
+
+class backButton extends Button{
+	
+	public backButton(){
+		super("");
+		this.getStyleClass().add("backBtn");
+	}
+	
+}
+
+
 public class Main extends Application {
 	
 	private static final int sceneWidth = 400;
 	private static final int sceneHeight = 600;
 	private Stage stage;
+	private backEventHandler backEventBtn = new backEventHandler();
+	
+	class backEventHandler implements EventHandler<ActionEvent>{
+
+		@Override
+		public void handle(ActionEvent e) {
+			stage.setScene(createMainScene());
+		}
+		
+	}
 	
 	private Scene createMainScene() {
 		
@@ -168,21 +205,11 @@ public class Main extends Application {
 	
 	protected Scene createGameScene() {
 		
-		Scene gameScene = null;
+		GameScene gameScene = null;
 		
-		VBox root = new VBox();
+		gameScene = new GameScene(sceneWidth, sceneHeight);
         
-		Button createAccountButton = new menuButton("create account");
-		createAccountButton.setOnAction(new EventHandler<ActionEvent>() {
-			public void handle(ActionEvent e) {
-				stage.setScene(createMainScene());
-			}   
-        });
-		root.getChildren().addAll(createAccountButton);
-        root.setStyle("-fx-background-color: #000;");
-        
-        gameScene = new Scene(root, sceneWidth, sceneHeight);
-        gameScene.getStylesheets().add(
+		gameScene.getStylesheets().add(
         		getClass().getResource("application.css").toExternalForm()
         	);
         		
@@ -192,25 +219,26 @@ public class Main extends Application {
 	
 	protected Scene resumeGameScene() {
 		
-		Scene gameScene = null;
+		Scene resumeScene = null;
 		
 		VBox root = new VBox();
         
-		Button createAccountButton = new menuButton("create account");
-		createAccountButton.setOnAction(new EventHandler<ActionEvent>() {
-			public void handle(ActionEvent e) {
-				stage.setScene(createMainScene());
-			}   
-        });
-		root.getChildren().addAll(createAccountButton);
-        root.setStyle("-fx-background-color: #000;");
+		Button backBtn = new backButton();
+		backBtn.setOnAction(backEventBtn);
+		
+		Text randomText = new Text("Game Will Resume!");
+		randomText.setFill(Color.WHITE);
+		randomText.getStyleClass().add("placeholderText");
+		root.getChildren().addAll(backBtn, randomText);
         
-        gameScene = new Scene(root, sceneWidth, sceneHeight);
-        gameScene.getStylesheets().add(
+		root.setStyle("-fx-background-color: #000;");
+        
+        resumeScene = new Scene(root, sceneWidth, sceneHeight);
+        resumeScene.getStylesheets().add(
         		getClass().getResource("application.css").toExternalForm()
         	);
         		
-        return gameScene;
+        return resumeScene;
 	
 	}
 
