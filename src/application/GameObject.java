@@ -29,8 +29,16 @@ public class GameObject {
 		return alive;
 	}
 	
+	public boolean isDead() {
+		return !alive;
+	}
+	
 	public void setAlive(boolean alive) {
 		this.alive = alive;
+	}
+	
+	public boolean isColliding(GameObject other) {
+		return this.getView().getBoundsInParent().intersects(other.getView().getBoundsInParent());
 	}
 	
 	public void update() {

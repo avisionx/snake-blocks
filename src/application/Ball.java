@@ -1,12 +1,11 @@
 package application;
 
-import javafx.scene.Node;
+import javafx.scene.paint.Color;
 
 public class Ball extends GameObject{
 
-	public Ball(Node view) {
-		super(view);
-		
+	public Ball() {
+		super(new circleWithText(200, 10, 10, Color.BISQUE, 10), 10);
 	}
 	
 }

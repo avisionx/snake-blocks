@@ -138,19 +138,17 @@ public class Main extends Application {
 	
 	private Scene createGameScene() {
 		
-		GameScene gameScene = null;
+		Scene gameScene = new GameScene();
 		
-		gameScene = new GameScene(sceneWidth, sceneHeight);
-        
 		gameScene.getStylesheets().add(
         		getClass().getResource("application.css").toExternalForm()
         	);
-        		
+
         return gameScene;
 	
 	}
 	
-	protected Scene resumeGameScene() {
+	private Scene resumeGameScene() {
 		
 		Scene resumeScene = null;
 		
@@ -176,7 +174,7 @@ public class Main extends Application {
 	}
 
 	
-	protected Scene showLeaderboardScene() {
+	private Scene showLeaderboardScene() {
 		
 //		Some Static Random LeaderBoard Data
 		Leaderboard l = new Leaderboard();
