@@ -10,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -18,9 +19,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -231,35 +229,82 @@ public class Main extends Application {
 		l.addScore(s5);
 		
 //		Final LeaderBoard Array
+
 		ArrayList<Score> leaderboards = l.getLeaderboard();
 		
 		Scene leaderboardScene = null;
-		
+
 		VBox root = new VBox();
+		HBox top = new HBox();
+		HBox backB = new HBox();
+		Button backButton = new Button("Back");
+		backB.getChildren().add(backButton);
+		root.getChildren().add(backB);
+		backB.setAlignment(Pos.CENTER_LEFT);
+		backB.setPadding(new Insets(5,5,5,5));
+
 		Text heading = new Text("Leaderboards");
 		heading.setFill(Color.WHITE);
 		heading.setFont(Font.font("Courier New", FontWeight.BOLD, 30));
 		root.getChildren().add(heading);
-		
-		Text labels = new Text("Rank Score Date");
-		labels.setFill(Color.WHITE);
-		labels.setFont(Font.font("Courier New", FontWeight.BOLD, 22));
-		root.getChildren().add(labels);
-		
-		VBox scoreLines = new VBox();
+		top.setAlignment(Pos.CENTER);
+
+
+		VBox ranks = new VBox();
+		VBox score = new VBox();
+		VBox date = new VBox();
+
+		Text rankL = new Text("Rank");
+		rankL.setFill(Color.WHITE);
+		rankL.setFont(Font.font("Courier New", FontWeight.BOLD, 22));
+		ranks.getChildren().add(rankL);
+
+
+		Text scoreL = new Text("Score");
+		scoreL.setFill(Color.WHITE);
+		scoreL.setFont(Font.font("Courier New", FontWeight.BOLD, 22));
+		score.getChildren().add(scoreL);
+
+
+		Text dateL = new Text("Date");
+		dateL.setFill(Color.WHITE);
+		dateL.setFont(Font.font("Courier New", FontWeight.BOLD, 22));
+		date.getChildren().add(dateL);
+
+
+		HBox boardColumns = new HBox();
 		
 		for(int i = 0; i < leaderboards.size(); i++) {
-			Text scoreText = new Text((i+1) + " " + leaderboards.get(i).getScore() + " " + leaderboards.get(i).getDate());
-			scoreText.setFill(Color.WHITE);
-			scoreText.setFont(Font.font("Courier New", 22));
-			scoreLines.getChildren().add(scoreText);
+			Text rankT = new Text((i+1) + "");
+			rankT.setFill(Color.WHITE);
+			rankT.setFont(Font.font("Courier New", 22));
+
+			Text scoreT = new Text(leaderboards.get(i).getScore() + "");
+			scoreT.setFill(Color.WHITE);
+			scoreT.setFont(Font.font("Courier New", 22));
+
+			Text dateT = new Text(leaderboards.get(i).getDate());
+			dateT.setFill(Color.WHITE);
+			dateT.setFont(Font.font("Courier New", 22));
+
+			ranks.getChildren().add(rankT);
+			score.getChildren().add(scoreT);
+			date.getChildren().add(dateT);
 		}
-		
-		scoreLines.setAlignment(Pos.CENTER);
-		
-		root.getChildren().add(scoreLines);
+		ranks.setAlignment(Pos.CENTER);
+		score.setAlignment(Pos.CENTER);
+		date.setAlignment(Pos.CENTER);
+
+		boardColumns.getChildren().add(ranks);
+		boardColumns.getChildren().add(score);
+		boardColumns.getChildren().add(date);
+
+		root.getChildren().add(boardColumns);
+
+		root.setAlignment(Pos.CENTER);
 		
 		root.setAlignment(Pos.TOP_CENTER);
+
 		root.setStyle("-fx-background-color: #000;");
         
 		leaderboardScene = new Scene(root, sceneWidth, sceneHeight);
