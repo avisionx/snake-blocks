@@ -22,6 +22,10 @@
     -fx-background-position: center center; 
 }
 
+.rootBg{
+	-fx-background-color: #000;
+}
+
 .placeholderText {
 	-fx-font: 30px "Courier New";
 }
