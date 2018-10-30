@@ -12,19 +12,20 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 
+@SuppressWarnings("serial")
 class Leaderboard implements Serializable {
 
     PriorityQueue<Score> scoreList = new PriorityQueue<>(new Comparator<Score>() {
@@ -60,6 +61,7 @@ class Leaderboard implements Serializable {
 
 }
  
+@SuppressWarnings("serial")
 class Score implements Serializable{
 
 	private int score;
@@ -88,6 +90,14 @@ class Score implements Serializable{
 
 }
 
+class Snake extends Node{
+	
+	public Snake() {
+		super();
+	}	
+	
+}
+
 class menuButton extends Button{
 	
 	public menuButton(String name){
@@ -97,11 +107,42 @@ class menuButton extends Button{
 	
 }
 
+class GameScene extends Scene{
+	
+	private static Pane root = new Pane();
+	
+	public GameScene(int scenewidth, int sceneheight) {
+		super(root, scenewidth, sceneheight);
+		root.setStyle("-fx-background-color: #000;");
+	}
+	
+}
+
+class backButton extends Button{
+	
+	public backButton(){
+		super("");
+		this.getStyleClass().add("backBtn");
+	}
+	
+}
+
+
 public class Main extends Application {
 	
 	private static final int sceneWidth = 400;
 	private static final int sceneHeight = 600;
 	private Stage stage;
+	private backEventHandler backEventBtn = new backEventHandler();
+	
+	class backEventHandler implements EventHandler<ActionEvent>{
+
+		@Override
+		public void handle(ActionEvent e) {
+			stage.setScene(createMainScene());
+		}
+		
+	}
 	
 	private Scene createMainScene() {
 		
@@ -166,21 +207,11 @@ public class Main extends Application {
 	
 	protected Scene createGameScene() {
 		
-		Scene gameScene = null;
+		GameScene gameScene = null;
 		
-		VBox root = new VBox();
+		gameScene = new GameScene(sceneWidth, sceneHeight);
         
-		Button createAccountButton = new menuButton("create account");
-		createAccountButton.setOnAction(new EventHandler<ActionEvent>() {
-			public void handle(ActionEvent e) {
-				stage.setScene(createMainScene());
-			}   
-        });
-		root.getChildren().addAll(createAccountButton);
-        root.setStyle("-fx-background-color: #000;");
-        
-        gameScene = new Scene(root, sceneWidth, sceneHeight);
-        gameScene.getStylesheets().add(
+		gameScene.getStylesheets().add(
         		getClass().getResource("application.css").toExternalForm()
         	);
         		
@@ -190,25 +221,26 @@ public class Main extends Application {
 	
 	protected Scene resumeGameScene() {
 		
-		Scene gameScene = null;
+		Scene resumeScene = null;
 		
 		VBox root = new VBox();
         
-		Button createAccountButton = new menuButton("create account");
-		createAccountButton.setOnAction(new EventHandler<ActionEvent>() {
-			public void handle(ActionEvent e) {
-				stage.setScene(createMainScene());
-			}   
-        });
-		root.getChildren().addAll(createAccountButton);
-        root.setStyle("-fx-background-color: #000;");
+		Button backBtn = new backButton();
+		backBtn.setOnAction(backEventBtn);
+		
+		Text randomText = new Text("Game Will Resume!");
+		randomText.setFill(Color.WHITE);
+		randomText.getStyleClass().add("placeholderText");
+		root.getChildren().addAll(backBtn, randomText);
         
-        gameScene = new Scene(root, sceneWidth, sceneHeight);
-        gameScene.getStylesheets().add(
+		root.setStyle("-fx-background-color: #000;");
+        
+        resumeScene = new Scene(root, sceneWidth, sceneHeight);
+        resumeScene.getStylesheets().add(
         		getClass().getResource("application.css").toExternalForm()
         	);
         		
-        return gameScene;
+        return resumeScene;
 	
 	}
 
@@ -235,40 +267,48 @@ public class Main extends Application {
 		Scene leaderboardScene = null;
 
 		VBox root = new VBox();
+		
 		HBox top = new HBox();
 		HBox backB = new HBox();
-		Button backButton = new Button("Back");
-		backB.getChildren().add(backButton);
+		
+		Button backBtn = new backButton();
+		backBtn.setOnAction(backEventBtn);
+		backB.getChildren().add(backBtn);
 		root.getChildren().add(backB);
 		backB.setAlignment(Pos.CENTER_LEFT);
-		backB.setPadding(new Insets(5,5,5,5));
+		backB.setPadding(new Insets(5,0,0,5));
 
-		Text heading = new Text("Leaderboards");
+		Text heading = new Text("LEADERBOARD");
 		heading.setFill(Color.WHITE);
-		heading.setFont(Font.font("Courier New", FontWeight.BOLD, 30));
-		root.getChildren().add(heading);
+		heading.setFont(Font.font("Courier New", FontWeight.BOLD, 35));
+		top.getChildren().add(heading);
+		root.getChildren().add(top);
 		top.setAlignment(Pos.CENTER);
-
+		top.setPadding(new Insets(0,0,20,0));
+		
 
 		VBox ranks = new VBox();
 		VBox score = new VBox();
 		VBox date = new VBox();
 
+		ranks.setSpacing(12);
+		score.setSpacing(12);
+		date.setSpacing(12);
+		
 		Text rankL = new Text("Rank");
 		rankL.setFill(Color.WHITE);
-		rankL.setFont(Font.font("Courier New", FontWeight.BOLD, 22));
+		rankL.setFont(Font.font("Helvetica", 22));
 		ranks.getChildren().add(rankL);
-
 
 		Text scoreL = new Text("Score");
 		scoreL.setFill(Color.WHITE);
-		scoreL.setFont(Font.font("Courier New", FontWeight.BOLD, 22));
+		scoreL.setFont(Font.font("Helvetica", 22));
 		score.getChildren().add(scoreL);
 
 
 		Text dateL = new Text("Date");
 		dateL.setFill(Color.WHITE);
-		dateL.setFont(Font.font("Courier New", FontWeight.BOLD, 22));
+		dateL.setFont(Font.font("Helvetica", 22));
 		date.getChildren().add(dateL);
 
 
@@ -277,20 +317,21 @@ public class Main extends Application {
 		for(int i = 0; i < leaderboards.size(); i++) {
 			Text rankT = new Text((i+1) + "");
 			rankT.setFill(Color.WHITE);
-			rankT.setFont(Font.font("Courier New", 22));
+			rankT.setFont(Font.font("Courier New", 19));
 
 			Text scoreT = new Text(leaderboards.get(i).getScore() + "");
 			scoreT.setFill(Color.WHITE);
-			scoreT.setFont(Font.font("Courier New", 22));
+			scoreT.setFont(Font.font("Courier New", 19));
 
 			Text dateT = new Text(leaderboards.get(i).getDate());
 			dateT.setFill(Color.WHITE);
-			dateT.setFont(Font.font("Courier New", 22));
+			dateT.setFont(Font.font("Courier New", 19));
 
 			ranks.getChildren().add(rankT);
 			score.getChildren().add(scoreT);
 			date.getChildren().add(dateT);
 		}
+		
 		ranks.setAlignment(Pos.CENTER);
 		score.setAlignment(Pos.CENTER);
 		date.setAlignment(Pos.CENTER);
@@ -298,7 +339,8 @@ public class Main extends Application {
 		boardColumns.getChildren().add(ranks);
 		boardColumns.getChildren().add(score);
 		boardColumns.getChildren().add(date);
-
+		boardColumns.setSpacing(15);
+		boardColumns.setAlignment(Pos.CENTER);
 		root.getChildren().add(boardColumns);
 
 		root.setAlignment(Pos.CENTER);
