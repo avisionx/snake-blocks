@@ -1,8 +1,6 @@
 package application;
 	
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.Serializable;
 import java.util.*;
 
 import javafx.application.Application;
@@ -12,12 +10,10 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -26,75 +22,11 @@ import javafx.scene.text.Text;
 
 
 @SuppressWarnings("serial")
-class Leaderboard implements Serializable {
-
-    PriorityQueue<Score> scoreList = new PriorityQueue<>(new Comparator<Score>() {
-        
-    	@Override
-        public int compare(Score o1, Score o2) {
-    		return o2.getScore() - o1.getScore();
-        }
-        
-    });
-
-    public void addScore(Score score){
-        scoreList.add(score);
-    }
-
-    public ArrayList<Score> getLeaderboard(){
-
-        ArrayList<Score> top10 = new ArrayList<>();
-        int l = scoreList.size();
-        
-        for(int i = 0; i < Math.min(10, l); i++){
-            top10.add(scoreList.poll());
-        }
-
-        for(int i = 0; i < top10.size(); i++){
-        	
-            scoreList.add(top10.get(i));
-        
-        }
-        
-        return top10;
-    }
-
-}
- 
-@SuppressWarnings("serial")
-class Score implements Serializable{
-
-	private int score;
-    private Date date;
-
-    public Score(int score, Date date) {
-    	this.score = score;
-    	this.date = date;
-    }
-    
-    public int getScore() {
-        return score;
-    }
-
-    public String getDate() {
-    	return date.toString().substring(0, 19);
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
-    }
-
-}
-
-class Snake extends Node{
+class ImageNotFound extends Exception{
 	
-	public Snake() {
-		super();
-	}	
+	public ImageNotFound(String pathToImage) {
+		super("ImageNotFound! Path: " + pathToImage);
+	}
 	
 }
 
@@ -103,17 +35,6 @@ class menuButton extends Button{
 	public menuButton(String name){
 		super(name);
 		this.getStyleClass().add("menuBtn");
-	}
-	
-}
-
-class GameScene extends Scene{
-	
-	private static Pane root = new Pane();
-	
-	public GameScene(int scenewidth, int sceneheight) {
-		super(root, scenewidth, sceneheight);
-		root.setStyle("-fx-background-color: #000;");
 	}
 	
 }
@@ -130,11 +51,6 @@ class backButton extends Button{
 
 public class Main extends Application {
 	
-	private static final int sceneWidth = 400;
-	private static final int sceneHeight = 600;
-	private Stage stage;
-	private backEventHandler backEventBtn = new backEventHandler();
-	
 	class backEventHandler implements EventHandler<ActionEvent>{
 
 		@Override
@@ -144,15 +60,30 @@ public class Main extends Application {
 		
 	}
 	
+	private static final int sceneWidth = 400;
+	private static final int sceneHeight = 600;
+	private Stage stage;
+	private backEventHandler backEventBtn = new backEventHandler();
+	
+	public static int getScenewidth() {
+		return sceneWidth;
+	}
+	
+	public static int getSceneheight() {
+		return sceneHeight;
+	}
+	
 	private Scene createMainScene() {
 		
+		Scene menuScene = null;
 		VBox root = new VBox();
+		
 		Image menuImage = null;
 		try {
-			menuImage = new Image(new FileInputStream("./img/logo.jpg"));
-		} catch (FileNotFoundException e) {
-			System.out.println("Logo Image Not Found!");
-			e.printStackTrace();
+			String pathToImage = "./img/logo.jpg";
+			menuImage = new Image(new FileInputStream(pathToImage));
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
 		}
 		
 		ImageView menuImageView = null;
@@ -194,9 +125,9 @@ public class Main extends Application {
 		}
 		
 		root.setAlignment(Pos.CENTER);
-		root.setStyle("-fx-background-color: #000;");
-		Scene menuScene = new Scene(root, sceneWidth, sceneHeight);
+		root.getStyleClass().add("rootBg");
 		
+		menuScene = new Scene(root, sceneWidth, sceneHeight);
 		menuScene.getStylesheets().add(
 				getClass().getResource("application.css").toExternalForm()
 			);
@@ -205,21 +136,19 @@ public class Main extends Application {
 	
 	}
 	
-	protected Scene createGameScene() {
+	private Scene createGameScene() {
 		
-		GameScene gameScene = null;
+		Scene gameScene = new GameScene();
 		
-		gameScene = new GameScene(sceneWidth, sceneHeight);
-        
 		gameScene.getStylesheets().add(
         		getClass().getResource("application.css").toExternalForm()
         	);
-        		
+
         return gameScene;
 	
 	}
 	
-	protected Scene resumeGameScene() {
+	private Scene resumeGameScene() {
 		
 		Scene resumeScene = null;
 		
@@ -231,9 +160,9 @@ public class Main extends Application {
 		Text randomText = new Text("Game Will Resume!");
 		randomText.setFill(Color.WHITE);
 		randomText.getStyleClass().add("placeholderText");
+		
 		root.getChildren().addAll(backBtn, randomText);
-        
-		root.setStyle("-fx-background-color: #000;");
+		root.getStyleClass().add("rootBg");
         
         resumeScene = new Scene(root, sceneWidth, sceneHeight);
         resumeScene.getStylesheets().add(
@@ -245,7 +174,7 @@ public class Main extends Application {
 	}
 
 	
-	protected Scene showLeaderboardScene() {
+	private Scene showLeaderboardScene() {
 		
 //		Some Static Random LeaderBoard Data
 		Leaderboard l = new Leaderboard();
@@ -268,86 +197,90 @@ public class Main extends Application {
 
 		VBox root = new VBox();
 		
-		HBox top = new HBox();
-		HBox backB = new HBox();
+		HBox headingWrapper = new HBox();
+		HBox backBtnWrapper = new HBox();
 		
 		Button backBtn = new backButton();
 		backBtn.setOnAction(backEventBtn);
-		backB.getChildren().add(backBtn);
-		root.getChildren().add(backB);
-		backB.setAlignment(Pos.CENTER_LEFT);
-		backB.setPadding(new Insets(5,0,0,5));
+		
+		backBtnWrapper.getChildren().add(backBtn);
+		backBtnWrapper.setAlignment(Pos.CENTER_LEFT);
+		backBtnWrapper.setPadding(new Insets(5,0,0,5));
 
 		Text heading = new Text("LEADERBOARD");
+		
 		heading.setFill(Color.WHITE);
 		heading.setFont(Font.font("Courier New", FontWeight.BOLD, 35));
-		top.getChildren().add(heading);
-		root.getChildren().add(top);
-		top.setAlignment(Pos.CENTER);
-		top.setPadding(new Insets(0,0,20,0));
 		
-
+		headingWrapper.getChildren().add(heading);
+		headingWrapper.setAlignment(Pos.CENTER);
+		headingWrapper.setPadding(new Insets(0,0,20,0));
+		
 		VBox ranks = new VBox();
-		VBox score = new VBox();
-		VBox date = new VBox();
+		VBox scores = new VBox();
+		VBox dates = new VBox();
 
 		ranks.setSpacing(12);
-		score.setSpacing(12);
-		date.setSpacing(12);
+		scores.setSpacing(12);
+		dates.setSpacing(12);
 		
-		Text rankL = new Text("Rank");
-		rankL.setFill(Color.WHITE);
-		rankL.setFont(Font.font("Helvetica", 22));
-		ranks.getChildren().add(rankL);
+		Text rankHead = new Text("Rank");
+		
+		rankHead.setFill(Color.WHITE);
+		rankHead.setFont(Font.font("Helvetica", 22));
+		
+		ranks.getChildren().add(rankHead);
 
-		Text scoreL = new Text("Score");
-		scoreL.setFill(Color.WHITE);
-		scoreL.setFont(Font.font("Helvetica", 22));
-		score.getChildren().add(scoreL);
+		Text scoreHead = new Text("Score");
+		
+		scoreHead.setFill(Color.WHITE);
+		scoreHead.setFont(Font.font("Helvetica", 22));
+		
+		scores.getChildren().add(scoreHead);
+
+		Text dateHead = new Text("Date");
+		
+		dateHead.setFill(Color.WHITE);
+		dateHead.setFont(Font.font("Helvetica", 22));
+		
+		dates.getChildren().add(dateHead);
 
 
-		Text dateL = new Text("Date");
-		dateL.setFill(Color.WHITE);
-		dateL.setFont(Font.font("Helvetica", 22));
-		date.getChildren().add(dateL);
-
-
-		HBox boardColumns = new HBox();
+		HBox leadTable = new HBox();
 		
 		for(int i = 0; i < leaderboards.size(); i++) {
-			Text rankT = new Text((i+1) + "");
-			rankT.setFill(Color.WHITE);
-			rankT.setFont(Font.font("Courier New", 19));
+			
+			Text rankText = new Text((i+1) + "");
+			rankText.setFill(Color.WHITE);
+			rankText.setFont(Font.font("Courier New", 19));
 
-			Text scoreT = new Text(leaderboards.get(i).getScore() + "");
-			scoreT.setFill(Color.WHITE);
-			scoreT.setFont(Font.font("Courier New", 19));
+			Text scoreText = new Text(leaderboards.get(i).getScore() + "");
+			scoreText.setFill(Color.WHITE);
+			scoreText.setFont(Font.font("Courier New", 19));
 
-			Text dateT = new Text(leaderboards.get(i).getDate());
-			dateT.setFill(Color.WHITE);
-			dateT.setFont(Font.font("Courier New", 19));
+			Text dateText = new Text(leaderboards.get(i).getDate());
+			dateText.setFill(Color.WHITE);
+			dateText.setFont(Font.font("Courier New", 19));
 
-			ranks.getChildren().add(rankT);
-			score.getChildren().add(scoreT);
-			date.getChildren().add(dateT);
+			ranks.getChildren().add(rankText);
+			scores.getChildren().add(scoreText);
+			dates.getChildren().add(dateText);
+			
 		}
 		
 		ranks.setAlignment(Pos.CENTER);
-		score.setAlignment(Pos.CENTER);
-		date.setAlignment(Pos.CENTER);
-
-		boardColumns.getChildren().add(ranks);
-		boardColumns.getChildren().add(score);
-		boardColumns.getChildren().add(date);
-		boardColumns.setSpacing(15);
-		boardColumns.setAlignment(Pos.CENTER);
-		root.getChildren().add(boardColumns);
-
-		root.setAlignment(Pos.CENTER);
+		scores.setAlignment(Pos.CENTER);
+		dates.setAlignment(Pos.CENTER);
 		
+		
+		leadTable.getChildren().addAll(ranks, scores, dates);
+		leadTable.setSpacing(15);
+		leadTable.setAlignment(Pos.CENTER);
+		
+		root.getChildren().addAll(backBtnWrapper, headingWrapper, leadTable);
 		root.setAlignment(Pos.TOP_CENTER);
 
-		root.setStyle("-fx-background-color: #000;");
+		root.getStyleClass().add("rootBg");
         
 		leaderboardScene = new Scene(root, sceneWidth, sceneHeight);
  
@@ -361,13 +294,16 @@ public class Main extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) {
+		
 		try {
+			
 			this.stage = primaryStage;
 			Scene scene = createMainScene();
 			primaryStage.setScene(scene);
 	        primaryStage.setTitle("Sanke VS Blocks");
 			primaryStage.setResizable(false);
 			primaryStage.show();
+			
 		} catch(Exception e) {
 			
 			e.printStackTrace();
