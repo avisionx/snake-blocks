@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.*;
 
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -13,6 +14,7 @@ import javafx.geometry.Pos;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -20,6 +22,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -90,11 +93,26 @@ class Score implements Serializable{
 
 }
 
-class Snake extends Node{
+class Snake extends Circle{
 	
-	public Snake() {
-		super();
+	private Node view;
+	private float xCord;
+	private float yCord;
+	private int length;
+	private float speed;
+	
+	public Snake(Node view, int xCord, int yCord, int length) {
+		this.view = view;
 	}	
+	
+	public void update() {
+		view.setTranslateY(view.getTranslateY() + 3);
+	}	
+	
+	public Node getView() {
+		return view;
+	}
+	
 	
 }
 
@@ -109,11 +127,39 @@ class menuButton extends Button{
 
 class GameScene extends Scene{
 	
-	private static Pane root = new Pane();
+	private static Pane root;
+	private static Snake userSnake;
 	
 	public GameScene(int scenewidth, int sceneheight) {
-		super(root, scenewidth, sceneheight);
-		root.setStyle("-fx-background-color: #000;");
+		super(createContent(scenewidth, sceneheight), scenewidth, sceneheight);
+		
+	}
+
+	private static Parent createContent(int scenewidth, int sceneheight) {
+		root = new Pane();
+		root.setPrefSize(scenewidth, sceneheight);
+//		root.setStyle("-fx-background-color: #000;");
+		userSnake =  new Snake(new Circle(35,35,5), 5,5,7);addGameObject(userSnake, 35, 35);
+		AnimationTimer timer = new AnimationTimer() {
+			
+			@Override
+			public void handle(long now) {
+				onUpdate();
+			}
+		};
+		timer.start();
+		return root;
+	}
+
+	private static void addGameObject(Snake object, double x, double y) {
+		object.getView().setTranslateX(x);
+		object.getView().setTranslateY(y);
+		root.getChildren().add(object.getView());
+	}
+	
+	protected static void onUpdate() {
+		userSnake.update();
+		
 	}
 	
 }
