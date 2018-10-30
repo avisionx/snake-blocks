@@ -113,7 +113,7 @@ class GameScene extends Scene{
 	
 	public GameScene(int scenewidth, int sceneheight) {
 		super(root, scenewidth, sceneheight);
-		
+		root.setStyle("-fx-background-color: #000;");
 	}
 	
 }
@@ -267,40 +267,48 @@ public class Main extends Application {
 		Scene leaderboardScene = null;
 
 		VBox root = new VBox();
+		
 		HBox top = new HBox();
 		HBox backB = new HBox();
-		Button backButton = new Button("Back");
-		backB.getChildren().add(backButton);
+		
+		Button backBtn = new backButton();
+		backBtn.setOnAction(backEventBtn);
+		backB.getChildren().add(backBtn);
 		root.getChildren().add(backB);
 		backB.setAlignment(Pos.CENTER_LEFT);
-		backB.setPadding(new Insets(5,5,5,5));
+		backB.setPadding(new Insets(5,0,0,5));
 
-		Text heading = new Text("Leaderboards");
+		Text heading = new Text("LEADERBOARD");
 		heading.setFill(Color.WHITE);
-		heading.setFont(Font.font("Courier New", FontWeight.BOLD, 30));
-		root.getChildren().add(heading);
+		heading.setFont(Font.font("Courier New", FontWeight.BOLD, 35));
+		top.getChildren().add(heading);
+		root.getChildren().add(top);
 		top.setAlignment(Pos.CENTER);
-
+		top.setPadding(new Insets(0,0,20,0));
+		
 
 		VBox ranks = new VBox();
 		VBox score = new VBox();
 		VBox date = new VBox();
 
+		ranks.setSpacing(12);
+		score.setSpacing(12);
+		date.setSpacing(12);
+		
 		Text rankL = new Text("Rank");
 		rankL.setFill(Color.WHITE);
-		rankL.setFont(Font.font("Courier New", FontWeight.BOLD, 22));
+		rankL.setFont(Font.font("Helvetica", 22));
 		ranks.getChildren().add(rankL);
-
 
 		Text scoreL = new Text("Score");
 		scoreL.setFill(Color.WHITE);
-		scoreL.setFont(Font.font("Courier New", FontWeight.BOLD, 22));
+		scoreL.setFont(Font.font("Helvetica", 22));
 		score.getChildren().add(scoreL);
 
 
 		Text dateL = new Text("Date");
 		dateL.setFill(Color.WHITE);
-		dateL.setFont(Font.font("Courier New", FontWeight.BOLD, 22));
+		dateL.setFont(Font.font("Helvetica", 22));
 		date.getChildren().add(dateL);
 
 
@@ -309,20 +317,21 @@ public class Main extends Application {
 		for(int i = 0; i < leaderboards.size(); i++) {
 			Text rankT = new Text((i+1) + "");
 			rankT.setFill(Color.WHITE);
-			rankT.setFont(Font.font("Courier New", 22));
+			rankT.setFont(Font.font("Courier New", 19));
 
 			Text scoreT = new Text(leaderboards.get(i).getScore() + "");
 			scoreT.setFill(Color.WHITE);
-			scoreT.setFont(Font.font("Courier New", 22));
+			scoreT.setFont(Font.font("Courier New", 19));
 
 			Text dateT = new Text(leaderboards.get(i).getDate());
 			dateT.setFill(Color.WHITE);
-			dateT.setFont(Font.font("Courier New", 22));
+			dateT.setFont(Font.font("Courier New", 19));
 
 			ranks.getChildren().add(rankT);
 			score.getChildren().add(scoreT);
 			date.getChildren().add(dateT);
 		}
+		
 		ranks.setAlignment(Pos.CENTER);
 		score.setAlignment(Pos.CENTER);
 		date.setAlignment(Pos.CENTER);
@@ -330,7 +339,8 @@ public class Main extends Application {
 		boardColumns.getChildren().add(ranks);
 		boardColumns.getChildren().add(score);
 		boardColumns.getChildren().add(date);
-
+		boardColumns.setSpacing(15);
+		boardColumns.setAlignment(Pos.CENTER);
 		root.getChildren().add(boardColumns);
 
 		root.setAlignment(Pos.CENTER);
