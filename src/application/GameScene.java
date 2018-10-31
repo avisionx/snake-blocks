@@ -12,7 +12,7 @@ public class GameScene extends Scene {
 	
 	private static Pane root;
 	private static Snake userSnake;
-	private static List<Ball> balls = new ArrayList<>();
+	private static List<GameObject> tokens = new ArrayList<>();
 	private static List<Block> blocks = new ArrayList<>();
 	private static List<Wall> walls = new ArrayList<>();
 	
@@ -98,10 +98,10 @@ public class GameScene extends Scene {
 	
 	protected static void onUpdate() {
 		
-		for(GameObject object : balls) {
+		for(GameObject object : tokens) {
 			if(object.isColliding(userSnake.getSnakeHead())) {
 				object.setAlive(false);
-				((Ball)object).collide();
+				((Interactable) object).collide();
 				root.getChildren().remove(object.getView());
 			}
 			if(object.isDead()) {
@@ -126,16 +126,25 @@ public class GameScene extends Scene {
 			}
 		}
 		
-		balls.removeIf(GameObject::isDead);
+		tokens.removeIf(GameObject::isDead);
 		blocks.removeIf(GameObject::isDead);
-		balls.forEach(GameObject::update);
+		tokens.forEach(GameObject::update);
 		blocks.forEach(GameObject::update);
 		walls.forEach(GameObject::update);
 		
 		if(Math.random() < 0.02) {
 			Ball b = new Ball(Math.random()*(Main.getScenewidth()-40), -10, 4, gameSpeed);
-			balls.add(b);
+			DestroyBlocks db = new DestroyBlocks(Math.random()*(Main.getScenewidth()-10), -10, gameSpeed);
+			Magnet m = new Magnet(Math.random()*(Main.getScenewidth()-10), -10, gameSpeed);
+			Shield s = new Shield(Math.random()*(Main.getScenewidth()-10), -10, gameSpeed);
+			tokens.add(b);
+			tokens.add(db);
+			tokens.add(m);
+			tokens.add(s);
 			addGameObject(b);
+			addGameObject(m);
+			addGameObject(db);
+			addGameObject(s);
 		}
 		
 		if(Math.random() < 0.02) {
