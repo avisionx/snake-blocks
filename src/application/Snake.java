@@ -2,30 +2,11 @@ package application;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextBoundsType;
-
-class circleWithText extends StackPane {
-	
-	public circleWithText(int x, int y, int radius, Color color, int length) {
-		super();
-		Circle headCircle = new Circle(x, y, radius, color);
-		Text headText = new Text(length + "");
-		headText .setBoundsType(TextBoundsType.VISUAL); 
-		this.getChildren().addAll(headCircle, headText);
-		this.setTranslateX(x);
-		this.setTranslateY(y);
-	}
-	
-}
 
 class followingCircle extends Circle{
 	
@@ -65,8 +46,6 @@ public class Snake extends Group {
 	private GameObject snakeHead;
 	private List<followingCircle> snakeBody;
 	private int length;
-	private double xCord;
-	private double yCord;
 	public double xVelocity = 0;
 	public double speed = 300;
 	public static double minDist = -185;
@@ -77,8 +56,6 @@ public class Snake extends Group {
 		super();
 		snakeHead = new GameObject(new Circle(Main.getScenewidth()/2, Main.getSceneheight()*8.7/10, 9, Color.RED));
 		this.length = length;
-		this.xCord = this.snakeHead.getView().getTranslateX();
-		this.yCord = this.snakeHead.getView().getTranslateY();
 		this.getChildren().add(snakeHead.getView());
 		this.snakeBody = new ArrayList<>();
 		for(int i = 1; i < Math.min(this.length, 6); i++) {
@@ -87,15 +64,6 @@ public class Snake extends Group {
 			this.getChildren().add(nextCircle);
 		}
 		
-		
-	}
-	
-	public double getxCord() {
-		return xCord;
-	}
-	
-	public double getyCord() {
-		return yCord;
 	}
 	
 	public GameObject getSnakeHead() {

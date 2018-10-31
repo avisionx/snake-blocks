@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.animation.AnimationTimer;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
@@ -17,7 +16,9 @@ public class GameScene extends Scene {
 	private static Pane root;
 	private static Snake userSnake;
 	private static List<Ball> balls = new ArrayList<>();
-	static double lastUpdateTime;
+	private static List<Block> blocks = new ArrayList<>();
+	private static double lastUpdateTime;
+	private static float gameSpeed;
 	
 	private static AnimationTimer mainTimer = new AnimationTimer() {
 		
@@ -44,8 +45,11 @@ public class GameScene extends Scene {
 	};
 	
 	public GameScene() {
+		
 		super(new Pane(createContent()), Main.getScenewidth(), Main.getSceneheight());
+		
 		setOnKeyPressed(e -> {
+			
 			if(e.getCode() == KeyCode.P) {
 				mainTimer.stop();
 			}
@@ -58,12 +62,15 @@ public class GameScene extends Scene {
 			else if(e.getCode() == KeyCode.D || e.getCode() == KeyCode.RIGHT) {
 				userSnake.xVelocity = +userSnake.speed;
 			}
+			
 		});
 		
 		setOnKeyReleased(e -> {
+			
 			if (e.getCode() == KeyCode.RIGHT || e.getCode() == KeyCode.LEFT || e.getCode() == KeyCode.A || e.getCode() == KeyCode.D) {
 			      userSnake.xVelocity = 0;
 			}
+			
 		});
 		
 	}
@@ -72,15 +79,12 @@ public class GameScene extends Scene {
 
 		root = new Pane();
 		root.setPrefSize(Main.getScenewidth(), Main.getSceneheight());
-		root.getChildren().add(new Circle(0,0,5, Color.WHITE));
+		
 		root.getStyleClass().add("rootBg");
-		
-		userSnake =  new Snake(12);
-		
+		gameSpeed = 5;
+		userSnake =  new Snake(10);
 		addSnake(userSnake);
-		
 		mainTimer.start();
-		
 		return root;
 		
 	}
@@ -101,14 +105,24 @@ public class GameScene extends Scene {
 				object.setAlive(false);
 				root.getChildren().remove(object.getView());
 			}
+			if(object.isDead()) {
+				root.getChildren().remove(object.getView());
+			}
 		}
 		
 		balls.removeIf(GameObject::isDead);
 		balls.forEach(GameObject::update);
+		blocks.forEach(GameObject::update);
 		
 		if(Math.random() < 0.02) {
-			Ball b = new Ball();
+			Ball b = new Ball(36 + Math.random()*(Main.getScenewidth()-72), -10, 5, gameSpeed);
 			balls.add(b);
+			addGameObject(b);
+		}
+		
+		if(Math.random() < 0.02) {
+			Block b = new Block(36 + Math.random()*(Main.getScenewidth()-72), -10, 5, gameSpeed);
+			blocks.add(b);
 			addGameObject(b);
 		}
 		

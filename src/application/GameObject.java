@@ -5,7 +5,7 @@ import javafx.scene.Node;
 public class GameObject {
 
 	private Node view;
-	private float speed;
+	private double speed;
 	
 	private boolean alive;
 	
@@ -15,7 +15,7 @@ public class GameObject {
 		this.alive = true;
 	}
 	
-	public GameObject(Node view, float speed) {
+	public GameObject(Node view, double speed) {
 		this.view = view;
 		this.speed = speed;
 		this.alive = true;
@@ -23,10 +23,6 @@ public class GameObject {
 	
 	public Node getView() {
 		return view;
-	}
-	
-	public boolean isAlive() {
-		return alive;
 	}
 	
 	public boolean isDead() {
@@ -43,6 +39,9 @@ public class GameObject {
 	
 	public void update() {
 		view.setTranslateY(view.getTranslateY() + speed);
+		if(view.getTranslateY() > 700) {
+			this.alive = false;
+		}
 	}	
 	
 }
