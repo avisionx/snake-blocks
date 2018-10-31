@@ -17,7 +17,18 @@ public class GameScene extends Scene {
 	private static List<Wall> walls = new ArrayList<>();
 	
 	private static double lastUpdateTime;
-	private static float gameSpeed;
+	private static double gameSpeed;
+	
+	public static double getGameSpeed() {
+		return gameSpeed;
+	}
+
+	public static void setGameSpeed(double oldGameSpeed) {
+		GameScene.gameSpeed = oldGameSpeed;
+		tokens.forEach(GameObject::setSpeed);
+		blocks.forEach(GameObject::setSpeed);
+		walls.forEach(GameObject::setSpeed);
+	}
 	
 	private static AnimationTimer mainTimer = new AnimationTimer() {
 		
