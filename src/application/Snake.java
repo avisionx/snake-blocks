@@ -29,7 +29,7 @@ class circleWithText extends StackPane {
 
 class followingCircle extends Circle{
 	
-	public followingCircle(int x, int y, int radius, Color color) {
+	public followingCircle(double x, double y, double radius, Color color) {
 		super(x,y,radius, color);
 	}
 	
@@ -75,14 +75,14 @@ public class Snake extends Group {
 	public Snake(int length) {
 		
 		super();
-		snakeHead = new GameObject(new Circle(Main.getScenewidth()/2, Main.getSceneheight()*9/10, 8, Color.RED));
+		snakeHead = new GameObject(new Circle(Main.getScenewidth()/2, Main.getSceneheight()*8.7/10, 9, Color.RED));
 		this.length = length;
 		this.xCord = this.snakeHead.getView().getTranslateX();
 		this.yCord = this.snakeHead.getView().getTranslateY();
 		this.getChildren().add(snakeHead.getView());
 		this.snakeBody = new ArrayList<>();
 		for(int i = 1; i < Math.min(this.length, 6); i++) {
-			followingCircle nextCircle = new followingCircle(Main.getScenewidth()/2, Main.getSceneheight()*9/10 + 16*i, 8, Color.AQUA);
+			followingCircle nextCircle = new followingCircle(Main.getScenewidth()/2, Main.getSceneheight()*8.7/10 + 18*i, 9, Color.AQUA);
 			this.snakeBody.add(nextCircle);
 			this.getChildren().add(nextCircle);
 		}
