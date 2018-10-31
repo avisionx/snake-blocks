@@ -45,6 +45,4 @@ public class GameObject {
 		view.setTranslateY(view.getTranslateY() + speed);
 	}	
 	
-	
-	
 }
