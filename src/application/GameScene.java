@@ -8,34 +8,35 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 
 public class GameScene extends Scene {
 	
 	private static Pane root;
 	private static Snake userSnake;
 	private static List<Ball> balls = new ArrayList<>();
-	static double lastUpdateTime;
+	private static List<Block> blocks = new ArrayList<>();
+	private static double lastUpdateTime;
+	private static float gameSpeed;
 	
 	private static AnimationTimer mainTimer = new AnimationTimer() {
 		
 		@Override
 		public void handle(long now) {
 			
-			double v;
+			double moveDistanceThisFrame;
 			if(lastUpdateTime > 0) {
-				double e = (now-lastUpdateTime)/1_000_000_000.0 ;
-				v = e*userSnake.xVelocity;
-				double old = userSnake.getView().getTranslateX();
-				double f = Math.max(userSnake.minVelocity, Math.min(userSnake.maxVelocity, old + v));
-				if(f > Main.getScenewidth() - 15) {
-					f = 400 - 15;
+				double elapsedTimeInSec = (now-lastUpdateTime)/1_000_000_000.0 ;
+				moveDistanceThisFrame = elapsedTimeInSec * userSnake.xVelocity;
+				double oldLocation = userSnake.getSnakeHead().getView().getTranslateX();
+				double newLocation = oldLocation + moveDistanceThisFrame;
+				if(Math.abs(newLocation) > 185) {
+					newLocation = newLocation/Math.abs(newLocation)*185;
 				}
-				else if(f < 15) {
-					f = 15;
-				}
-				((snakeBody) userSnake.getView()).moveHead(old , f);
-				
+				userSnake.moveHead(oldLocation , newLocation);
 			}
+			
 			lastUpdateTime = now;
 			onUpdate();
 		
@@ -44,8 +45,11 @@ public class GameScene extends Scene {
 	};
 	
 	public GameScene() {
+		
 		super(new Pane(createContent()), Main.getScenewidth(), Main.getSceneheight());
+		
 		setOnKeyPressed(e -> {
+			
 			if(e.getCode() == KeyCode.P) {
 				mainTimer.stop();
 			}
@@ -58,12 +62,15 @@ public class GameScene extends Scene {
 			else if(e.getCode() == KeyCode.D || e.getCode() == KeyCode.RIGHT) {
 				userSnake.xVelocity = +userSnake.speed;
 			}
+			
 		});
 		
 		setOnKeyReleased(e -> {
+			
 			if (e.getCode() == KeyCode.RIGHT || e.getCode() == KeyCode.LEFT || e.getCode() == KeyCode.A || e.getCode() == KeyCode.D) {
 			      userSnake.xVelocity = 0;
 			}
+			
 		});
 		
 	}
@@ -72,18 +79,20 @@ public class GameScene extends Scene {
 
 		root = new Pane();
 		root.setPrefSize(Main.getScenewidth(), Main.getSceneheight());
+		
 		root.getStyleClass().add("rootBg");
-		
+		gameSpeed = 5;
 		userSnake =  new Snake(10);
-		
-		addGameObject(userSnake);
-		
+		addSnake(userSnake);
 		mainTimer.start();
-		
 		return root;
 		
 	}
-
+	
+	private static void addSnake(Snake snake) {
+		root.getChildren().add(snake);
+	}
+	
 	private static void addGameObject(GameObject object) {
 		root.getChildren().add(object.getView());
 	}
@@ -91,20 +100,29 @@ public class GameScene extends Scene {
 	protected static void onUpdate() {
 		
 		for(GameObject object : balls) {
-			if(object.isColliding(userSnake)) {
+			if(object.isColliding(userSnake.getSnakeHead())) {
 				System.out.println("Collide");
 				object.setAlive(false);
+				root.getChildren().remove(object.getView());
+			}
+			if(object.isDead()) {
 				root.getChildren().remove(object.getView());
 			}
 		}
 		
 		balls.removeIf(GameObject::isDead);
 		balls.forEach(GameObject::update);
-		userSnake.update();
+		blocks.forEach(GameObject::update);
 		
 		if(Math.random() < 0.02) {
-			Ball b = new Ball();
+			Ball b = new Ball(36 + Math.random()*(Main.getScenewidth()-72), -10, 5, gameSpeed);
 			balls.add(b);
+			addGameObject(b);
+		}
+		
+		if(Math.random() < 0.02) {
+			Block b = new Block(36 + Math.random()*(Main.getScenewidth()-72), -10, 5, gameSpeed);
+			blocks.add(b);
 			addGameObject(b);
 		}
 		

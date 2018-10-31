@@ -1,72 +1,93 @@
 package application;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextBoundsType;
 
-class circleWithText extends StackPane {
+class followingCircle extends Circle{
 	
-	public circleWithText(int x, int y, int radius, Color color, int length) {
-		super();
-		Circle headCircle = new Circle(x, y, radius, color);
-		Text headText = new Text(length + "");
-		headText .setBoundsType(TextBoundsType.VISUAL); 
-		this.getChildren().addAll(headCircle, headText);
-		this.setTranslateX(x);
-		this.setTranslateY(y);
+	public followingCircle(double x, double y, double radius, Color color) {
+		super(x,y,radius, color);
 	}
 	
+	public void update(double rateX, double finalX, followingCircle bodyElem) {
+		
+		AnimationTimer moveAnimation = new AnimationTimer() {
+			
+			double reachedPos = bodyElem.getTranslateX();
+			
+			@Override
+			public void handle(long now) {
+				double moveDistanceThisFrame = rateX;
+				double oldLocation = reachedPos;
+				double newLocation = oldLocation + moveDistanceThisFrame;
+				if(Math.abs(newLocation) > Math.abs(finalX)) {
+					newLocation = finalX;
+				}
+				bodyElem.setTranslateX(newLocation);
+				if(Math.abs(reachedPos) >= Math.abs(newLocation)) {
+					this.stop();
+				}
+				reachedPos = newLocation;
+			}
+		};
+		
+		moveAnimation.start();
+		
+	}
 }
 
-class snakeBody extends Group{
+public class Snake extends Group {
 	
-	public snakeBody(int x, int y, int radius, Color color, int length) {
-		super();
-		this.getChildren().add(new Circle(0, 0, radius, color));
-		for (int i = 1; i < Math.min(length, 7); i++) {
-			this.getChildren().add(new Circle(0, 2*i*radius, radius, color));
-		}
-		this.setTranslateX(x + radius);
-		this.setTranslateY(y + radius);
-	}
-	
-	public void moveHead(double oldX, double newX) {
-		System.out.println(newX);
-		this.setTranslateX(newX);
-	}
-}
-
-public class Snake extends GameObject{
-
+	private GameObject snakeHead;
+	private List<followingCircle> snakeBody;
 	private int length;
-	private double xCord;
-	private double yCord;
 	public double xVelocity = 0;
 	public double speed = 300;
-	public static double minVelocity = 0;
-	public static double maxVelocity = 600;
+	public static double minDist = -185;
+	public static double maxDist = +185;
 	
 	public Snake(int length) {
-		super(new snakeBody(Main.getScenewidth()/2, Main.getSceneheight()*8/10, 15, Color.AQUA, length));
+		
+		super();
+		snakeHead = new GameObject(new Circle(Main.getScenewidth()/2, Main.getSceneheight()*8.7/10, 9, Color.RED));
 		this.length = length;
-		this.xCord = this.getView().getTranslateX();
-		this.yCord = this.getView().getTranslateY();
+		this.getChildren().add(snakeHead.getView());
+		this.snakeBody = new ArrayList<>();
+		for(int i = 1; i < Math.min(this.length, 6); i++) {
+			followingCircle nextCircle = new followingCircle(Main.getScenewidth()/2, Main.getSceneheight()*8.7/10 + 18*i, 9, Color.AQUA);
+			this.snakeBody.add(nextCircle);
+			this.getChildren().add(nextCircle);
+		}
 		
 	}
 	
-	public void moveLeft() {
-		this.getView().setTranslateX(this.getView().getTranslateX() - 10);
+	public GameObject getSnakeHead() {
+		return snakeHead;
 	}
 	
-	public void moveRight() {
-		this.getView().setTranslateX(this.getView().getTranslateX() + 10);
+	public List<followingCircle> getSnakeBody() {
+		return snakeBody;
 	}
-
-	public void update() {
-		return;
+	
+	public void moveHead(double oldX, double newX) {
+	
+		this.snakeHead.getView().setTranslateX(newX);
+		
+		if(this.length >= 2) {
+			double delta = newX/1.4;
+			this.snakeBody.get(0).update(delta, newX, this.snakeBody.get(0));
+			for(int i = 1; i < this.snakeBody.size(); i++) {
+				delta/=1.4;
+				followingCircle bodyElem = this.snakeBody.get(i);
+				bodyElem.update(delta, newX, bodyElem);				
+			}
+		}
+		
 	}	
 	
 }
