@@ -20,10 +20,18 @@ class circleWithText extends StackPane {
 	
 }
 
-public class Ball extends GameObject{
+public class Ball extends GameObject implements Token{
 
+	private int value;
+	
 	public Ball(double x, double y, int value, double speed) {
 		super(new circleWithText(x, y, 20, Color.BISQUE, value), speed);
+		this.value = value;
+	}
+
+	@Override
+	public void collide() {
+		System.out.println("COLLIDE WITH BALL OF VALUE: " + this.value);
 	}
 	
 }

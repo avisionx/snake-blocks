@@ -21,10 +21,18 @@ class rectangleWithText extends StackPane {
 	
 }
 
-public class Block extends GameObject{
+public class Block extends GameObject implements Interactable{
 
+	private int value;
+	
 	public Block(double x, double y, int value, double speed) {
 		super(new rectangleWithText(x, y, Color.BLUEVIOLET, value), speed);
+		this.value = value;
+	}
+
+	@Override
+	public void collide() {
+		System.out.println("COLLIDE WITH BLOCK OF VALUE: " + this.value);
 	}
 	
 }

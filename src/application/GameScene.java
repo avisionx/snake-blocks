@@ -8,15 +8,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-
 public class GameScene extends Scene {
 	
 	private static Pane root;
 	private static Snake userSnake;
 	private static List<Ball> balls = new ArrayList<>();
 	private static List<Block> blocks = new ArrayList<>();
+	private static List<Wall> walls = new ArrayList<>();
+	
 	private static double lastUpdateTime;
 	private static float gameSpeed;
 	
@@ -101,8 +100,8 @@ public class GameScene extends Scene {
 		
 		for(GameObject object : balls) {
 			if(object.isColliding(userSnake.getSnakeHead())) {
-				System.out.println("Collide");
 				object.setAlive(false);
+				((Ball)object).collide();
 				root.getChildren().remove(object.getView());
 			}
 			if(object.isDead()) {
@@ -110,20 +109,45 @@ public class GameScene extends Scene {
 			}
 		}
 		
+		for(GameObject object : blocks) {
+			if(object.isColliding(userSnake.getSnakeHead())) {
+				object.setAlive(false);
+				((Block)object).collide();
+				root.getChildren().remove(object.getView());
+			}
+			if(object.isDead()) {
+				root.getChildren().remove(object.getView());
+			}
+		}
+		
+		for(GameObject object : walls) {
+			if(object.isColliding(userSnake.getSnakeHead())) {
+				((Wall)object).collide();
+			}
+		}
+		
 		balls.removeIf(GameObject::isDead);
+		blocks.removeIf(GameObject::isDead);
 		balls.forEach(GameObject::update);
 		blocks.forEach(GameObject::update);
+		walls.forEach(GameObject::update);
 		
 		if(Math.random() < 0.02) {
-			Ball b = new Ball(36 + Math.random()*(Main.getScenewidth()-72), -10, 5, gameSpeed);
+			Ball b = new Ball(Math.random()*(Main.getScenewidth()-40), -10, 4, gameSpeed);
 			balls.add(b);
 			addGameObject(b);
 		}
 		
 		if(Math.random() < 0.02) {
-			Block b = new Block(36 + Math.random()*(Main.getScenewidth()-72), -10, 5, gameSpeed);
+			Block b = new Block(Math.random()*(Main.getScenewidth()-50), -10, 9, gameSpeed);
 			blocks.add(b);
 			addGameObject(b);
+		}
+		
+		if(Math.random() < 0.02) {
+			Wall w = new Wall(Math.random()*(Main.getScenewidth()-10), 80 + Math.random()*200, gameSpeed);
+			walls.add(w);
+			addGameObject(w);
 		}
 		
 	}
