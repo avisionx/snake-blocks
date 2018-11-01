@@ -8,17 +8,28 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-
 public class GameScene extends Scene {
 	
 	private static Pane root;
 	private static Snake userSnake;
-	private static List<Ball> balls = new ArrayList<>();
+	private static List<GameObject> tokens = new ArrayList<>();
 	private static List<Block> blocks = new ArrayList<>();
+	private static List<Wall> walls = new ArrayList<>();
+	
 	private static double lastUpdateTime;
-	private static float gameSpeed;
+	private static double gameSpeed;
+	
+	public static double getGameSpeed() {
+		return gameSpeed;
+	}
+
+	
+	public static void setGameSpeed(double newGameSpeed) {
+		GameScene.gameSpeed = newGameSpeed;
+		tokens.forEach(GameObject::setSpeed);
+		blocks.forEach(GameObject::setSpeed);
+		walls.forEach(GameObject::setSpeed);
+	}
 	
 	private static AnimationTimer mainTimer = new AnimationTimer() {
 		
@@ -99,10 +110,10 @@ public class GameScene extends Scene {
 	
 	protected static void onUpdate() {
 		
-		for(GameObject object : balls) {
+		for(GameObject object : tokens) {
 			if(object.isColliding(userSnake.getSnakeHead())) {
-				System.out.println("Collide");
 				object.setAlive(false);
+				((Interactable) object).collide();
 				root.getChildren().remove(object.getView());
 			}
 			if(object.isDead()) {
@@ -110,20 +121,54 @@ public class GameScene extends Scene {
 			}
 		}
 		
-		balls.removeIf(GameObject::isDead);
-		balls.forEach(GameObject::update);
+		for(GameObject object : blocks) {
+			if(object.isColliding(userSnake.getSnakeHead())) {
+				object.setAlive(false);
+				((Block)object).collide();
+				root.getChildren().remove(object.getView());
+			}
+			if(object.isDead()) {
+				root.getChildren().remove(object.getView());
+			}
+		}
+		
+		for(GameObject object : walls) {
+			if(object.isColliding(userSnake.getSnakeHead())) {
+				((Wall)object).collide();
+			}
+		}
+		
+		tokens.removeIf(GameObject::isDead);
+		blocks.removeIf(GameObject::isDead);
+		tokens.forEach(GameObject::update);
 		blocks.forEach(GameObject::update);
+		walls.forEach(GameObject::update);
 		
 		if(Math.random() < 0.02) {
-			Ball b = new Ball(36 + Math.random()*(Main.getScenewidth()-72), -10, 5, gameSpeed);
-			balls.add(b);
+			Ball b = new Ball(Math.random()*(Main.getScenewidth()-40), -10, 4, gameSpeed);
+			DestroyBlocks db = new DestroyBlocks(Math.random()*(Main.getScenewidth()-10), -10, gameSpeed);
+			Magnet m = new Magnet(Math.random()*(Main.getScenewidth()-10), -10, gameSpeed);
+			Shield s = new Shield(Math.random()*(Main.getScenewidth()-10), -10, gameSpeed);
+			tokens.add(b);
+			tokens.add(db);
+			tokens.add(m);
+			tokens.add(s);
+			addGameObject(b);
+			addGameObject(m);
+			addGameObject(db);
+			addGameObject(s);
+		}
+		
+		if(Math.random() < 0.02) {
+			Block b = new Block(Math.random()*(Main.getScenewidth()-50), -10, 9, gameSpeed);
+			blocks.add(b);
 			addGameObject(b);
 		}
 		
 		if(Math.random() < 0.02) {
-			Block b = new Block(36 + Math.random()*(Main.getScenewidth()-72), -10, 5, gameSpeed);
-			blocks.add(b);
-			addGameObject(b);
+			Wall w = new Wall(Math.random()*(Main.getScenewidth()-10), 80 + Math.random()*200, gameSpeed);
+			walls.add(w);
+			addGameObject(w);
 		}
 		
 	}

@@ -9,6 +9,10 @@ public class GameObject {
 	
 	private boolean alive;
 	
+	public void setSpeed() {
+		this.speed = GameScene.getGameSpeed();
+	}
+	
 	public GameObject(Node view) {
 		this.view = view;
 		this.speed = 0;
