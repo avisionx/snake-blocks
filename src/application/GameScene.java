@@ -23,8 +23,9 @@ public class GameScene extends Scene {
 		return gameSpeed;
 	}
 
-	public static void setGameSpeed(double oldGameSpeed) {
-		GameScene.gameSpeed = oldGameSpeed;
+	
+	public static void setGameSpeed(double newGameSpeed) {
+		GameScene.gameSpeed = newGameSpeed;
 		tokens.forEach(GameObject::setSpeed);
 		blocks.forEach(GameObject::setSpeed);
 		walls.forEach(GameObject::setSpeed);
