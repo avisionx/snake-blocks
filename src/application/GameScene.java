@@ -15,7 +15,7 @@ public class GameScene extends Scene {
 	private static List<GameObject> tokens = new ArrayList<>();
 	private static List<Block> blocks = new ArrayList<>();
 	private static List<Wall> walls = new ArrayList<>();
-	
+	private static int occur = 0;
 	private static double lastUpdateTime;
 	private static double gameSpeed;
 	
@@ -45,9 +45,11 @@ public class GameScene extends Scene {
 				if(Math.abs(newLocation) > 185) {
 					newLocation = newLocation/Math.abs(newLocation)*185;
 				}
+				double before = oldLocation;
+				double after = newLocation;
 				userSnake.moveHead(oldLocation , newLocation);
+				if(collideWall()){ userSnake.moveHead(after , before); }
 			}
-			
 			lastUpdateTime = now;
 			onUpdate();
 		
@@ -92,7 +94,7 @@ public class GameScene extends Scene {
 		root.setPrefSize(Main.getScenewidth(), Main.getSceneheight());
 		
 		root.getStyleClass().add("rootBg");
-		gameSpeed = 5;
+		gameSpeed = 4.5;
 		userSnake =  new Snake(10);
 		addSnake(userSnake);
 		mainTimer.start();
@@ -145,32 +147,48 @@ public class GameScene extends Scene {
 		walls.forEach(GameObject::update);
 		
 		if(Math.random() < 0.02) {
-			Ball b = new Ball(Math.random()*(Main.getScenewidth()-40), -10, 4, gameSpeed);
-			DestroyBlocks db = new DestroyBlocks(Math.random()*(Main.getScenewidth()-10), -10, gameSpeed);
-			Magnet m = new Magnet(Math.random()*(Main.getScenewidth()-10), -10, gameSpeed);
-			Shield s = new Shield(Math.random()*(Main.getScenewidth()-10), -10, gameSpeed);
-			tokens.add(b);
-			tokens.add(db);
-			tokens.add(m);
-			tokens.add(s);
-			addGameObject(b);
-			addGameObject(m);
-			addGameObject(db);
-			addGameObject(s);
+			Ball b = new Ball(Math.random()*(Main.getScenewidth()-40), -20, (int)(1 + Math.floor(Math.random()*10)), gameSpeed);
+			DestroyBlocks db = new DestroyBlocks(2 + Math.random()*(Main.getScenewidth()-17), -20, gameSpeed);
+			Magnet m = new Magnet(2 + Math.random()*(Main.getScenewidth() - 17), -20, gameSpeed);
+			Shield s = new Shield(2 + Math.random()*(Main.getScenewidth() - 17), -20, gameSpeed);
+
+			if(isSafe(b)){tokens.add(b); addGameObject(b); occur++;}
+			if(isSafe(m) && occur%20 == 0){tokens.add(m); addGameObject(m); }
+			if(isSafe(db) && occur%30 == 0){tokens.add(db); addGameObject(db); }
+			if(isSafe(s) && occur% 25 == 0){tokens.add(s); addGameObject(s); }
+
 		}
 		
 		if(Math.random() < 0.02) {
-			Block b = new Block(Math.random()*(Main.getScenewidth()-50), -10, 9, gameSpeed);
-			blocks.add(b);
-			addGameObject(b);
+			Block b = new Block( 2 + Math.random()*(Main.getScenewidth() - 62), -20, (int)(1 + Math.floor(Math.random()*56)), gameSpeed);
+			if(isSafe(b)) {blocks.add(b); addGameObject(b);}
 		}
 		
 		if(Math.random() < 0.02) {
-			Wall w = new Wall(Math.random()*(Main.getScenewidth()-10), 80 + Math.random()*200, gameSpeed);
-			walls.add(w);
-			addGameObject(w);
+			Wall w = new Wall( 2 + Math.random()*(Main.getScenewidth() - 7), 80 + Math.random()*200, gameSpeed);
+			if(isSafe(w)){ walls.add(w); addGameObject(w); }
 		}
 		
+	}
+
+	static boolean isSafe(GameObject G){
+		for(GameObject T : tokens){
+			if(T.isColliding(G)){return false;}
+		}
+		for(GameObject W : walls){
+			if(W.isColliding(G)){return false;}
+		}
+		for(GameObject B : blocks){
+			if(B.isColliding(G)){return false;}
+		}
+		return true;
+	}
+
+	static boolean collideWall(){
+		for(GameObject W : walls){
+			if(W.isColliding(userSnake.getSnakeHead())){return true;}
+		}
+		return false;
 	}
 	
 }

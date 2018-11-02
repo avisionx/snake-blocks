@@ -54,12 +54,12 @@ public class Snake extends Group {
 	public Snake(int length) {
 		
 		super();
-		snakeHead = new GameObject(new Circle(Main.getScenewidth()/2, Main.getSceneheight()*8.7/10, 9, Color.RED));
+		snakeHead = new GameObject(new Circle(Main.getScenewidth()/2, Main.getSceneheight()*8.7/10, 9, Color.web("#fedc0f")));
 		this.length = length;
 		this.getChildren().add(snakeHead.getView());
 		this.snakeBody = new ArrayList<>();
 		for(int i = 1; i < Math.min(this.length, 6); i++) {
-			followingCircle nextCircle = new followingCircle(Main.getScenewidth()/2, Main.getSceneheight()*8.7/10 + 18*i, 9, Color.AQUA);
+			followingCircle nextCircle = new followingCircle(Main.getScenewidth()/2, Main.getSceneheight()*8.7/10 + 18*i, 9, Color.web("#fedc0f"));
 			this.snakeBody.add(nextCircle);
 			this.getChildren().add(nextCircle);
 		}
@@ -75,16 +75,16 @@ public class Snake extends Group {
 	}
 	
 	public void moveHead(double oldX, double newX) {
-	
+
 		this.snakeHead.getView().setTranslateX(newX);
-		
+
 		if(this.length >= 2) {
 			double delta = newX/1.4;
 			this.snakeBody.get(0).update(delta, newX, this.snakeBody.get(0));
 			for(int i = 1; i < this.snakeBody.size(); i++) {
 				delta/=1.4;
 				followingCircle bodyElem = this.snakeBody.get(i);
-				bodyElem.update(delta, newX, bodyElem);				
+				bodyElem.update(delta, newX, bodyElem);
 			}
 		}
 		
