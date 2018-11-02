@@ -10,12 +10,33 @@ class rectangleWithText extends StackPane {
 	
 	private Text rectText;
 	private Rectangle rectBody;
+	private static final String[] colorSet = {"#2cffff", "#2bffa3", "#74ff2d", "#f8fd2e", "#fd6f2d", "#fe552c"}; 
 	
-	public rectangleWithText(double x, double y, Color color, int value) {
+	public rectangleWithText(double x, double y, int value) {
 		super();
-		rectBody = new Rectangle(x, y, 50, 50);
-		rectBody.setFill(color);
+		rectBody = new Rectangle(x, y, 60, 60);
+		if(value <= 5) {
+			rectBody.setFill(Color.web(colorSet[0]));
+		}
+		else if(value <= 15) {
+			rectBody.setFill(Color.web(colorSet[1]));
+		}
+		else if(value <= 30) {
+			rectBody.setFill(Color.web(colorSet[2]));
+		}
+		else if(value <= 38) {
+			rectBody.setFill(Color.web(colorSet[3]));
+		}
+		else if(value <= 45) {
+			rectBody.setFill(Color.web(colorSet[4]));
+		} 
+		else {
+			rectBody.setFill(Color.web(colorSet[5]));
+		}
+		rectBody.setArcHeight(10);
+		rectBody.setArcWidth(10);
 		this.rectText = new Text(value+ "");
+		rectText.getStyleClass().add("boxFont");
 		rectText.setBoundsType(TextBoundsType.VISUAL); 
 		this.getChildren().addAll(rectBody, rectText);
 		this.setTranslateX(x);
@@ -29,7 +50,7 @@ public class Block extends GameObject implements Interactable{
 	private int value;
 	
 	public Block(double x, double y, int value, double speed) {
-		super(new rectangleWithText(x, y, Color.BLUEVIOLET, value), speed);
+		super(new rectangleWithText(x, y, value), speed);
 		this.value = value;
 	}
 

@@ -1,9 +1,9 @@
 .menuBtn {
 	-fx-font: 18px "Courier New";
-    -fx-padding: 15;
-    -fx-pref-width: 300px;
+    -fx-padding: 12;
+    -fx-pref-width: 280px;
     -fx-text-fill: #fff;
-    -fx-background-color: #000;
+    -fx-background-color: #161616;
     -fx-border-insets: 10px;
     -fx-background-insets: 10px;
     -fx-border-color: white;
@@ -22,8 +22,18 @@
     -fx-background-position: center center; 
 }
 
+.boxFont {
+	-fx-font: 20px "San Serif";
+	-fx-font-weight: 700;
+}
+
+.circleFont {
+	-fx-font: 15px "Helvetica";
+	-fx-font-weight: 900;
+}
+
 .rootBg{
-	-fx-background-color: #000;
+	-fx-background-color: #161616;
 }
 
 .placeholderText {
