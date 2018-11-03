@@ -25,7 +25,7 @@ public class DestroyBlocks extends GameObject implements Token{
 	}
 
 	@Override
-	public void collide() {
+	public void collide(Snake snake) {
 		System.out.println("POWER UP: DESTROY ALL BLOCKS");
 	}
 	

@@ -14,8 +14,9 @@ public class Wall extends GameObject implements Interactable{
 	}
 
 	@Override
-	public void collide() {
-		System.out.println("COLLIDE WITH WALL");
+	public void collide(Snake snake) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

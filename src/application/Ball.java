@@ -35,7 +35,7 @@ public class Ball extends GameObject implements Token{
 	}
 
 	@Override
-	public void collide() {
+	public void collide(Snake snake) {
 		System.out.println("COLLIDE WITH BALL OF VALUE: " + this.value);
 	}
 	

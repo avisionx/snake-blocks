@@ -1,6 +1,7 @@
 package application;
 
 import javafx.scene.Node;
+import javafx.scene.shape.Rectangle;
 
 public class GameObject {
 
@@ -43,8 +44,15 @@ public class GameObject {
 	
 	public void update() {
 		view.setTranslateY(view.getTranslateY() + speed);
-		if(view.getTranslateY() > 700) {
-			this.alive = false;
+		if(view.getClass() != Rectangle.class) {
+			if(view.getTranslateY() > 700) {
+				this.alive = false;
+			}
+		}
+		else {
+			if(view.getTranslateY() > 900) {
+				this.alive = false;
+			}
 		}
 	}	
 	

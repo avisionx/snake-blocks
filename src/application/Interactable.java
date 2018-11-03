@@ -2,8 +2,6 @@ package application;
 
 public interface Interactable {
 
-	boolean okStatus = true;
-
-	public void collide();
+	public void collide(Snake snake);
 	
 }

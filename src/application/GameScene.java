@@ -5,9 +5,11 @@ import java.util.List;
 
 import javafx.animation.AnimationTimer;
 import javafx.scene.Parent;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Circle;
 public class GameScene extends Scene {
 	
 	private static Pane root;
@@ -37,18 +39,29 @@ public class GameScene extends Scene {
 		public void handle(long now) {
 			
 			double moveDistanceThisFrame;
+			
 			if(lastUpdateTime > 0) {
+				
 				double elapsedTimeInSec = (now-lastUpdateTime)/1_000_000_000.0 ;
 				moveDistanceThisFrame = elapsedTimeInSec * userSnake.xVelocity;
-				double oldLocation = userSnake.getSnakeHead().getView().getTranslateX();
-				double newLocation = oldLocation + moveDistanceThisFrame;
-				if(Math.abs(newLocation) > 185) {
-					newLocation = newLocation/Math.abs(newLocation)*185;
+				double snakeHeadPos = ((Circle)userSnake.getSnakeHead().getView()).getCenterX();
+				if(snakeHeadPos + moveDistanceThisFrame > 390) {
+					moveDistanceThisFrame = 390 - snakeHeadPos;
 				}
-				double before = oldLocation;
-				double after = newLocation;
-				userSnake.moveHead(oldLocation , newLocation);
-				if(collideWall()){ userSnake.moveHead(after , before); }
+				else if(snakeHeadPos + moveDistanceThisFrame < 10) {
+					moveDistanceThisFrame = 10 - snakeHeadPos;
+				}
+				userSnake.moveHead(moveDistanceThisFrame );
+				GameObject collidingWall = collideWall();
+				if(collidingWall != null){
+					if(moveDistanceThisFrame > 0) {
+						moveDistanceThisFrame = ((Rectangle)((Wall)collidingWall).getView()).getX() - snakeHeadPos - 15;
+					}
+					else if(moveDistanceThisFrame < 0) {
+						moveDistanceThisFrame = ((Rectangle)((Wall)collidingWall).getView()).getX() + 7.5 - snakeHeadPos + 15;
+					}
+					userSnake.moveHead(moveDistanceThisFrame); 
+				}
 			}
 			lastUpdateTime = now;
 			onUpdate();
@@ -95,7 +108,7 @@ public class GameScene extends Scene {
 		
 		root.getStyleClass().add("rootBg");
 		gameSpeed = 4.5;
-		userSnake =  new Snake(10);
+		userSnake =  new Snake(6);
 		addSnake(userSnake);
 		mainTimer.start();
 		return root;
@@ -115,7 +128,7 @@ public class GameScene extends Scene {
 		for(GameObject object : tokens) {
 			if(object.isColliding(userSnake.getSnakeHead())) {
 				object.setAlive(false);
-				((Interactable) object).collide();
+				((Interactable) object).collide(userSnake);
 				root.getChildren().remove(object.getView());
 			}
 			if(object.isDead()) {
@@ -126,7 +139,7 @@ public class GameScene extends Scene {
 		for(GameObject object : blocks) {
 			if(object.isColliding(userSnake.getSnakeHead())) {
 				object.setAlive(false);
-				((Block)object).collide();
+				((Block)object).collide(userSnake);
 				root.getChildren().remove(object.getView());
 			}
 			if(object.isDead()) {
@@ -136,12 +149,16 @@ public class GameScene extends Scene {
 		
 		for(GameObject object : walls) {
 			if(object.isColliding(userSnake.getSnakeHead())) {
-				((Wall)object).collide();
+				((Wall)object).collide(userSnake);
+			}
+			if(object.isDead()) {
+				root.getChildren().remove(object.getView());
 			}
 		}
 		
 		tokens.removeIf(GameObject::isDead);
 		blocks.removeIf(GameObject::isDead);
+		walls.removeIf(GameObject::isDead);
 		tokens.forEach(GameObject::update);
 		blocks.forEach(GameObject::update);
 		walls.forEach(GameObject::update);
@@ -184,11 +201,12 @@ public class GameScene extends Scene {
 		return true;
 	}
 
-	static boolean collideWall(){
+	static GameObject collideWall(){
 		for(GameObject W : walls){
-			if(W.isColliding(userSnake.getSnakeHead())){return true;}
+			if(W.isColliding(userSnake.getSnakeHead())) {
+				return W;
+			}
 		}
-		return false;
+		return null;
 	}
-	
 }
