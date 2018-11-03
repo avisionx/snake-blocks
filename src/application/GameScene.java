@@ -5,6 +5,7 @@ import java.util.List;
 
 import javafx.animation.AnimationTimer;
 import javafx.scene.Parent;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
@@ -51,8 +52,15 @@ public class GameScene extends Scene {
 					moveDistanceThisFrame = 10 - snakeHeadPos;
 				}
 				userSnake.moveHead(moveDistanceThisFrame );
-				if(collideWall()){ 
-					userSnake.moveHead(-moveDistanceThisFrame ); 
+				GameObject collidingWall = collideWall();
+				if(collidingWall != null){
+					if(moveDistanceThisFrame > 0) {
+						moveDistanceThisFrame = ((Rectangle)((Wall)collidingWall).getView()).getX() - snakeHeadPos - 15;
+					}
+					else if(moveDistanceThisFrame < 0) {
+						moveDistanceThisFrame = ((Rectangle)((Wall)collidingWall).getView()).getX() + 7.5 - snakeHeadPos + 15;
+					}
+					userSnake.moveHead(moveDistanceThisFrame); 
 				}
 			}
 			lastUpdateTime = now;
@@ -100,7 +108,7 @@ public class GameScene extends Scene {
 		
 		root.getStyleClass().add("rootBg");
 		gameSpeed = 4.5;
-		userSnake =  new Snake(10);
+		userSnake =  new Snake(6);
 		addSnake(userSnake);
 		mainTimer.start();
 		return root;
@@ -120,7 +128,7 @@ public class GameScene extends Scene {
 		for(GameObject object : tokens) {
 			if(object.isColliding(userSnake.getSnakeHead())) {
 				object.setAlive(false);
-				((Interactable) object).collide();
+				((Interactable) object).collide(userSnake);
 				root.getChildren().remove(object.getView());
 			}
 			if(object.isDead()) {
@@ -131,7 +139,7 @@ public class GameScene extends Scene {
 		for(GameObject object : blocks) {
 			if(object.isColliding(userSnake.getSnakeHead())) {
 				object.setAlive(false);
-				((Block)object).collide();
+				((Block)object).collide(userSnake);
 				root.getChildren().remove(object.getView());
 			}
 			if(object.isDead()) {
@@ -140,6 +148,9 @@ public class GameScene extends Scene {
 		}
 		
 		for(GameObject object : walls) {
+			if(object.isColliding(userSnake.getSnakeHead())) {
+				((Wall)object).collide(userSnake);
+			}
 			if(object.isDead()) {
 				root.getChildren().remove(object.getView());
 			}
@@ -174,9 +185,6 @@ public class GameScene extends Scene {
 			Wall w = new Wall( 2 + Math.random()*(Main.getScenewidth() - 7), 80 + Math.random()*200, gameSpeed);
 			if(isSafe(w)){ walls.add(w); addGameObject(w); }
 		}
-		System.out.println("T: " + tokens.size());
-		System.out.println("W: " + walls.size());
-		System.out.println("B: " + blocks.size());
 		
 	}
 
@@ -193,12 +201,12 @@ public class GameScene extends Scene {
 		return true;
 	}
 
-	static boolean collideWall(){
+	static GameObject collideWall(){
 		for(GameObject W : walls){
 			if(W.isColliding(userSnake.getSnakeHead())) {
-				return true;
+				return W;
 			}
 		}
-		return false;
+		return null;
 	}
 }

@@ -55,7 +55,7 @@ public class Block extends GameObject implements Interactable{
 	}
 
 	@Override
-	public void collide() {
+	public void collide(Snake snake) {
 		System.out.println("COLLIDE WITH BLOCK OF VALUE: " + this.value);
 	}
 	
