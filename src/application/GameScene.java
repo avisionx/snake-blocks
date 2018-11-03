@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Circle;
 public class GameScene extends Scene {
 	
 	private static Pane root;
@@ -37,18 +38,22 @@ public class GameScene extends Scene {
 		public void handle(long now) {
 			
 			double moveDistanceThisFrame;
+			
 			if(lastUpdateTime > 0) {
+				
 				double elapsedTimeInSec = (now-lastUpdateTime)/1_000_000_000.0 ;
 				moveDistanceThisFrame = elapsedTimeInSec * userSnake.xVelocity;
-				double oldLocation = userSnake.getSnakeHead().getView().getTranslateX();
-				double newLocation = oldLocation + moveDistanceThisFrame;
-				if(Math.abs(newLocation) > 185) {
-					newLocation = newLocation/Math.abs(newLocation)*185;
+				double snakeHeadPos = ((Circle)userSnake.getSnakeHead().getView()).getCenterX();
+				if(snakeHeadPos + moveDistanceThisFrame > 390) {
+					moveDistanceThisFrame = 390 - snakeHeadPos;
 				}
-				double before = oldLocation;
-				double after = newLocation;
-				userSnake.moveHead(oldLocation , newLocation);
-				if(collideWall()){ userSnake.moveHead(after , before); }
+				else if(snakeHeadPos + moveDistanceThisFrame < 10) {
+					moveDistanceThisFrame = 10 - snakeHeadPos;
+				}
+				userSnake.moveHead(moveDistanceThisFrame );
+				if(collideWall()){ 
+					userSnake.moveHead(-moveDistanceThisFrame ); 
+				}
 			}
 			lastUpdateTime = now;
 			onUpdate();
@@ -135,9 +140,6 @@ public class GameScene extends Scene {
 		}
 		
 		for(GameObject object : walls) {
-			if(object.isColliding(userSnake.getSnakeHead())) {
-				((Wall)object).collide();
-			}
 			if(object.isDead()) {
 				root.getChildren().remove(object.getView());
 			}
@@ -172,7 +174,6 @@ public class GameScene extends Scene {
 			Wall w = new Wall( 2 + Math.random()*(Main.getScenewidth() - 7), 80 + Math.random()*200, gameSpeed);
 			if(isSafe(w)){ walls.add(w); addGameObject(w); }
 		}
-		
 		System.out.println("T: " + tokens.size());
 		System.out.println("W: " + walls.size());
 		System.out.println("B: " + blocks.size());
@@ -194,9 +195,10 @@ public class GameScene extends Scene {
 
 	static boolean collideWall(){
 		for(GameObject W : walls){
-			if(W.isColliding(userSnake.getSnakeHead())){return true;}
+			if(W.isColliding(userSnake.getSnakeHead())) {
+				return true;
+			}
 		}
 		return false;
 	}
-	
 }

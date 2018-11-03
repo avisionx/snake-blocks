@@ -46,13 +46,11 @@ public class GameObject {
 		view.setTranslateY(view.getTranslateY() + speed);
 		if(view.getClass() != Rectangle.class) {
 			if(view.getTranslateY() > 700) {
-				System.out.println(view.getTranslateY());
 				this.alive = false;
 			}
 		}
 		else {
 			if(view.getTranslateY() > 900) {
-				System.out.println(view.getTranslateY());
 				this.alive = false;
 			}
 		}
