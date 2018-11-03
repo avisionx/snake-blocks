@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.animation.AnimationTimer;
+import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -14,25 +15,18 @@ class followingCircle extends Circle{
 		super(x,y,radius, color);
 	}
 	
-	public void update(double rateX, double finalX, followingCircle bodyElem) {
+	public void update(double parentX, double parentY, followingCircle bodyElem) {
 		
 		AnimationTimer moveAnimation = new AnimationTimer() {
 			
-			double reachedPos = bodyElem.getTranslateX();
-			
 			@Override
 			public void handle(long now) {
-				double moveDistanceThisFrame = rateX;
-				double oldLocation = reachedPos;
-				double newLocation = oldLocation + moveDistanceThisFrame;
-				if(Math.abs(newLocation) > Math.abs(finalX)) {
-					newLocation = finalX;
+				Point2D parentPos = new Point2D(parentX, parentY);
+				Point2D selfPos = new Point2D(bodyElem.getCenterX(), bodyElem.getCenterY());
+				if(parentPos.distance(selfPos) > 18) {
+					Point2D orientation = parentPos.subtract(selfPos);
+					bodyElem.setCenterX(selfPos.getX() + orientation.getX());
 				}
-				bodyElem.setTranslateX(newLocation);
-				if(Math.abs(reachedPos) >= Math.abs(newLocation)) {
-					this.stop();
-				}
-				reachedPos = newLocation;
 			}
 		};
 		
@@ -76,15 +70,13 @@ public class Snake extends Group {
 	
 	public void moveHead(double oldX, double newX) {
 
-		this.snakeHead.getView().setTranslateX(newX);
-
+		((Circle)this.snakeHead.getView()).setCenterX(((Circle)this.snakeHead.getView()).getCenterX() + newX);
+		
 		if(this.length >= 2) {
-			double delta = newX/1.4;
-			this.snakeBody.get(0).update(delta, newX, this.snakeBody.get(0));
+			this.snakeBody.get(0).update(((Circle)this.snakeHead.getView()).getCenterX(), ((Circle)this.snakeHead.getView()).getCenterY(), this.snakeBody.get(0));
 			for(int i = 1; i < this.snakeBody.size(); i++) {
-				delta/=1.4;
 				followingCircle bodyElem = this.snakeBody.get(i);
-				bodyElem.update(delta, newX, bodyElem);
+				bodyElem.update(this.snakeBody.get(i-1).getCenterX(), this.snakeBody.get(i-1).getCenterY(), bodyElem);
 			}
 		}
 		

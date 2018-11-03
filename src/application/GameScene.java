@@ -138,10 +138,14 @@ public class GameScene extends Scene {
 			if(object.isColliding(userSnake.getSnakeHead())) {
 				((Wall)object).collide();
 			}
+			if(object.isDead()) {
+				root.getChildren().remove(object.getView());
+			}
 		}
 		
 		tokens.removeIf(GameObject::isDead);
 		blocks.removeIf(GameObject::isDead);
+		walls.removeIf(GameObject::isDead);
 		tokens.forEach(GameObject::update);
 		blocks.forEach(GameObject::update);
 		walls.forEach(GameObject::update);
@@ -168,6 +172,10 @@ public class GameScene extends Scene {
 			Wall w = new Wall( 2 + Math.random()*(Main.getScenewidth() - 7), 80 + Math.random()*200, gameSpeed);
 			if(isSafe(w)){ walls.add(w); addGameObject(w); }
 		}
+		
+		System.out.println("T: " + tokens.size());
+		System.out.println("W: " + walls.size());
+		System.out.println("B: " + blocks.size());
 		
 	}
 
