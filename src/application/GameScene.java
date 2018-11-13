@@ -171,6 +171,7 @@ public class GameScene extends Scene {
 	}
 
 	static boolean isSafe(GameObject G){
+		
 		for(GameObject T : tokens){
 			if(T.isColliding(G)){return false;}
 		}
@@ -181,6 +182,7 @@ public class GameScene extends Scene {
 			if(B.isColliding(G)){return false;}
 		}
 		return true;
+	
 	}
 
 	static GameObject collideWall(){
