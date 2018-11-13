@@ -1,30 +1,44 @@
 package application;
 
+import javafx.animation.AnimationTimer;
 import javafx.scene.Node;
-import javafx.scene.shape.Rectangle;
 
 public class GameObject {
 
 	private Node view;
 	private double speed;
-	
+	private AnimationTimer fallDownMotionTimer;
 	private boolean alive;
-	
-	public void setSpeed() {
-		this.speed = GameScene.getGameSpeed();
-	}
 	
 	public GameObject(Node view) {
 		this.view = view;
 		this.speed = 0;
 		this.alive = true;
+		fallDownMotionTimer = null;
 	}
 	
 	public GameObject(Node view, double speed) {
+		
 		this.view = view;
 		this.speed = speed;
 		this.alive = true;
+		this.fallDownMotionTimer = new AnimationTimer() {
+			
+			@Override
+			public void handle(long arg0) {
+				update();
+			}
+		};
+		
 	}	
+	
+	public void setSpeed(double speed) {
+		this.speed = speed;
+	}
+	
+	public AnimationTimer getFallDownTimer() {
+		return fallDownMotionTimer;
+	}
 	
 	public Node getView() {
 		return view;
@@ -43,17 +57,12 @@ public class GameObject {
 	}
 	
 	public void update() {
+		
 		view.setTranslateY(view.getTranslateY() + speed);
-		if(view.getClass() != Rectangle.class) {
-			if(view.getTranslateY() > 700) {
-				this.alive = false;
-			}
+		if(view.getTranslateY() > 900) {
+			this.alive = false;
 		}
-		else {
-			if(view.getTranslateY() > 900) {
-				this.alive = false;
-			}
-		}
+		
 	}	
 	
 }

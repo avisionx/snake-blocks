@@ -9,19 +9,30 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 
 public class Magnet extends GameObject implements Token{
-
-	double duration;
+	
+	private static final ImagePattern magnetImage;
+	private static final Color altColor = Color.ALICEBLUE; 
+	
+	static{
+		FileInputStream fileUrl = null;
+		try {
+			fileUrl = new FileInputStream("./img/magnetImage.png");
+		}
+		catch (FileNotFoundException e) {
+			fileUrl = null;
+		}
+		if(fileUrl != null)
+			magnetImage = new ImagePattern(new Image(fileUrl));
+		else
+			magnetImage = null;
+	}
 	
 	public Magnet(double x, double y, double speed) {
+			
 		super(new Circle(x, y, 16), speed);
-		try {
-			((Circle)this.getView()).setFill(new ImagePattern(new Image(new FileInputStream("./img/magnetImage.png"))));
-		} catch (FileNotFoundException e) {
-			System.out.println("Magnet Image Not Found");
-			((Circle)this.getView()).setFill(Color.BEIGE);
-			e.printStackTrace();
-		}
-		this.duration = 5;
+		((Circle)this.getView()).setFill(magnetImage != null ? magnetImage : altColor);
+		this.getFallDownTimer().start();
+		
 	}
 
 	@Override
