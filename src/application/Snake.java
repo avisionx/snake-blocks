@@ -42,22 +42,13 @@ public class Snake extends Group {
 	private int length;
 	public double xVelocity = 0;
 	public double speed = 300;
-	public static double minDist = -185;
-	public static double maxDist = +185;
 	
-	public Snake(int length) {
-		
-		super();
-		snakeHead = new GameObject(new Circle(Main.getScenewidth()/2, Main.getSceneheight()*8/10, 9, Color.web("#fedc0f")));
-		this.length = length;
-		this.getChildren().add(snakeHead.getView());
-		this.snakeBody = new ArrayList<>();
-		for(int i = 1; i < Math.min(this.length, 6); i++) {
-			followingCircle nextCircle = new followingCircle(Main.getScenewidth()/2, Main.getSceneheight()*8/10 + 18*i, 9, Color.web("#fedc0f"));
-			this.snakeBody.add(nextCircle);
-			this.getChildren().add(nextCircle);
-		}
-		
+	public double getVelocity() {
+		return xVelocity;
+	}
+	
+	public double setVelocity(int sign) {
+		return sign*speed;
 	}
 	
 	public GameObject getSnakeHead() {
@@ -66,6 +57,25 @@ public class Snake extends Group {
 	
 	public List<followingCircle> getSnakeBody() {
 		return snakeBody;
+	}
+	
+	public double getSnakeHeadPos() {
+		return ((Circle)snakeHead.getView()).getCenterX();
+	}
+	
+	public Snake(int length) {
+		
+		super();
+		snakeHead = new GameObject(new Circle(Main.getScenewidth()/2, Main.getSceneheight()*8/10, 9, Color.web("#fedc0f")));
+		this.getChildren().add(snakeHead.getView());
+		this.snakeBody = new ArrayList<>();
+		this.length = length;
+		for(int i = 1; i < Math.min(this.length, 8); i++) {
+			followingCircle nextCircle = new followingCircle(Main.getScenewidth()/2, Main.getSceneheight()*8/10 + 18*i, 9, Color.web("#fedc0f"));
+			this.snakeBody.add(nextCircle);
+			this.getChildren().add(nextCircle);
+		}
+		
 	}
 	
 	public void moveHead(double newX) {

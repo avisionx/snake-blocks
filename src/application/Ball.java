@@ -30,8 +30,11 @@ public class Ball extends GameObject implements Token{
 	private int value;
 	
 	public Ball(double x, double y, int value, double speed) {
+		
 		super(new circleWithText(x, y, 13, Color.web("#ffdd0c"), value), speed);
 		this.value = value;
+		this.getFallDownTimer().start();
+		
 	}
 
 	@Override

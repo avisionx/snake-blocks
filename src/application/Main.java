@@ -51,15 +51,7 @@ class backButton extends Button{
 
 public class Main extends Application {
 	
-	class backEventHandler implements EventHandler<ActionEvent>{
 
-		@Override
-		public void handle(ActionEvent e) {
-			stage.setScene(createMainScene());
-		}
-		
-	}
-	
 	private static final int sceneWidth = 400;
 	private static final int sceneHeight = 600;
 	private Stage stage;
@@ -71,6 +63,15 @@ public class Main extends Application {
 	
 	public static int getSceneheight() {
 		return sceneHeight;
+	}
+	
+	class backEventHandler implements EventHandler<ActionEvent>{
+
+		@Override
+		public void handle(ActionEvent e) {
+			stage.setScene(createMainScene());
+		}
+		
 	}
 	
 	private Scene createMainScene() {

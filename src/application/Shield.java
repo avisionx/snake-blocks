@@ -10,18 +10,29 @@ import javafx.scene.shape.Circle;
 
 public class Shield extends GameObject implements Token{
 
-	double duration;
+	private static final ImagePattern shieldImage;
+	private static final Color altColor = Color.BLANCHEDALMOND; 
+	
+	static{
+		FileInputStream fileUrl = null;
+		try {
+			fileUrl = new FileInputStream("./img/shieldImage.png");
+		}
+		catch (FileNotFoundException e) {
+			fileUrl = null;
+		}
+		if(fileUrl != null)
+			shieldImage = new ImagePattern(new Image(fileUrl));
+		else
+			shieldImage = null;
+	}
 	
 	public Shield(double x, double y, double speed) {
+		
 		super(new Circle(x, y, 16, Color.MAGENTA), speed);
-		try {
-			((Circle)this.getView()).setFill(new ImagePattern(new Image(new FileInputStream("./img/shieldImage.png"))));
-		} catch (FileNotFoundException e) {
-			System.out.println("Shield Image Not Found");
-			((Circle)this.getView()).setFill(Color.DARKMAGENTA);
-			e.printStackTrace();
-		}
-		this.duration = 8;
+		((Circle)this.getView()).setFill(shieldImage != null ? shieldImage : altColor);
+		this.getFallDownTimer().start();
+		
 	}
 
 	@Override
