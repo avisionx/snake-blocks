@@ -5,9 +5,11 @@ import java.util.List;
 
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Point2D;
+import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
 
 class followingCircle extends Circle{
 	
@@ -15,21 +17,26 @@ class followingCircle extends Circle{
 		super(x,y,radius, color);
 	}
 	
-	public void update(double parentX, double parentY, followingCircle bodyElem) {
+	public void update(double parentX, double parentY, followingCircle self) {
 		
 		AnimationTimer moveAnimation = new AnimationTimer() {
 			
 			@Override
 			public void handle(long now) {
+				
 				Point2D parentPos = new Point2D(parentX, parentY);
-				Point2D selfPos = new Point2D(bodyElem.getCenterX(), bodyElem.getCenterY());
+				Point2D selfPos = new Point2D(self.getCenterX(), self.getCenterY());
+				
 				if(parentPos.distance(selfPos) > 18) {
 					Point2D orientation = parentPos.subtract(selfPos);
-					bodyElem.setCenterX(selfPos.getX() + orientation.getX());
+					self.setCenterX(selfPos.getX() + orientation.getX());
 				}
+				else {
+					this.stop();
+				}
+				
 			}
 		};
-		
 		moveAnimation.start();
 		
 	}
@@ -37,45 +44,56 @@ class followingCircle extends Circle{
 
 public class Snake extends Group {
 	
+	private Text snakeText;
 	private GameObject snakeHead;
 	private List<followingCircle> snakeBody;
 	private int length;
-	public double xVelocity = 0;
-	public double speed = 300;
+	private double xVelocity;
+	private double xSpeed = 400;
 	
-	public double getVelocity() {
-		return xVelocity;
-	}
-	
-	public void moveLeft() {
-		System.out.println("LEFT JA");
-	}
-	
-	public void moveRight() {
-		System.out.println("RIGHT JA");
-	}
-	
-	public double setVelocity(int sign) {
-		return sign*speed;
-	}
+	private AnimationTimer snakeMotion = new AnimationTimer() {
+		
+		double lastMotionTime;
+		
+		@Override
+		public void handle(long now) {
+			if(lastMotionTime > 0) {
+				double elapsedTimeInSec = (now-lastMotionTime)/1_000_000_000.0;
+				double moveDistanceThisFrame = elapsedTimeInSec * xVelocity;
+				moveHead(moveDistanceThisFrame);
+			}
+			lastMotionTime = now;
+		}
+		
+	};
 	
 	public GameObject getSnakeHead() {
 		return snakeHead;
 	}
 	
-	public List<followingCircle> getSnakeBody() {
-		return snakeBody;
+	public void moveLeft() {
+		xVelocity = -xSpeed;
 	}
 	
-	public double getSnakeHeadPos() {
-		return ((Circle)snakeHead.getView()).getCenterX();
+	public void moveRight() {
+		xVelocity = +xSpeed;
+	}
+	
+	public void stopSnake() {
+		xVelocity = 0;
 	}
 	
 	public Snake(int length) {
 		
 		super();
-		snakeHead = new GameObject(new Circle(Main.getScenewidth()/2, Main.getSceneheight()*8/10, 9, Color.web("#fedc0f")));
-		this.getChildren().add(snakeHead.getView());
+		this.snakeHead = new GameObject(new Circle(Main.getScenewidth()/2, Main.getSceneheight()*8/10, 9, Color.web("#fedc0f")));
+		this.snakeText = new Text(length + "");
+		this.snakeText.setFill(Color.WHITE);
+		this.snakeText.getStyleClass().add("circleFont");
+		this.snakeText.setTranslateX(Main.getScenewidth()/2 - this.snakeText.getBoundsInLocal().getWidth()*2/3);
+		this.snakeText.setTranslateY(Main.getSceneheight() * 7.7/10);
+		this.snakeText.setTextOrigin(VPos.CENTER);
+		this.getChildren().addAll(snakeText, snakeHead.getView());
 		this.snakeBody = new ArrayList<>();
 		this.length = length;
 		for(int i = 1; i < Math.min(this.length, 8); i++) {
@@ -83,19 +101,30 @@ public class Snake extends Group {
 			this.snakeBody.add(nextCircle);
 			this.getChildren().add(nextCircle);
 		}
+		snakeMotion.start();
 		
 	}
 	
-	public void moveHead(double newX) {
-
-		((Circle)this.snakeHead.getView()).setCenterX(((Circle)this.snakeHead.getView()).getCenterX() + newX);
+	public void moveHead(double deltaX) {
+		
+		double oldHeadX = ((Circle)this.snakeHead.getView()).getCenterX();
+		double oldTextX = this.snakeText.getTranslateX();
+		double newHeadX = oldHeadX + deltaX;
+		double newHeadY = ((Circle)this.snakeHead.getView()).getCenterY();
+		this.snakeText.setTranslateX(oldTextX + deltaX);
+		((Circle)this.snakeHead.getView()).setCenterX(newHeadX);
 		
 		if(this.length >= 2) {
-			this.snakeBody.get(0).update(((Circle)this.snakeHead.getView()).getCenterX(), ((Circle)this.snakeHead.getView()).getCenterY(), this.snakeBody.get(0));
+			
+			this.snakeBody.get(0).update(newHeadX, newHeadY, this.snakeBody.get(0));
+			
 			for(int i = 1; i < this.snakeBody.size(); i++) {
-				followingCircle bodyElem = this.snakeBody.get(i);
-				bodyElem.update(this.snakeBody.get(i-1).getCenterX(), this.snakeBody.get(i-1).getCenterY(), bodyElem);
+				followingCircle prevBodyElem = this.snakeBody.get(i-1);
+				followingCircle curBodyElem = this.snakeBody.get(i);
+				curBodyElem.update(prevBodyElem.getCenterX(), prevBodyElem.getCenterY(), curBodyElem);
+			
 			}
+			
 		}
 		
 	}	

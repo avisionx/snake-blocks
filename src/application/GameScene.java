@@ -56,9 +56,17 @@ public class GameScene extends Scene {
 			}
 			else if(e.getCode() == KeyCode.P) {
 				pauseGame();
+				populationTimer.stop();
 			}
 			else if(e.getCode() == KeyCode.R) {
 				resumeGame();
+				populationTimer.start();
+			}
+		});
+		
+		this.setOnKeyReleased(e -> {	
+			if(e.getCode() == KeyCode.A || e.getCode() == KeyCode.D) {
+				userSnake.stopSnake();
 			}
 		});
 		
@@ -112,6 +120,7 @@ public class GameScene extends Scene {
 	
 	private static void addGameObject(GameObject object) {
 		root.getChildren().add(object.getView());
+		userSnake.toFront();
 	}
 	
 	private static void updateEachFrame() {
