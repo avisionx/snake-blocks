@@ -47,6 +47,14 @@ public class Snake extends Group {
 		return xVelocity;
 	}
 	
+	public void moveLeft() {
+		System.out.println("LEFT JA");
+	}
+	
+	public void moveRight() {
+		System.out.println("RIGHT JA");
+	}
+	
 	public double setVelocity(int sign) {
 		return sign*speed;
 	}

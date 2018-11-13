@@ -1,15 +1,12 @@
 package application;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Parent;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
-import javafx.scene.shape.Circle;
 
 public class GameScene extends Scene {
 	
@@ -19,6 +16,7 @@ public class GameScene extends Scene {
 	private static List<Block> blocks = new ArrayList<>();
 	private static List<Wall> walls = new ArrayList<>();
 	private static double gameSpeed;	
+	private static int occur = 0;
 	
 	private static AnimationTimer mainFrameTimer = new AnimationTimer() {
 		
@@ -31,9 +29,16 @@ public class GameScene extends Scene {
 	
 	private static AnimationTimer populationTimer = new AnimationTimer() {
 		
+		double lastPopulateTime = System.currentTimeMillis();
+		
 		@Override
 		public void handle(long now) {
-			populateNewItems();
+			
+			double elapsedTimeInSec = (now-lastPopulateTime)/1_000_000_000.0 ;
+			if(elapsedTimeInSec >= 1) {
+				populateNewItems();
+				lastPopulateTime = now;
+			}
 		}
 		
 	};
