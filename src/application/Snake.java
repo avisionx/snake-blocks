@@ -17,20 +17,24 @@ class followingCircle extends Circle{
 		super(x,y,radius, color);
 	}
 	
-	public void update(double parentX, double parentY, followingCircle bodyElem) {
+	public void update(double parentX, double parentY, followingCircle self) {
 		
 		AnimationTimer moveAnimation = new AnimationTimer() {
+			
 			@Override
 			public void handle(long now) {
+				
 				Point2D parentPos = new Point2D(parentX, parentY);
-				Point2D selfPos = new Point2D(bodyElem.getCenterX(), bodyElem.getCenterY());
+				Point2D selfPos = new Point2D(self.getCenterX(), self.getCenterY());
+				
 				if(parentPos.distance(selfPos) > 18) {
 					Point2D orientation = parentPos.subtract(selfPos);
-					bodyElem.setCenterX(selfPos.getX() + orientation.getX());
+					self.setCenterX(selfPos.getX() + orientation.getX());
 				}
 				else {
 					this.stop();
 				}
+				
 			}
 		};
 		moveAnimation.start();
@@ -69,17 +73,14 @@ public class Snake extends Group {
 	
 	public void moveLeft() {
 		xVelocity = -xSpeed;
-//		snakeMotion.start();
 	}
 	
 	public void moveRight() {
 		xVelocity = +xSpeed;
-//		snakeMotion.start();
 	}
 	
 	public void stopSnake() {
 		xVelocity = 0;
-//		snakeMotion.stop();
 	}
 	
 	public Snake(int length) {
@@ -105,14 +106,25 @@ public class Snake extends Group {
 	}
 	
 	public void moveHead(double deltaX) {
-
-		((Circle)this.snakeHead.getView()).setCenterX(((Circle)this.snakeHead.getView()).getCenterX() + deltaX);
+		
+		double oldHeadX = ((Circle)this.snakeHead.getView()).getCenterX();
+		double oldTextX = this.snakeText.getTranslateX();
+		double newHeadX = oldHeadX + deltaX;
+		double newHeadY = ((Circle)this.snakeHead.getView()).getCenterY();
+		this.snakeText.setTranslateX(oldTextX + deltaX);
+		((Circle)this.snakeHead.getView()).setCenterX(newHeadX);
+		
 		if(this.length >= 2) {
-			this.snakeBody.get(0).update(((Circle)this.snakeHead.getView()).getCenterX(), ((Circle)this.snakeHead.getView()).getCenterY(), this.snakeBody.get(0));
+			
+			this.snakeBody.get(0).update(newHeadX, newHeadY, this.snakeBody.get(0));
+			
 			for(int i = 1; i < this.snakeBody.size(); i++) {
-				followingCircle bodyElem = this.snakeBody.get(i);
-				bodyElem.update(this.snakeBody.get(i-1).getCenterX(), this.snakeBody.get(i-1).getCenterY(), bodyElem);
+				followingCircle prevBodyElem = this.snakeBody.get(i-1);
+				followingCircle curBodyElem = this.snakeBody.get(i);
+				curBodyElem.update(prevBodyElem.getCenterX(), prevBodyElem.getCenterY(), curBodyElem);
+			
 			}
+			
 		}
 		
 	}	
