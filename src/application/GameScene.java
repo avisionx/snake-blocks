@@ -3,11 +3,40 @@ package application;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.animation.AnimationTimer;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+
+class GamePauseHandler implements EventHandler<ActionEvent>{
+
+	@Override
+	public void handle(ActionEvent e) {
+		GameScene.pauseGame();
+	}
+
+	public void handle(KeyEvent e) {
+		GameScene.pauseGame();
+	}
+	
+}
+
+class GameResumeHandler implements EventHandler<ActionEvent>{
+
+	@Override
+	public void handle(ActionEvent e) {
+		GameScene.resumeGame();
+	}
+
+	public void handle(KeyEvent e) {
+		GameScene.resumeGame();
+	}
+	
+}
 
 public class GameScene extends Scene {
 	
@@ -17,7 +46,9 @@ public class GameScene extends Scene {
 	private static List<Block> blocks = new ArrayList<>();
 	private static List<Wall> walls = new ArrayList<>();
 	private static double gameSpeed;	
-	
+	private static Button pauseButton;
+	private static GamePauseHandler gamePauseHandler;
+	private static GameResumeHandler gameResumeHandler;
 	private static int occur = 0;
 	
 	private static AnimationTimer mainFrameTimer = new AnimationTimer() {
@@ -57,14 +88,10 @@ public class GameScene extends Scene {
 				userSnake.moveRight();
 			}
 			else if(e.getCode() == KeyCode.P) {
-				pauseGame();
-				populationTimer.stop();
-				userSnake.setSpeed(0);
+				gamePauseHandler.handle(e);
 			}
 			else if(e.getCode() == KeyCode.R) {
-				resumeGame();
-				populationTimer.start();
-				userSnake.setSpeed(400);
+				gameResumeHandler.handle(e);
 			}
 		});
 		
@@ -76,7 +103,13 @@ public class GameScene extends Scene {
 		
 	}
 	
-	private static void pauseGame() {
+	protected static void pauseGame() {
+		stopFallAnimation();
+		populationTimer.stop();
+		userSnake.setSpeed(0);
+	}
+	
+	private static void stopFallAnimation() {
 		for (GameObject token : tokens) {
 			token.getFallDownTimer().stop();
 		}
@@ -88,7 +121,13 @@ public class GameScene extends Scene {
 		}
 	}
 	
-	private static void resumeGame() {
+	protected static void resumeGame() {
+		resumeFallAnimation();
+		populationTimer.start();
+		userSnake.setSpeed(400);
+	}
+	
+	private static void resumeFallAnimation() {
 		for (GameObject token : tokens) {
 			token.getFallDownTimer().start();
 		}
@@ -108,18 +147,23 @@ public class GameScene extends Scene {
 		
 		gameSpeed = 4.5;
 		
+		pauseButton = new Button();
+		pauseButton.getStyleClass().add("pauseBtn");
+		pauseButton.setTranslateX(Main.getScenewidth() - 45);
+		pauseButton.setTranslateY(Main.getSceneheight() - 45);
+		
+		gamePauseHandler = new GamePauseHandler();
+		pauseButton.setOnAction(gamePauseHandler);
+		
+		gameResumeHandler = new GameResumeHandler();
+		
+		root.getChildren().add(pauseButton);
+
 		userSnake =  new Snake(10);
 		addSnake(userSnake);
 		
 		mainFrameTimer.start();
 		populationTimer.start();
-		
-		Button pauseButton = new Button();
-		pauseButton.getStyleClass().add("pauseBtn");
-		pauseButton.setTranslateX(Main.getScenewidth() - 45);
-		pauseButton.setTranslateY(Main.getSceneheight() - 45);
-		
-		root.getChildren().add(pauseButton);
 		
 		return root;
 		
@@ -127,11 +171,13 @@ public class GameScene extends Scene {
 	
 	private static void addSnake(Snake snake) {
 		root.getChildren().add(snake);
+		pauseButton.toFront();
 	}
 	
 	private static void addGameObject(GameObject object) {
 		root.getChildren().add(object.getView());
 		userSnake.toFront();
+		pauseButton.toFront();
 	}
 	
 	private static void updateEachFrame() {
@@ -183,9 +229,9 @@ public class GameScene extends Scene {
 		Shield s = new Shield(2 + Math.random()*(Main.getScenewidth() - 17), -20, gameSpeed);
 
 		if(isSafe(b)){tokens.add(b); addGameObject(b); occur++;}
-		if(isSafe(m) && occur%2 == 0){tokens.add(m); addGameObject(m); }
-		if(isSafe(db) && occur%3 == 0){tokens.add(db); addGameObject(db); }
-		if(isSafe(s) && occur% 2 == 0){tokens.add(s); addGameObject(s); }
+		if(isSafe(m) && occur%20 == 0){tokens.add(m); addGameObject(m); }
+		if(isSafe(db) && occur%30 == 0){tokens.add(db); addGameObject(db); }
+		if(isSafe(s) && occur% 25 == 0){tokens.add(s); addGameObject(s); }
 
 		Block bb = new Block( 2 + Math.random()*(Main.getScenewidth() - 62), -20, (int)(1 + Math.floor(Math.random()*56)), gameSpeed);
 		blocks.add(bb); addGameObject(bb);
