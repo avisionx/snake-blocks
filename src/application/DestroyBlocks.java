@@ -31,7 +31,6 @@ public class DestroyBlocks extends GameObject implements Token{
 		super(new Circle(x, y, 16), speed);
 		((Circle)this.getView()).setFill(destroyImage != null ? destroyImage : altColor);
 		this.getFallDownTimer().start();
-	
 		
 	}
 	
