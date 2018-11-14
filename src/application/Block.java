@@ -12,6 +12,14 @@ class rectangleWithText extends StackPane {
 	private Rectangle rectBody;
 	private static final String[] colorSet = {"#2cffff", "#2bffa3", "#74ff2d", "#f8fd2e", "#fd6f2d", "#fe552c"}; 
 	
+	public Rectangle getRectBody() {
+		return rectBody;
+	}
+	
+	public Text getRectText() {
+		return rectText;
+	}
+	
 	public rectangleWithText(double x, double y, int value) {
 		
 		super();
