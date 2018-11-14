@@ -5,6 +5,7 @@ import java.util.List;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 
@@ -16,6 +17,7 @@ public class GameScene extends Scene {
 	private static List<Block> blocks = new ArrayList<>();
 	private static List<Wall> walls = new ArrayList<>();
 	private static double gameSpeed;	
+	
 	private static int occur = 0;
 	
 	private static AnimationTimer mainFrameTimer = new AnimationTimer() {
@@ -57,10 +59,12 @@ public class GameScene extends Scene {
 			else if(e.getCode() == KeyCode.P) {
 				pauseGame();
 				populationTimer.stop();
+				userSnake.setSpeed(0);
 			}
 			else if(e.getCode() == KeyCode.R) {
 				resumeGame();
 				populationTimer.start();
+				userSnake.setSpeed(400);
 			}
 		});
 		
@@ -109,6 +113,13 @@ public class GameScene extends Scene {
 		
 		mainFrameTimer.start();
 		populationTimer.start();
+		
+		Button pauseButton = new Button();
+		pauseButton.getStyleClass().add("pauseBtn");
+		pauseButton.setTranslateX(Main.getScenewidth() - 45);
+		pauseButton.setTranslateY(Main.getSceneheight() - 45);
+		
+		root.getChildren().add(pauseButton);
 		
 		return root;
 		
@@ -172,9 +183,9 @@ public class GameScene extends Scene {
 		Shield s = new Shield(2 + Math.random()*(Main.getScenewidth() - 17), -20, gameSpeed);
 
 		if(isSafe(b)){tokens.add(b); addGameObject(b); occur++;}
-		if(isSafe(m) && occur%20 == 0){tokens.add(m); addGameObject(m); }
-		if(isSafe(db) && occur%30 == 0){tokens.add(db); addGameObject(db); }
-		if(isSafe(s) && occur% 25 == 0){tokens.add(s); addGameObject(s); }
+		if(isSafe(m) && occur%2 == 0){tokens.add(m); addGameObject(m); }
+		if(isSafe(db) && occur%3 == 0){tokens.add(db); addGameObject(db); }
+		if(isSafe(s) && occur% 2 == 0){tokens.add(s); addGameObject(s); }
 
 		Block bb = new Block( 2 + Math.random()*(Main.getScenewidth() - 62), -20, (int)(1 + Math.floor(Math.random()*56)), gameSpeed);
 		blocks.add(bb); addGameObject(bb);

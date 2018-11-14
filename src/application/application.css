@@ -39,3 +39,16 @@
 .placeholderText {
 	-fx-font: 30px "Courier New";
 }
+
+.pauseBtn {
+    -fx-background-image: url("./../../img/pauseBtn.png") ;
+    -fx-background-repeat: no-repeat;   
+    -fx-background-size: 30px 30px;
+    -fx-min-height: 40px;
+    -fx-min-width: 40px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 0;
+    -fx-background-color: transparent;
+    -fx-background-position: center center; 
+}

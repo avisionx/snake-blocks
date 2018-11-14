@@ -151,6 +151,10 @@ public class Snake extends Group {
 		xVelocity = 0;
 	}
 	
+	public void setSpeed(double speed) {
+		this.xSpeed = speed;
+	}
+	
 	public Snake(int length) {
 		
 		super();
