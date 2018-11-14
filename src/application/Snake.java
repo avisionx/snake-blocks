@@ -9,6 +9,7 @@ import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
 class followingCircle extends Circle{
@@ -57,12 +58,79 @@ public class Snake extends Group {
 		
 		@Override
 		public void handle(long now) {
+			
 			if(lastMotionTime > 0) {
+				
 				double elapsedTimeInSec = (now-lastMotionTime)/1_000_000_000.0;
 				double moveDistanceThisFrame = elapsedTimeInSec * xVelocity;
-				moveHead(moveDistanceThisFrame);
+				double snakeHeadPos = ((Circle)snakeHead.getView()).getCenterX();
+				
+				GameObject collidingWall = GameScene.collideWall();
+				if(collidingWall != null){
+					
+					Rectangle collidingRect = ((Rectangle)((Wall)collidingWall).getView());
+					double wallCenterX = collidingRect.getX() + 2.5;
+					boolean moved = false;
+					
+					if(snakeHeadPos < wallCenterX - 2.5) {
+						if(moveDistanceThisFrame == 0) {
+							moveDistanceThisFrame = wallCenterX - 11.5 - snakeHeadPos;
+							moved = true;
+						}else if(snakeHeadPos == wallCenterX - 11.5 && moveDistanceThisFrame > 0) {
+							moveDistanceThisFrame = 0;
+							moved = true;
+						}else if(snakeHeadPos + moveDistanceThisFrame >= wallCenterX - 2.5) {
+							moveDistanceThisFrame = wallCenterX - 11.5 - snakeHeadPos;
+							moved = true;
+						}
+					}else if(snakeHeadPos > wallCenterX + 2.5) {
+						if(moveDistanceThisFrame == 0) {
+							moveDistanceThisFrame = wallCenterX + 11.5 - snakeHeadPos;
+							moved = true;
+						}else if(snakeHeadPos == wallCenterX + 11.5  && moveDistanceThisFrame < 0) {
+							moveDistanceThisFrame = 0;
+							moved = true;
+						}
+						else if(snakeHeadPos + moveDistanceThisFrame <= wallCenterX + 2.5) {
+							moveDistanceThisFrame = wallCenterX + 11.5 - snakeHeadPos;
+							moved = true;
+						}
+					}else {
+						if(snakeHeadPos > wallCenterX) {
+							moveDistanceThisFrame = wallCenterX + 11.5 - snakeHeadPos;
+						}else {
+							moveDistanceThisFrame = wallCenterX - 11.5 - snakeHeadPos;
+						}
+						moved = true;
+					}
+					if(moved) {
+						moveHead(moveDistanceThisFrame);
+						moveDistanceThisFrame = 0;
+					}
+					else {
+						if(snakeHeadPos + moveDistanceThisFrame > 390) {
+							moveDistanceThisFrame = 390 - snakeHeadPos;
+						}
+						else if(snakeHeadPos + moveDistanceThisFrame < 10) {
+							moveDistanceThisFrame = 10 - snakeHeadPos;
+						}
+						moveHead(moveDistanceThisFrame);
+					}
+				}
+				else {					
+					moveDistanceThisFrame = elapsedTimeInSec * xVelocity;
+					if(snakeHeadPos + moveDistanceThisFrame > 390) {
+						moveDistanceThisFrame = 390 - snakeHeadPos;
+					}
+					else if(snakeHeadPos + moveDistanceThisFrame < 10) {
+						moveDistanceThisFrame = 10 - snakeHeadPos;
+					}
+					moveHead(moveDistanceThisFrame);
+				}
 			}
+			
 			lastMotionTime = now;
+		
 		}
 		
 	};
@@ -81,6 +149,10 @@ public class Snake extends Group {
 	
 	public void stopSnake() {
 		xVelocity = 0;
+	}
+	
+	public void setSpeed(double speed) {
+		this.xSpeed = speed;
 	}
 	
 	public Snake(int length) {
