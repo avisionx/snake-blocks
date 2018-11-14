@@ -56,6 +56,7 @@ public class Main extends Application {
 	private static final int sceneHeight = 600;
 	private Stage stage;
 	private backEventHandler backEventBtn = new backEventHandler();
+	private Scene mainMenuScene;
 	
 	public static int getScenewidth() {
 		return sceneWidth;
@@ -69,12 +70,12 @@ public class Main extends Application {
 
 		@Override
 		public void handle(ActionEvent e) {
-			stage.setScene(createMainScene());
+			stage.setScene(mainMenuScene);
 		}
 		
 	}
 	
-	private Scene createMainScene() {
+	protected Scene createMainScene() {
 		
 		Scene menuScene = null;
 		VBox root = new VBox();
@@ -103,7 +104,7 @@ public class Main extends Application {
 		Button exitBtn = new menuButton("Exit");
 		
 		playBtn.setOnAction(e -> {
-			stage.setScene(createGameScene());
+			stage.setScene(createGameScene(mainMenuScene));
 		});
 		
 		resumeBtn.setOnAction(e -> {
@@ -137,9 +138,9 @@ public class Main extends Application {
 	
 	}
 	
-	private Scene createGameScene() {
+	private Scene createGameScene(Scene mainScene) {
 		
-		Scene gameScene = new GameScene();
+		Scene gameScene = new GameScene(stage, mainScene);
 		
 		gameScene.getStylesheets().add(
         		getClass().getResource("application.css").toExternalForm()
@@ -299,8 +300,8 @@ public class Main extends Application {
 		try {
 			
 			this.stage = primaryStage;
-			Scene scene = createMainScene();
-			primaryStage.setScene(scene);
+			mainMenuScene = createMainScene();
+			primaryStage.setScene(mainMenuScene);
 	        primaryStage.setTitle("Sanke VS Blocks");
 			primaryStage.setResizable(false);
 			primaryStage.show();

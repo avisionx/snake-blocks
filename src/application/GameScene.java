@@ -21,6 +21,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 class GamePauseHandler implements EventHandler<ActionEvent>{
 
@@ -100,11 +101,15 @@ class pauseScreen extends StackPane {
 		});
 		
 		newGameBtn.setOnAction(e -> {
-			System.out.println("New Game");
+			GameScene gameScene = new GameScene(GameScene.primaryStage, GameScene.mainMenuScene);
+			GameScene.primaryStage.setScene(gameScene);
+			gameScene.getStylesheets().add(
+	        		getClass().getResource("application.css").toExternalForm()
+	        	);
 		});
 		
 		goToMenuBtn.setOnAction(e -> {
-			System.out.println("Go TO Menu");
+			GameScene.primaryStage.setScene(GameScene.mainMenuScene);
 		});
 		
 		exitBtn.setOnAction(e -> {
@@ -135,7 +140,8 @@ public class GameScene extends Scene {
 	private static HBox scoreOnGameBox;
 	private static pauseScreen pausedMenu;
 	private static boolean openedPauseMenu = false;
-	
+	protected static Stage primaryStage;
+	protected static Scene mainMenuScene;
 	
 	private static int occur = 0;
 	
@@ -164,7 +170,7 @@ public class GameScene extends Scene {
 		
 	};
 	
-	public GameScene() {
+	public GameScene(Stage stage, Scene mainScreen) {
 		
 		super(new Pane(createContent()), Main.getScenewidth(), Main.getSceneheight());	
 		
@@ -189,6 +195,9 @@ public class GameScene extends Scene {
 				userSnake.stopSnake();
 			}
 		});
+		
+		primaryStage = stage;
+		mainMenuScene = mainScreen;
 		
 	}
 	
@@ -239,12 +248,10 @@ public class GameScene extends Scene {
 
 	private static Parent createContent() {
 		
+		resetGame();
 		root = new Pane();
 		root.setPrefSize(Main.getScenewidth(), Main.getSceneheight());
 		root.getStyleClass().add("rootBg");
-		
-		gameSpeed = 4.5;
-		
 		
 		scoreOnGameBox = new HBox(7);
 		scoreOnGame = new Text(curGameScore + "");
@@ -298,6 +305,16 @@ public class GameScene extends Scene {
 		
 	}
 	
+	private static void resetGame() {
+		userSnake = null;
+		tokens = new ArrayList<>();
+		blocks = new ArrayList<>();
+		walls = new ArrayList<>();
+		gameSpeed = 4.5;	
+		curGameScore = 0;
+		openedPauseMenu = false;
+	}
+
 	private static void addSnake(Snake snake) {
 		root.getChildren().add(snake);
 		pauseButton.toFront();
