@@ -143,7 +143,7 @@ public class GameScene extends Scene {
 	protected static Stage primaryStage;
 	protected static Scene mainMenuScene;
 	
-	private static int occur = 0;
+	private static int interactablesCount = 0;
 	
 	private static AnimationTimer mainFrameTimer = new AnimationTimer() {
 		
@@ -379,36 +379,65 @@ public class GameScene extends Scene {
 	}
 	
 	public static void populateNewItems() {
-		
-		Ball b = new Ball(Math.random()*(Main.getScenewidth()-40), -20, (int)(1 + Math.floor(Math.random()*10)), gameSpeed);
-		DestroyBlocks db = new DestroyBlocks(2 + Math.random()*(Main.getScenewidth()-17), -20, gameSpeed);
-		Magnet m = new Magnet(2 + Math.random()*(Main.getScenewidth() - 17), -20, gameSpeed);
-		Shield s = new Shield(2 + Math.random()*(Main.getScenewidth() - 17), -20, gameSpeed);
 
-		if(isSafe(b)){tokens.add(b); addGameObject(b); occur++;}
-		if(isSafe(m) && occur%2 == 0){tokens.add(m); addGameObject(m); }
-		if(isSafe(db) && occur%3 == 0){tokens.add(db); addGameObject(db); }
-		if(isSafe(s) && occur% 2 == 0){tokens.add(s); addGameObject(s); }
+		Ball newBall = new Ball(1 + Math.random()*(Main.getScenewidth() - 30), -50, (int)(1 + Math.floor(Math.random()*20)), gameSpeed);
+		DestroyBlocks newDestroyBlock = new DestroyBlocks(20 + Math.random()*(Main.getScenewidth() - 20), -40, gameSpeed);
+		Magnet newMagnet = new Magnet(20 + Math.random()*(Main.getScenewidth() - 20), -40, gameSpeed);
+		Shield newShield = new Shield(20 + Math.random()*(Main.getScenewidth() - 20), -40, gameSpeed);
 
-		Block bb = new Block( 2 + Math.random()*(Main.getScenewidth() - 62), -20, (int)(1 + Math.floor(Math.random()*56)), gameSpeed);
-		blocks.add(bb); addGameObject(bb);
+		if(isSafe(newBall)){
+			tokens.add(newBall); 
+			addGameObject(newBall); 
+			interactablesCount++;
+		}
 		
-		Wall w = new Wall( 2 + Math.random()*(Main.getScenewidth() - 7), 80 + Math.random()*200, gameSpeed);
-		if(isSafe(w)){ walls.add(w); addGameObject(w); }
+		if(isSafe(newMagnet) && interactablesCount%4 == 0){
+			tokens.add(newMagnet); 
+			addGameObject(newMagnet); 
+		}
+		
+		if(isSafe(newDestroyBlock) && interactablesCount%5 == 0){
+			tokens.add(newDestroyBlock); 
+			addGameObject(newDestroyBlock); 
+		}
+		
+		if(isSafe(newShield) && interactablesCount%4 == 0){
+			tokens.add(newShield); 
+			addGameObject(newShield); 
+		}
+
+		Block newBlock = new Block(1 + Math.random()*(Main.getScenewidth() - 62), -61, (int)(1 + Math.floor(Math.random()*56)), gameSpeed);
+		if(isSafe(newBlock)) {
+			blocks.add(newBlock); 
+			addGameObject(newBlock);
+		}
+		
+		Wall newWall = new Wall(1 + Math.random()*(Main.getScenewidth() - 6), 80 + Math.random()*200, gameSpeed);
+		if(isSafe(newWall)){ 
+			walls.add(newWall); 
+			addGameObject(newWall); 
+		}
 		
 	}
 
-	static boolean isSafe(GameObject G){
+	static boolean isSafe(GameObject object){
 		
-		for(GameObject T : tokens){
-			if(T.isColliding(G)){return false;}
+		for(GameObject token : tokens){
+			if(token.isColliding(object)){
+				return false;
+			}
 		}
-		for(GameObject W : walls){
-			if(W.isColliding(G)){return false;}
+		for(GameObject wall : walls){
+			if(wall.isColliding(object)){
+				return false;
+			}
 		}
-		for(GameObject B : blocks){
-			if(B.isColliding(G)){return false;}
+		for(GameObject block : blocks){
+			if(block.isColliding(object)){
+				return false;
+			}
 		}
+		
 		return true;
 	
 	}
