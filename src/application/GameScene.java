@@ -349,8 +349,8 @@ public class GameScene extends Scene {
 				Point2D rectPos = ((rectangleWithText)block.getView()).getRectCenter();
 				Point2D snakePos = userSnake.getSnakeHeadPosPoint2D();
 				Point2D trianglePoint = new Point2D(rectPos.getX(), snakePos.getY());
-				if(Math.atan(snakePos.distance(trianglePoint)/trianglePoint.distance(rectPos)) > 0.78 || snakePos.getY() <= rectPos.getY()) {
-					
+				if(Math.atan(snakePos.distance(trianglePoint)/trianglePoint.distance(rectPos)) > 0.77 || snakePos.getY() <= rectPos.getY()) {
+					userSnake.setSnakeCollideBlock(true);
 				}
 				else {
 					block.setAlive(false);
@@ -364,9 +364,6 @@ public class GameScene extends Scene {
 		}
 		
 		for(Wall wall : walls) {
-			if(wall.isColliding(userSnake.getSnakeHead())) {
-				wall.collide(userSnake);
-			}
 			if(wall.isDead()) {
 				root.getChildren().remove(wall.getView());
 			}

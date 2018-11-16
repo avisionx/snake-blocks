@@ -51,6 +51,7 @@ public class Snake extends Group {
 	private int length;
 	private double xVelocity;
 	private double xSpeed = 400;
+	private boolean snakeCollideBlock;
 	
 	private AnimationTimer snakeMotion = new AnimationTimer() {
 		
@@ -117,6 +118,11 @@ public class Snake extends Group {
 						moveHead(moveDistanceThisFrame);
 					}
 				}
+				else if(snakeCollideBlock) {
+					moveDistanceThisFrame = 0;
+					moveHead(moveDistanceThisFrame);
+					snakeCollideBlock = false;
+				}
 				else {					
 					moveDistanceThisFrame = elapsedTimeInSec * xVelocity;
 					if(snakeHeadPos + moveDistanceThisFrame > 390) {
@@ -134,6 +140,10 @@ public class Snake extends Group {
 		}
 		
 	};
+	
+	public void setSnakeCollideBlock(boolean snakeCollideBlock) {
+		this.snakeCollideBlock = snakeCollideBlock;
+	}
 	
 	public GameObject getSnakeHead() {
 		return snakeHead;
@@ -174,6 +184,7 @@ public class Snake extends Group {
 		this.getChildren().addAll(snakeText, snakeHead.getView());
 		this.snakeBody = new ArrayList<>();
 		this.length = length;
+		this.snakeCollideBlock = false;
 		for(int i = 1; i < Math.min(this.length, 8); i++) {
 			followingCircle nextCircle = new followingCircle(Main.getScenewidth()/2, Main.getSceneheight()*8/10 + 18*i, 9, Color.web("#fedc0f"));
 			this.snakeBody.add(nextCircle);
