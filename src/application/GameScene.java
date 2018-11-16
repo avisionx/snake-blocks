@@ -125,6 +125,67 @@ class pauseScreen extends StackPane {
 	
 }
 
+class endScreen extends StackPane {
+	
+	public endScreen(int scoreToDisplay) {
+		
+		super();
+		
+		Rectangle background = new Rectangle(0, 0, Main.getScenewidth(), Main.getSceneheight());
+		background.setFill(Color.rgb(0, 0, 0, 0.5));
+		
+		VBox displayItems = new VBox(30);
+		
+		HBox scoreWithCrown = new HBox(10);
+		Text scoreText = new Text(scoreToDisplay + "");
+		scoreText.getStyleClass().add("pauseScoreText");
+		scoreText.setFill(Color.WHITE);
+		Image corwnImage = null;
+		try {
+			String pathToImage = "./img/scoreCrown.png";
+			corwnImage = new Image(new FileInputStream(pathToImage));
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		ImageView crownImageView = null;
+		if(corwnImage != null) {
+			crownImageView = new ImageView(corwnImage);
+			crownImageView.setX(0);
+			crownImageView.setY(0);
+			crownImageView.setFitWidth(45);
+			crownImageView.setPreserveRatio(true);  
+		}
+		scoreWithCrown.setAlignment(Pos.CENTER);
+		scoreWithCrown.getChildren().addAll(crownImageView, scoreText);
+		
+		Button newGameBtn = new pauseScreenButton("New Game");
+		Button goToMenuBtn = new pauseScreenButton("Main Menu");
+		Button exitBtn = new pauseScreenButton("Exit");
+		
+		newGameBtn.setOnAction(e -> {
+			GameScene gameScene = new GameScene(GameScene.primaryStage, GameScene.mainMenuScene);
+			GameScene.primaryStage.setScene(gameScene);
+			gameScene.getStylesheets().add(
+	        		getClass().getResource("application.css").toExternalForm()
+	        	);
+		});
+		
+		goToMenuBtn.setOnAction(e -> {
+			GameScene.primaryStage.setScene(GameScene.mainMenuScene);
+		});
+		
+		exitBtn.setOnAction(e -> {
+			System.exit(0);
+		});
+		
+		displayItems.getChildren().addAll(scoreWithCrown, newGameBtn, goToMenuBtn, exitBtn);
+		displayItems.setAlignment(Pos.CENTER);
+		this.getChildren().addAll(background, displayItems);
+	
+	}	
+	
+}
+
 public class GameScene extends Scene {
 	
 	private static Pane root;
@@ -140,9 +201,11 @@ public class GameScene extends Scene {
 	private static Text scoreOnGame;
 	private static HBox scoreOnGameBox;
 	private static pauseScreen pausedMenu;
+	private static endScreen endMenu;
 	private static boolean openedPauseMenu = false;
 	protected static Stage primaryStage;
 	protected static Scene mainMenuScene;
+	
 	
 	private static int interactablesCount = 0;
 	
@@ -170,6 +233,15 @@ public class GameScene extends Scene {
 		}
 		
 	};
+	
+	public static void setGameScore(int newScore) {
+		curGameScore = newScore;
+		scoreOnGame.setText(newScore + "");
+	}
+	
+	public static int getGameScore() {
+		return curGameScore;
+	}
 	
 	public GameScene(Stage stage, Scene mainScreen) {
 		
@@ -203,14 +275,12 @@ public class GameScene extends Scene {
 	}
 	
 	protected static void pauseGame() {
-		
 		openedPauseMenu = true;
 		stopFallAnimation();
 		populationTimer.stop();
 		userSnake.setSpeed(0);
 		pausedMenu = new pauseScreen(curGameScore);
 		root.getChildren().add(pausedMenu);
-	
 	}
 	
 	private static void stopFallAnimation() {
@@ -304,6 +374,19 @@ public class GameScene extends Scene {
 		
 		return root;
 		
+	}
+	
+	public static void gameOver() {
+		System.out.println("GAME OVER");
+		endGame();
+	}
+	
+	private static void endGame() {
+		stopFallAnimation();
+		populationTimer.stop();
+		userSnake.setSpeed(0);
+		endMenu = new endScreen(curGameScore);
+		root.getChildren().add(endMenu);
 	}
 	
 	private static void resetGame() {

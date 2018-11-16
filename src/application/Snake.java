@@ -171,6 +171,20 @@ public class Snake extends Group {
 		this.xSpeed = speed;
 	}
 	
+	public void setSnakeLength(int newLength) {
+		length = newLength;
+		snakeText.setText(newLength + "");
+		if(length <= 0) {
+			length = 0;
+			snakeText.setText("0");
+			GameScene.gameOver();
+		}
+	}
+	
+	public int getSnakeLength() {
+		return length;
+	}
+	
 	public Snake(int length) {
 		
 		super();
