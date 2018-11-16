@@ -1,5 +1,6 @@
 package application;
 
+import javafx.geometry.Point2D;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -18,6 +19,10 @@ class rectangleWithText extends StackPane {
 	
 	public Text getRectText() {
 		return rectText;
+	}
+	
+	public Point2D getRectCenter() {
+		return new Point2D(this.getTranslateX() + 30, this.getTranslateY() + 30);
 	}
 	
 	public rectangleWithText(double x, double y, int value) {

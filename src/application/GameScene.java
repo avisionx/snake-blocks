@@ -6,6 +6,7 @@ import java.util.List;
 import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -19,7 +20,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -346,9 +346,17 @@ public class GameScene extends Scene {
 		
 		for(Block block : blocks) {
 			if(block.isColliding(userSnake.getSnakeHead())) {
-				block.setAlive(false);
-				block.collide(userSnake);
-				root.getChildren().remove(block.getView());
+				Point2D rectPos = ((rectangleWithText)block.getView()).getRectCenter();
+				Point2D snakePos = userSnake.getSnakeHeadPosPoint2D();
+				Point2D trianglePoint = new Point2D(rectPos.getX(), snakePos.getY());
+				if(Math.atan(snakePos.distance(trianglePoint)/trianglePoint.distance(rectPos)) > 0.78 || snakePos.getY() <= rectPos.getY()) {
+					
+				}
+				else {
+					block.setAlive(false);
+					block.collide(userSnake);
+					root.getChildren().remove(block.getView());
+				}
 			}
 			if(block.isDead()) {
 				root.getChildren().remove(block.getView());

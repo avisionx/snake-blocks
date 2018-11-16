@@ -139,6 +139,12 @@ public class Snake extends Group {
 		return snakeHead;
 	}
 	
+	public Point2D getSnakeHeadPosPoint2D() {
+		double x = ((Circle)snakeHead.getView()).getCenterX();
+		double y = ((Circle)snakeHead.getView()).getCenterY();
+		return new Point2D(x, y);
+	}
+	
 	public void moveLeft() {
 		xVelocity = -xSpeed;
 	}
