@@ -172,12 +172,22 @@ public class Snake extends Group {
 	}
 	
 	public void setSnakeLength(int newLength) {
+		int oldLength = length;
 		length = newLength;
 		snakeText.setText(newLength + "");
 		if(length <= 0) {
 			length = 0;
 			snakeText.setText("0");
 			GameScene.gameOver();
+			return;
+		}
+		if(oldLength > newLength) {
+			if(newLength < 8)
+				this.getChildren().remove(newLength+1, this.getChildren().size());
+		}
+		else {
+			if(oldLength < 8)
+				this.getChildren().addAll(snakeBody.subList(oldLength-1, Math.min(newLength-1, 7)));
 		}
 	}
 	

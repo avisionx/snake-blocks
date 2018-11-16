@@ -2,6 +2,7 @@ package application;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.List;
 
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -37,7 +38,10 @@ public class DestroyBlocks extends GameObject implements Token{
 
 	@Override
 	public void collide(Snake snake) {
-		System.out.println("POWER UP: DESTROY ALL BLOCKS");
+		List<Block> blockList = GameScene.getBlockList();
+		for(Block block : blockList) {
+			block.destroy(snake);
+		}
 	}
 	
 }

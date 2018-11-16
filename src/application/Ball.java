@@ -1,6 +1,9 @@
 package application;
 
+import javafx.animation.AnimationTimer;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -40,6 +43,30 @@ public class Ball extends GameObject implements Token{
 	@Override
 	public void collide(Snake snake) {
 		snake.setSnakeLength(snake.getSnakeLength() + this.value);
+	}
+
+	public void attract(Point2D snakePos) {
+		
+		this.getFallDownTimer().stop();
+		
+		new AnimationTimer() {
+			
+			@Override
+			public void handle(long arg) {
+
+				Node view = getView();
+				Point2D newPosVector = snakePos.subtract(getPos2D()).normalize();
+				view.setTranslateX(view.getTranslateX() + newPosVector.getX());
+				view.setTranslateY(view.getTranslateY() + newPosVector.getY());
+				
+			}
+			
+		}.start();
+	
+	}
+
+	public Point2D getPos2D() {
+		return new Point2D(this.getView().getTranslateX(), this.getView().getTranslateY());
 	}
 	
 }

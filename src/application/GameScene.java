@@ -212,6 +212,28 @@ public class GameScene extends Scene {
 		}
 
 	};
+	
+	public static List<Block> getBlockList() {
+		return blocks;
+	}
+	
+	public static List<Ball> getBallList() {
+		List<Ball> ballList = new ArrayList<>();
+		for(GameObject object : tokens) {
+			if(object.getClass() == Ball.class) {
+				ballList.add((Ball)object);
+			}
+		}
+		return ballList;
+	}
+	
+	public static void setMagnetOn() {
+		System.out.println("Magnet On");
+	}
+	
+	public static void setMagnetOff() {
+		System.out.println("Magnet Off");
+	}
 
 	private static AnimationTimer populationTimer = new AnimationTimer() {
 

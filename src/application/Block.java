@@ -86,4 +86,9 @@ public class Block extends GameObject implements Interactable{
 		snake.setSnakeLength(snake.getSnakeLength() - this.value);
 	}
 	
+	public void destroy(Snake snake) {
+		GameScene.setGameScore(GameScene.getGameScore() + this.value);
+		setAlive(false);
+	}
+	
 }

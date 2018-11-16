@@ -2,7 +2,10 @@ package application;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.List;
 
+import javafx.animation.AnimationTimer;
+import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
@@ -12,6 +15,7 @@ public class Magnet extends GameObject implements Token{
 	
 	private static final ImagePattern magnetImage;
 	private static final Color altColor = Color.ALICEBLUE; 
+	private int duration;
 	
 	static{
 		FileInputStream fileUrl = null;
@@ -32,12 +36,47 @@ public class Magnet extends GameObject implements Token{
 		super(new Circle(x, y, 16), speed);
 		((Circle)this.getView()).setFill(magnetImage != null ? magnetImage : altColor);
 		this.getFallDownTimer().start();
+		this.duration = 5;
 		
 	}
 
 	@Override
 	public void collide(Snake snake) {
-		System.out.println("POWER UP: MAGNET");
+		
+		GameScene.setMagnetOn();
+		
+		new AnimationTimer() {
+			
+			double lastUpdateFrameTime = 0;
+			
+			@Override
+			public void handle(long now) {
+				
+				if(lastUpdateFrameTime > 0) {
+					
+					double elapsedTimeInSec = (now-lastUpdateFrameTime)/1_000_000_000.0; 
+					
+					if(elapsedTimeInSec >= duration) {
+						GameScene.setMagnetOff();
+						this.stop();
+					}	
+					
+					for (Ball ball : GameScene.getBallList()) {
+						Point2D snakePos = snake.getSnakeHeadPosPoint2D(); 
+						Point2D ballPos = ball.getPos2D();
+						if(snakePos.distance(ballPos) < 100) {
+							ball.attract(snakePos);
+						}
+					}
+					
+				}
+				else {
+					lastUpdateFrameTime = now;
+				}
+			}
+			
+		}.start();
+	
 	}
 	
 }

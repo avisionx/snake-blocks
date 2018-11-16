@@ -25,7 +25,7 @@ public class GameObject {
 		this.fallDownMotionTimer = new AnimationTimer() {
 			
 			@Override
-			public void handle(long arg0) {
+			public void handle(long arg) {
 				update();
 			}
 		};
