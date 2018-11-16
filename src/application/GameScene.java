@@ -201,6 +201,7 @@ public class GameScene extends Scene {
 	private static boolean openedPauseMenu = false;
 	protected static Stage primaryStage;
 	protected static Scene mainMenuScene;
+	private static long pauseTime;
 
 	private static int interactablesCount = 0;
 
@@ -302,6 +303,7 @@ public class GameScene extends Scene {
 	}
 
 	protected static void pauseGame() {
+		pauseTime = System.currentTimeMillis();
 		openedPauseMenu = true;
 		stopFallAnimation();
 		stopPowerUps();
@@ -335,18 +337,19 @@ public class GameScene extends Scene {
 	protected static void resumeGame() {
 		openedPauseMenu = false;
 		resumeFallAnimation();
-		resumePowerUps();
 		populationTimer.start();
 		userSnake.setSpeed(400);
+		resumePowerUps();
 		root.getChildren().remove(pausedMenu);
-
 	}
 
 	private static void resumePowerUps() {
 		if(userSnake.hasMagnet) {
+			userSnake.curMagnet.addDuration(((long)System.currentTimeMillis() - pauseTime)/1000);
 			userSnake.curMagnet.magnetTimer.start();
 		}
 		if(userSnake.hasShield) {
+			userSnake.curShield.addDuration(((long)System.currentTimeMillis() - pauseTime)/1000);
 			userSnake.curShield.shieldTimer.start();
 		}
 	}

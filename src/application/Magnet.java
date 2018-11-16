@@ -14,7 +14,7 @@ public class Magnet extends GameObject implements Token{
 	
 	private static final ImagePattern magnetImage;
 	private static final Color altColor = Color.ALICEBLUE; 
-	private int duration;
+	private double duration;
 	protected AnimationTimer magnetTimer;
 	
 	static{
@@ -40,6 +40,10 @@ public class Magnet extends GameObject implements Token{
 		this.magnetTimer = null;
 		
 	}
+	
+	public void addDuration(double d) {
+		this.duration += d;
+	}
 
 	@Override
 	public void collide(Snake snake) {
@@ -63,7 +67,6 @@ public class Magnet extends GameObject implements Token{
 					if(lastUpdateFrameTime > 0) {
 						
 						double elapsedTimeInSec = (now-lastUpdateFrameTime)/1_000_000_000.0; 
-						
 						if(elapsedTimeInSec >= duration) {
 							GameScene.setMagnetOff();
 							snake.hasMagnet = false;

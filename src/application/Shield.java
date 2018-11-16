@@ -13,7 +13,7 @@ public class Shield extends GameObject implements Token{
 
 	private static final ImagePattern shieldImage;
 	private static final Color altColor = Color.BLANCHEDALMOND; 
-	private int duration;
+	private double duration;
 	protected AnimationTimer shieldTimer;
 	
 	static{
@@ -38,6 +38,10 @@ public class Shield extends GameObject implements Token{
 		this.duration = 5;
 		this.shieldTimer = null;
 		
+	}
+	
+	public void addDuration(double d) {
+		this.duration += d;
 	}
 
 	@Override
