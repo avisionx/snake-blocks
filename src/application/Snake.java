@@ -181,6 +181,7 @@ public class Snake extends Group {
 		snakeText.setText(newLength + "");
 		if(length <= 0) {
 			length = 0;
+			this.getChildren().remove(2, this.getChildren().size());
 			snakeText.setText("0");
 			GameScene.gameOver();
 			return;
