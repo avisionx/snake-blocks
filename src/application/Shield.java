@@ -3,6 +3,7 @@ package application;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+import javafx.animation.AnimationTimer;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
@@ -12,6 +13,8 @@ public class Shield extends GameObject implements Token{
 
 	private static final ImagePattern shieldImage;
 	private static final Color altColor = Color.BLANCHEDALMOND; 
+	private double duration;
+	protected AnimationTimer shieldTimer;
 	
 	static{
 		FileInputStream fileUrl = null;
@@ -32,12 +35,57 @@ public class Shield extends GameObject implements Token{
 		super(new Circle(x, y, 16, Color.MAGENTA), speed);
 		((Circle)this.getView()).setFill(shieldImage != null ? shieldImage : altColor);
 		this.getFallDownTimer().start();
+		this.duration = 5;
+		this.shieldTimer = null;
 		
+	}
+	
+	public void addDuration(double d) {
+		this.duration += d;
 	}
 
 	@Override
 	public void collide(Snake snake) {
-		System.out.println("POWER UP: SHIELD");
+		
+		if(snake.hasShield) {
+			snake.curShield.duration += 5;
+		}
+		else {
+			
+			snake.hasShield = true;
+			snake.curShield = this;
+			
+			GameScene.setShieldOn();
+			
+			shieldTimer = new AnimationTimer() {
+				
+				double lastUpdateFrameTime = 0;
+				
+				@Override
+				public void handle(long now) {
+					
+					if(lastUpdateFrameTime > 0) {
+						
+						double elapsedTimeInSec = (now-lastUpdateFrameTime)/1_000_000_000.0; 
+						
+						if(elapsedTimeInSec >= duration) {
+							GameScene.setShieldOff();;
+							snake.hasShield = false;
+							snake.curShield = null;
+							this.stop();
+						}	
+
+					}
+					else {
+						lastUpdateFrameTime = now;
+					}
+				}
+				
+			};
+			
+			shieldTimer.start();
+			
+		}
 	}
 	
 }

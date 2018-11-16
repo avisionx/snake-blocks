@@ -51,6 +51,11 @@ public class Snake extends Group {
 	private int length;
 	private double xVelocity;
 	private double xSpeed = 400;
+	private boolean snakeCollideBlock;
+	protected boolean hasMagnet;
+	protected Magnet curMagnet;
+	protected boolean hasShield;
+	protected Shield curShield;
 	
 	private AnimationTimer snakeMotion = new AnimationTimer() {
 		
@@ -117,6 +122,11 @@ public class Snake extends Group {
 						moveHead(moveDistanceThisFrame);
 					}
 				}
+				else if(snakeCollideBlock) {
+					moveDistanceThisFrame = 0;
+					moveHead(moveDistanceThisFrame);
+					snakeCollideBlock = false;
+				}
 				else {					
 					moveDistanceThisFrame = elapsedTimeInSec * xVelocity;
 					if(snakeHeadPos + moveDistanceThisFrame > 390) {
@@ -135,8 +145,18 @@ public class Snake extends Group {
 		
 	};
 	
+	public void setSnakeCollideBlock(boolean snakeCollideBlock) {
+		this.snakeCollideBlock = snakeCollideBlock;
+	}
+	
 	public GameObject getSnakeHead() {
 		return snakeHead;
+	}
+	
+	public Point2D getSnakeHeadPosPoint2D() {
+		double x = ((Circle)snakeHead.getView()).getCenterX();
+		double y = ((Circle)snakeHead.getView()).getCenterY();
+		return new Point2D(x, y);
 	}
 	
 	public void moveLeft() {
@@ -155,6 +175,31 @@ public class Snake extends Group {
 		this.xSpeed = speed;
 	}
 	
+	public void setSnakeLength(int newLength) {
+		int oldLength = length;
+		length = newLength;
+		snakeText.setText(newLength + "");
+		if(length <= 0) {
+			length = 0;
+			this.getChildren().remove(2, this.getChildren().size());
+			snakeText.setText("0");
+			GameScene.gameOver();
+			return;
+		}
+		if(oldLength > newLength) {
+			if(newLength < 8)
+				this.getChildren().remove(newLength+1, this.getChildren().size());
+		}
+		else {
+			if(oldLength < 8)
+				this.getChildren().addAll(snakeBody.subList(oldLength-1, Math.min(newLength-1, 7)));
+		}
+	}
+	
+	public int getSnakeLength() {
+		return length;
+	}
+	
 	public Snake(int length) {
 		
 		super();
@@ -168,6 +213,11 @@ public class Snake extends Group {
 		this.getChildren().addAll(snakeText, snakeHead.getView());
 		this.snakeBody = new ArrayList<>();
 		this.length = length;
+		this.hasMagnet = false;
+		this.curMagnet = null;
+		this.hasShield = false;
+		this.curShield = null;
+		this.snakeCollideBlock = false;
 		for(int i = 1; i < Math.min(this.length, 8); i++) {
 			followingCircle nextCircle = new followingCircle(Main.getScenewidth()/2, Main.getSceneheight()*8/10 + 18*i, 9, Color.web("#fedc0f"));
 			this.snakeBody.add(nextCircle);

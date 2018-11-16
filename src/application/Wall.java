@@ -19,7 +19,6 @@ public class Wall extends GameObject implements Interactable{
 	@Override
 	public void collide(Snake snake) {
 		// TODO Auto-generated method stub
-		
 	}
 	
 }

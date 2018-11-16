@@ -1,5 +1,6 @@
 package application;
 
+import javafx.geometry.Point2D;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -18,6 +19,10 @@ class rectangleWithText extends StackPane {
 	
 	public Text getRectText() {
 		return rectText;
+	}
+	
+	public Point2D getRectCenter() {
+		return new Point2D(this.getTranslateX() + 30, this.getTranslateY() + 30);
 	}
 	
 	public rectangleWithText(double x, double y, int value) {
@@ -74,7 +79,19 @@ public class Block extends GameObject implements Interactable{
 
 	@Override
 	public void collide(Snake snake) {
-		System.out.println("COLLIDE WITH BLOCK OF VALUE: " + this.value);
+		
+		if(snake.getSnakeLength() >= this.value)
+			GameScene.setGameScore(GameScene.getGameScore() + this.value);
+		else
+			GameScene.setGameScore(GameScene.getGameScore() + snake.getSnakeLength());
+		
+		if(!snake.hasShield)
+			snake.setSnakeLength(snake.getSnakeLength() - this.value);
+	}
+	
+	public void destroy(Snake snake) {
+		GameScene.setGameScore(GameScene.getGameScore() + this.value);
+		setAlive(false);
 	}
 	
 }
