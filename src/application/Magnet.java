@@ -15,6 +15,7 @@ public class Magnet extends GameObject implements Token{
 	private static final ImagePattern magnetImage;
 	private static final Color altColor = Color.ALICEBLUE; 
 	private int duration;
+	protected AnimationTimer magnetTimer;
 	
 	static{
 		FileInputStream fileUrl = null;
@@ -36,6 +37,7 @@ public class Magnet extends GameObject implements Token{
 		((Circle)this.getView()).setFill(magnetImage != null ? magnetImage : altColor);
 		this.getFallDownTimer().start();
 		this.duration = 5;
+		this.magnetTimer = null;
 		
 	}
 
@@ -51,7 +53,7 @@ public class Magnet extends GameObject implements Token{
 			
 			GameScene.setMagnetOn();
 			
-			new AnimationTimer() {
+			magnetTimer = new AnimationTimer() {
 				
 				double lastUpdateFrameTime = 0;
 				
@@ -83,7 +85,10 @@ public class Magnet extends GameObject implements Token{
 					}
 				}
 				
-			}.start();
+			};
+			
+			magnetTimer.start();
+			
 		}
 		
 	}

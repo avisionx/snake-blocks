@@ -236,6 +236,16 @@ public class GameScene extends Scene {
 		System.out.println("Magnet Off");
 //		TODO
 	}
+	
+	public static void setShieldOn() {
+		System.out.println("Shield On");
+//		TODO
+	}
+	
+	public static void setShieldOff() {
+		System.out.println("Shield Off");
+//		TODO
+	}
 
 	private static AnimationTimer populationTimer = new AnimationTimer() {
 
@@ -294,10 +304,20 @@ public class GameScene extends Scene {
 	protected static void pauseGame() {
 		openedPauseMenu = true;
 		stopFallAnimation();
+		stopPowerUps();
 		populationTimer.stop();
 		userSnake.setSpeed(0);
 		pausedMenu = new pauseScreen(curGameScore);
 		root.getChildren().add(pausedMenu);
+	}
+
+	private static void stopPowerUps() {
+		if(userSnake.hasMagnet) {
+			userSnake.curMagnet.magnetTimer.stop();
+		}
+		if(userSnake.hasShield) {
+			userSnake.curShield.shieldTimer.stop();
+		}
 	}
 
 	private static void stopFallAnimation() {
@@ -313,13 +333,22 @@ public class GameScene extends Scene {
 	}
 
 	protected static void resumeGame() {
-
 		openedPauseMenu = false;
 		resumeFallAnimation();
+		resumePowerUps();
 		populationTimer.start();
 		userSnake.setSpeed(400);
 		root.getChildren().remove(pausedMenu);
 
+	}
+
+	private static void resumePowerUps() {
+		if(userSnake.hasMagnet) {
+			userSnake.curMagnet.magnetTimer.start();
+		}
+		if(userSnake.hasShield) {
+			userSnake.curShield.shieldTimer.start();
+		}
 	}
 
 	private static void resumeFallAnimation() {

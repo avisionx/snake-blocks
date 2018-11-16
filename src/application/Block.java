@@ -79,11 +79,14 @@ public class Block extends GameObject implements Interactable{
 
 	@Override
 	public void collide(Snake snake) {
+		
 		if(snake.getSnakeLength() >= this.value)
 			GameScene.setGameScore(GameScene.getGameScore() + this.value);
 		else
 			GameScene.setGameScore(GameScene.getGameScore() + snake.getSnakeLength());
-		snake.setSnakeLength(snake.getSnakeLength() - this.value);
+		
+		if(!snake.hasShield)
+			snake.setSnakeLength(snake.getSnakeLength() - this.value);
 	}
 	
 	public void destroy(Snake snake) {

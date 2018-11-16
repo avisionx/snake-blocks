@@ -54,6 +54,8 @@ public class Snake extends Group {
 	private boolean snakeCollideBlock;
 	protected boolean hasMagnet;
 	protected Magnet curMagnet;
+	protected boolean hasShield;
+	protected Shield curShield;
 	
 	private AnimationTimer snakeMotion = new AnimationTimer() {
 		
@@ -212,6 +214,8 @@ public class Snake extends Group {
 		this.length = length;
 		this.hasMagnet = false;
 		this.curMagnet = null;
+		this.hasShield = false;
+		this.curShield = null;
 		this.snakeCollideBlock = false;
 		for(int i = 1; i < Math.min(this.length, 8); i++) {
 			followingCircle nextCircle = new followingCircle(Main.getScenewidth()/2, Main.getSceneheight()*8/10 + 18*i, 9, Color.web("#fedc0f"));
