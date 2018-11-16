@@ -229,10 +229,12 @@ public class GameScene extends Scene {
 	
 	public static void setMagnetOn() {
 		System.out.println("Magnet On");
+//		TODO
 	}
 	
 	public static void setMagnetOff() {
 		System.out.println("Magnet Off");
+//		TODO
 	}
 
 	private static AnimationTimer populationTimer = new AnimationTimer() {

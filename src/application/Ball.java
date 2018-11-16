@@ -55,7 +55,7 @@ public class Ball extends GameObject implements Token{
 			public void handle(long arg) {
 
 				Node view = getView();
-				Point2D newPosVector = snakePos.subtract(getPos2D()).normalize();
+				Point2D newPosVector = snakePos.subtract(getPos2D()).normalize().multiply(2);
 				view.setTranslateX(view.getTranslateX() + newPosVector.getX());
 				view.setTranslateY(view.getTranslateY() + newPosVector.getY());
 				

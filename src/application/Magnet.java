@@ -2,7 +2,6 @@ package application;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.List;
 
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Point2D;
@@ -43,40 +42,50 @@ public class Magnet extends GameObject implements Token{
 	@Override
 	public void collide(Snake snake) {
 		
-		GameScene.setMagnetOn();
-		
-		new AnimationTimer() {
+		if(snake.hasMagnet) {
+			snake.curMagnet.duration += 5;
+		}
+		else {
+			snake.hasMagnet = true;
+			snake.curMagnet = this;
 			
-			double lastUpdateFrameTime = 0;
+			GameScene.setMagnetOn();
 			
-			@Override
-			public void handle(long now) {
+			new AnimationTimer() {
 				
-				if(lastUpdateFrameTime > 0) {
+				double lastUpdateFrameTime = 0;
+				
+				@Override
+				public void handle(long now) {
 					
-					double elapsedTimeInSec = (now-lastUpdateFrameTime)/1_000_000_000.0; 
-					
-					if(elapsedTimeInSec >= duration) {
-						GameScene.setMagnetOff();
-						this.stop();
-					}	
-					
-					for (Ball ball : GameScene.getBallList()) {
-						Point2D snakePos = snake.getSnakeHeadPosPoint2D(); 
-						Point2D ballPos = ball.getPos2D();
-						if(snakePos.distance(ballPos) < 100) {
-							ball.attract(snakePos);
+					if(lastUpdateFrameTime > 0) {
+						
+						double elapsedTimeInSec = (now-lastUpdateFrameTime)/1_000_000_000.0; 
+						
+						if(elapsedTimeInSec >= duration) {
+							GameScene.setMagnetOff();
+							snake.hasMagnet = false;
+							snake.curMagnet = null;
+							this.stop();
+						}	
+						
+						for (Ball ball : GameScene.getBallList()) {
+							Point2D snakePos = snake.getSnakeHeadPosPoint2D(); 
+							Point2D ballPos = ball.getPos2D();
+							if(snakePos.distance(ballPos) < 200) {
+								ball.attract(snakePos);
+							}
 						}
+						
 					}
-					
+					else {
+						lastUpdateFrameTime = now;
+					}
 				}
-				else {
-					lastUpdateFrameTime = now;
-				}
-			}
-			
-		}.start();
-	
+				
+			}.start();
+		}
+		
 	}
 	
 }
