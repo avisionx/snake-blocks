@@ -211,18 +211,20 @@ public class GameScene extends Scene {
 		public void handle(long now) {
 			double elapsedTime = (now - lastUpdateTime) / 1_000_000_000.0;
 			if(elapsedTime > 0.05) {
-				if(collidingWithBlock.getValue() <= 0) {
-					collidingWithBlock.setAlive(false);
-					collidingWithBlock = null;
-					this.stop();
+				if(collidingWithBlock != null) {
+					if(collidingWithBlock.getValue() <= 0) {
+						collidingWithBlock.setAlive(false);
+						collidingWithBlock = null;
+						this.stop();
+					}
+					else if(userSnake.getSnakeLength() <= 0) {
+						this.stop();
+					}
+					else {
+						collidingWithBlock.collide(userSnake);
+					}
+					lastUpdateTime = now;
 				}
-				else if(userSnake.getSnakeLength() <= 0) {
-					this.stop();
-				}
-				else {
-					collidingWithBlock.collide(userSnake);
-				}
-				lastUpdateTime = now;
 			}
 		}
 	};
