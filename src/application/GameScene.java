@@ -442,6 +442,7 @@ public class GameScene extends Scene {
 	private static void endGame() {
 		stopFallAnimation();
 		populationTimer.stop();
+		stopPowerUps();
 		userSnake.setSpeed(0);
 		endMenu = new endScreen(curGameScore);
 		root.getChildren().add(endMenu);
@@ -528,27 +529,28 @@ public class GameScene extends Scene {
 	public static void populateNewItems() {
 
 		Random posR = new Random();
-		Ball newBall = new Ball(posR.nextInt(360) + 20, -362, (int) (1 + Math.floor(Math.random() * 20)), gameSpeed);
-		if (isSafe(newBall)) {
-			tokens.add(newBall);
-			addGameObject(newBall);
-			interactablesCount++;
+		for(int i = 0; i < 8; i++) {
+			Ball newBall = new Ball(posR.nextInt(360) + 20, -100 + posR.nextFloat()*-1*300, 1 + posR.nextInt(20), gameSpeed);
+			if (isSafe(newBall)) {
+				tokens.add(newBall);
+				addGameObject(newBall);
+				interactablesCount++;
+			}
 		}
-		DestroyBlocks newDestroyBlock = new DestroyBlocks(20 + Math.random() * (Main.getScenewidth() - 20), -40,
-				gameSpeed);
-		Magnet newMagnet = new Magnet(20 + Math.random() * (Main.getScenewidth() - 20), -40, gameSpeed);
-		Shield newShield = new Shield(20 + Math.random() * (Main.getScenewidth() - 20), -40, gameSpeed);
-
-		if (isSafe(newMagnet) && interactablesCount % 4 == 0) {
-			tokens.add(newMagnet);
-			addGameObject(newMagnet);
-		}
-
+		
+		DestroyBlocks newDestroyBlock = new DestroyBlocks(posR.nextInt(360) + 20, -50 + posR.nextFloat()*-1*300, gameSpeed);
 		if (isSafe(newDestroyBlock) && interactablesCount % 5 == 0) {
 			tokens.add(newDestroyBlock);
 			addGameObject(newDestroyBlock);
 		}
-
+		
+		Magnet newMagnet = new Magnet(posR.nextInt(360) + 20, -50 + posR.nextFloat()*-1*300, gameSpeed);
+		if (isSafe(newMagnet) && interactablesCount % 4 == 0) {
+			tokens.add(newMagnet);
+			addGameObject(newMagnet);
+		}
+		
+		Shield newShield = new Shield(posR.nextInt(360) + 20, -50 + posR.nextFloat()*-1*300, gameSpeed);
 		if (isSafe(newShield) && interactablesCount % 4 == 0) {
 			tokens.add(newShield);
 			addGameObject(newShield);
@@ -624,7 +626,31 @@ public class GameScene extends Scene {
 		}
 
 		return true;
+	}
 
+	public static void setGameSpeed() {
+		if(userSnake.getSnakeLength() <= 10) {
+			gameSpeed = 4.5;
+		}
+		else {
+			if(userSnake.getSnakeLength() >= 100) {
+				gameSpeed = 6;
+			}
+			else {
+				gameSpeed = 4.5 + 1.5/90 * (userSnake.getSnakeLength()-10);
+			}
+		}
+		
+		for (GameObject token : tokens) {
+			token.setSpeed(gameSpeed);
+		}
+		for (Wall wall : walls) {
+			wall.setSpeed(gameSpeed);
+		}
+		for (Block block : blocks) {
+			block.setSpeed(gameSpeed);
+		}
+		
 	}
 
 }

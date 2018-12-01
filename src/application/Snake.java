@@ -194,6 +194,7 @@ public class Snake extends Group {
 			if(oldLength < 8)
 				this.getChildren().addAll(snakeBody.subList(oldLength-1, Math.min(newLength-1, 7)));
 		}
+		GameScene.setGameSpeed();
 	}
 	
 	public int getSnakeLength() {

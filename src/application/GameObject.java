@@ -64,7 +64,7 @@ public class GameObject {
 				this.alive = false;
 			}
 		}
-		else if(view.getTranslateY() > 700) {
+		else if(view.getTranslateY() > 900) {
 			this.alive = false;
 		}
 	}	
