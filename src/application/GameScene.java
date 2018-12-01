@@ -186,7 +186,7 @@ class endScreen extends StackPane {
 
 public class GameScene extends Scene {
 
-	private static Pane root;
+	protected static Pane root;
 	private static Snake userSnake;
 	private static List<GameObject> tokens = new ArrayList<>();
 	private static List<Block> blocks = new ArrayList<>();
@@ -448,7 +448,6 @@ public class GameScene extends Scene {
 
 		userSnake = new Snake(10);
 		addSnake(userSnake);
-
 		mainFrameTimer.start();
 		populationTimer.start();
 

@@ -42,6 +42,8 @@ public class DestroyBlocks extends GameObject implements Token{
 		for(Block block : blockList) {
 			block.destroy(snake);
 		}
+		ParticleBurst burstAnimation = new ParticleBurst(this.getView().getTranslateX(), this.getView().getTranslateY(), Color.WHITE);
+		GameScene.root.getChildren().add(burstAnimation);
 	}
 	
 }

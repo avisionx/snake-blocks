@@ -94,6 +94,9 @@ public class Magnet extends GameObject implements Token{
 			
 		}
 		
+		ParticleBurst burstAnimation = new ParticleBurst(this.getView().getTranslateX(), this.getView().getTranslateY(), Color.WHITE);
+		GameScene.root.getChildren().add(burstAnimation);
+		
 	}
 	
 }

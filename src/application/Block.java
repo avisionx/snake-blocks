@@ -90,6 +90,8 @@ public class Block extends GameObject implements Interactable{
 					GameScene.setGameScore(GameScene.getGameScore() + this.value);
 					snake.setSnakeLength(snake.getSnakeLength() - this.value);
 					changeValue(this.value);
+					ParticleBurst burstAnimation = new ParticleBurst(this.getView().getTranslateX(), this.getView().getTranslateY(), (Color) ((Rectangle)((rectangleWithText) this.getView()).getRectBody()).getFill());
+					GameScene.root.getChildren().add(burstAnimation);
 				}
 				else {
 					GameScene.setGameScore(GameScene.getGameScore() + 1);
@@ -100,6 +102,8 @@ public class Block extends GameObject implements Interactable{
 			else {
 				GameScene.setGameScore(GameScene.getGameScore() + this.value);
 				this.value = 0;
+				ParticleBurst burstAnimation = new ParticleBurst(this.getView().getTranslateX(), this.getView().getTranslateY(), (Color) ((Rectangle)((rectangleWithText) this.getView()).getRectBody()).getFill());
+				GameScene.root.getChildren().add(burstAnimation);
 			}
 		else {
 			GameScene.gameOver();
@@ -107,6 +111,10 @@ public class Block extends GameObject implements Interactable{
 	}
 	
 	private void changeValue(int minus) {
+		if(minus > 1) {
+			ParticleBurst burstAnimation = new ParticleBurst(this.getView().getTranslateX(), this.getView().getTranslateY(), (Color) ((Rectangle)((rectangleWithText) this.getView()).getRectBody()).getFill());
+			GameScene.root.getChildren().add(burstAnimation);
+		}
 		this.value -= minus;
 		((rectangleWithText)(this.getView())).getRectText().setText(this.value + "");
 	}
@@ -114,6 +122,8 @@ public class Block extends GameObject implements Interactable{
 	public void destroy(Snake snake) {
 		GameScene.setGameScore(GameScene.getGameScore() + this.value);
 		setAlive(false);
+		ParticleBurst burstAnimation = new ParticleBurst(this.getView().getTranslateX(), this.getView().getTranslateY(), (Color) ((Rectangle)((rectangleWithText) this.getView()).getRectBody()).getFill());
+		GameScene.root.getChildren().add(burstAnimation);
 	}
 	
 }
