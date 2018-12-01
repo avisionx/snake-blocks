@@ -188,231 +188,291 @@ class endScreen extends StackPane {
 public class GameScene extends Scene {
 
 	protected static Pane root;
+	
 	private static Snake userSnake;
-	private static List<GameObject> tokens = new ArrayList<>();
-	private static List<Block> blocks = new ArrayList<>();
-	private static List<Wall> walls = new ArrayList<>();
+	private static List<GameObject> tokens;
+	private static List<Block> blocks;
+	private static List<Wall> walls;
 	private static double gameSpeed;
+	private static int interactablesCount;
+
 	private static Button pauseButton;
+	
 	private static GamePauseHandler gamePauseHandler;
 	protected static GameResumeHandler gameResumeHandler;
+	
 	private static int curGameScore;
 	private static Text scoreOnGame;
 	private static HBox scoreOnGameBox;
+	
 	private static pauseScreen pausedMenu;
 	private static endScreen endMenu;
-	private static boolean openedPauseMenu = false;
+	
 	protected static Stage primaryStage;
 	protected static Scene mainMenuScene;
+	
 	private static long pauseTime;
+	
 	protected static Block collidingWithBlock;
 	private static Text shieldText;
 	private static Text magnetText;
-	
+
 	protected static AnimationTimer collidingBlockTimer = new AnimationTimer() {
+		
 		double lastUpdateTime = System.currentTimeMillis();
+
 		@Override
 		public void handle(long now) {
 			double elapsedTime = (now - lastUpdateTime) / 1_000_000_000.0;
-			if(elapsedTime > 0.05) {
-				if(collidingWithBlock != null) {
-					if(collidingWithBlock.getValue() <= 0) {
+			if (elapsedTime > 0.05) {
+				if (collidingWithBlock != null) {
+					
+					if (collidingWithBlock.getValue() <= 0) {
+						
 						collidingWithBlock.setAlive(false);
 						collidingWithBlock = null;
 						this.stop();
-					}
-					else if(userSnake.getSnakeLength() <= 0) {
+						
+					} 
+					else if (userSnake.getSnakeLength() <= 0) {
 						this.stop();
-					}
+					} 
 					else {
 						collidingWithBlock.collide(userSnake);
 					}
+					
 					lastUpdateTime = now;
+				
 				}
 			}
 		}
+		
 	};
-	private static int interactablesCount = 0;
-
+	
 	private static AnimationTimer mainFrameTimer = new AnimationTimer() {
 
 		@Override
 		public void handle(long now) {
-			updateEachFrame();
+			GameScene.updateEachFrame();
 		}
 
 	};
 	
-	public static List<Block> getBlockList() {
-		return blocks;
-	}
-	
-	public static List<Ball> getBallList() {
-		List<Ball> ballList = new ArrayList<>();
-		for(GameObject object : tokens) {
-			if(object.getClass() == Ball.class) {
-				ballList.add((Ball)object);
+	private static void updateEachFrame() {
+
+		for (GameObject token : GameScene.tokens) {
+			
+			if (token.isColliding(GameScene.userSnake.getSnakeHead())) {
+				
+				token.setAlive(false);
+				((Interactable) token).collide(GameScene.userSnake);
+				GameScene.root.getChildren().remove(token.getView());
+			
+			}
+			if (token.isDead()) {
+				
+				GameScene.root.getChildren().remove(token.getView());
+			
 			}
 		}
-		return ballList;
-	}
-	
-	public static void setMagnetOn() {
-		magnetText.setText("Magnet: On");
-		magnetText.setFill(Color.RED);
-	}
-	
-	public static void setMagnetOff() {
-		magnetText.setText("Magnet: Off");
-		magnetText.setFill(Color.WHITE);
-	}
-	
-	public static void setShieldOn() {
-		shieldText.setText("Shield: On");
-		shieldText.setFill(Color.GREENYELLOW);
-	}
-	
-	public static void setShieldOff() {
-		shieldText.setText("Shield: Off");
-		shieldText.setFill(Color.WHITE);
-	}
 
+		for (Block block : GameScene.blocks) {
+			
+			if (block.isColliding(GameScene.userSnake.getSnakeHead())) {
+				
+				Point2D rectPos = ((rectangleWithText) block.getView()).getRectCenter();
+				Point2D snakePos = userSnake.getSnakeHeadPosPoint2D();
+				Point2D trianglePoint = new Point2D(rectPos.getX(), snakePos.getY());
+				
+				if (Math.atan(snakePos.distance(trianglePoint) / trianglePoint.distance(rectPos)) > 1 || snakePos.getY() <= rectPos.getY()) {	
+					GameScene.userSnake.setSnakeCollideBlock(true);
+				} 
+				else {
+					if (GameScene.collidingWithBlock != null && GameScene.collidingWithBlock != block) {
+						
+						GameScene.collidingBlockTimer.stop();
+						GameScene.collidingWithBlock = block;
+						GameScene.collidingBlockTimer.start();
+						
+						if (GameScene.collidingWithBlock.isDead()) {
+							GameScene.root.getChildren().remove(GameScene.collidingWithBlock.getView());
+							GameScene.resumeFallAnimation();
+							GameScene.populationTimer.start();
+						}
+						
+					}
+					if (GameScene.collidingWithBlock == null) {
+						
+						GameScene.collidingWithBlock = block;
+						GameScene.stopFallAnimation();
+						GameScene.populationTimer.stop();
+						GameScene.collidingBlockTimer.start();
+						
+						if (GameScene.collidingWithBlock.isDead()) {
+							GameScene.root.getChildren().remove(GameScene.collidingWithBlock.getView());
+							GameScene.resumeFallAnimation();
+							GameScene.populationTimer.start();
+						}
+					
+					}
+				}
+			}
+			if (block.isDead()) {
+				GameScene.root.getChildren().remove(block.getView());
+			}
+		}
+
+		if (GameScene.collidingWithBlock != null) {
+			
+			boolean notColliding = true;
+			for (Block block : GameScene.blocks) {
+				if (GameScene.userSnake.getSnakeHead().isColliding(block) && notColliding) {
+					notColliding = false;
+				}
+			}
+
+			if (notColliding) {
+				GameScene.resumeFallAnimation();
+				GameScene.populationTimer.start();
+				GameScene.collidingBlockTimer.stop();
+				GameScene.collidingWithBlock = null;
+			}
+		}
+
+		for (Wall wall : GameScene.walls) {
+			if (wall.isDead()) {
+				GameScene.root.getChildren().remove(wall.getView());
+			}
+		}
+
+		GameScene.tokens.removeIf(GameObject::isDead);
+		GameScene.blocks.removeIf(GameObject::isDead);
+		GameScene.walls.removeIf(GameObject::isDead);
+
+	}
+	
 	private static AnimationTimer populationTimer = new AnimationTimer() {
-
 		double lastPopulateTime = System.currentTimeMillis();
 		boolean checker = false;
-		
+
 		@Override
 		public void handle(long now) {
 			double elapsedTimeInSec = (now - lastPopulateTime) / 1_000_000_000.0;
-			if(elapsedTimeInSec >= 1.5 && checker) {
+			if (elapsedTimeInSec >= 1.5 && checker) {
 				populateNewItems();
 				lastPopulateTime = now;
 				checker = false;
-			}
-			else if (elapsedTimeInSec >= 1.5 && !checker) {
+			} else if (elapsedTimeInSec >= 1.5 && !checker) {
 				spawnBlockLayer();
 				lastPopulateTime = now;
 				checker = true;
 			}
 		}
-
 	};
+	
+	public static List<Block> getBlockList() {
+		return GameScene.blocks;
+	}
+	
+	public static List<Ball> getBallList() {
+		List<Ball> ballList = new ArrayList<>();
+		for (GameObject object : GameScene.tokens) {
+			
+			if (object.getClass() == Ball.class) {
+				ballList.add((Ball) object);
+			}
+			
+		}	
+		return ballList;
+	}
+	
+	public static void setMagnetOn() {
+		GameScene.magnetText.setText("Magnet: On");
+		GameScene.magnetText.setFill(Color.RED);
+	}
 
+	public static void setMagnetOff() {
+		GameScene.magnetText.setText("Magnet: Off");
+		GameScene.magnetText.setFill(Color.WHITE);
+	}
+
+	public static void setShieldOn() {
+		GameScene.shieldText.setText("Shield: On");
+		GameScene.shieldText.setFill(Color.GREENYELLOW);
+	}
+
+	public static void setShieldOff() {
+		GameScene.shieldText.setText("Shield: Off");
+		GameScene.shieldText.setFill(Color.WHITE);
+	}
+	
 	public static void setGameScore(int newScore) {
-		curGameScore = newScore;
-		scoreOnGame.setText(newScore + "");
+		GameScene.curGameScore = newScore;
+		GameScene.scoreOnGame.setText(newScore + "");
 	}
 
 	public static int getGameScore() {
-		return curGameScore;
+		return GameScene.curGameScore;
+	}
+	
+	private static void addSnake(Snake snake) {
+		
+		GameScene.root.getChildren().add(snake);
+		GameScene.pauseButton.toFront();
+		GameScene.scoreOnGameBox.toFront();
+	
 	}
 
+	private static void addGameObject(GameObject object) {
+		
+		GameScene.root.getChildren().add(object.getView());
+		GameScene.userSnake.toFront();
+		GameScene.pauseButton.toFront();
+		GameScene.scoreOnGameBox.toFront();
+	
+	}
+
+	
 	public GameScene(Stage stage, Scene mainScreen) {
 
 		super(new Pane(createContent()), Main.getScenewidth(), Main.getSceneheight());
 
 		this.setOnKeyPressed(e -> {
-
+			
 			if (e.getCode() == KeyCode.A) {
 				userSnake.moveLeft();
 			} else if (e.getCode() == KeyCode.D) {
 				userSnake.moveRight();
-			} else if (e.getCode() == KeyCode.P) {
-				if (!openedPauseMenu)
-					gamePauseHandler.handle(e);
-				else
-					gameResumeHandler.handle(e);
 			}
+			
 		});
 
 		this.setOnKeyReleased(e -> {
+			
 			if (e.getCode() == KeyCode.A || e.getCode() == KeyCode.D) {
 				userSnake.stopSnake();
 			}
+			
 		});
 
-		primaryStage = stage;
-		mainMenuScene = mainScreen;
+		GameScene.primaryStage = stage;
+		GameScene.mainMenuScene = mainScreen;
 
 	}
-
-	protected static void pauseGame() {
-		pauseTime = System.currentTimeMillis();
-		openedPauseMenu = true;
-		stopFallAnimation();
-		stopPowerUps();
-		populationTimer.stop();
-		userSnake.setSpeed(0);
-		pausedMenu = new pauseScreen(curGameScore);
-		root.getChildren().add(pausedMenu);
-	}
-
-	private static void stopPowerUps() {
-		if(userSnake.hasMagnet) {
-			userSnake.curMagnet.stopMagnetTimer();
-		}
-		if(userSnake.hasShield) {
-			userSnake.curShield.shieldTimer.stop();
-		}
-	}
-
-	private static void stopFallAnimation() {
-		for (GameObject token : tokens) {
-			token.getFallDownTimer().stop();
-		}
-		for (Wall wall : walls) {
-			wall.getFallDownTimer().stop();
-		}
-		for (Block block : blocks) {
-			block.getFallDownTimer().stop();
-		}
-	}
-
-	protected static void resumeGame() {
-		openedPauseMenu = false;
-		resumeFallAnimation();
-		populationTimer.start();
-		userSnake.setSpeed(400);
-		resumePowerUps();
-		root.getChildren().remove(pausedMenu);
-	}
-
-	private static void resumePowerUps() {
-		if(userSnake.hasMagnet) {
-			userSnake.curMagnet.addDuration(((long)System.currentTimeMillis() - pauseTime)/1000);
-			userSnake.curMagnet.startMagnetTimer();
-		}
-		if(userSnake.hasShield) {
-			userSnake.curShield.addDuration(((long)System.currentTimeMillis() - pauseTime)/1000);
-			userSnake.curShield.shieldTimer.start();
-		}
-	}
-
-	private static void resumeFallAnimation() {
-		for (GameObject token : tokens) {
-			token.getFallDownTimer().start();
-		}
-		for (Wall wall : walls) {
-			wall.getFallDownTimer().start();
-		}
-		for (Block block : blocks) {
-			block.getFallDownTimer().start();
-		}
-	}
-
+	
 	private static Parent createContent() {
+		
+		GameScene.resetGame();
+		
+		GameScene.root = new Pane();
+		
+		GameScene.root.setPrefSize(Main.getScenewidth(), Main.getSceneheight());
+		GameScene.root.getStyleClass().add("rootBg");
 
-		resetGame();
-		root = new Pane();
-		root.setPrefSize(Main.getScenewidth(), Main.getSceneheight());
-		root.getStyleClass().add("rootBg");
-
-		scoreOnGameBox = new HBox(7);
-		scoreOnGame = new Text(curGameScore + "");
-
-		scoreOnGame.getStyleClass().add("scoreGameText");
-		scoreOnGame.setFill(Color.WHITE);
+		GameScene.scoreOnGameBox = new HBox(7);
+		GameScene.scoreOnGame = new Text(GameScene.curGameScore + "");
+		GameScene.scoreOnGame.getStyleClass().add("scoreGameText");
+		GameScene.scoreOnGame.setFill(Color.WHITE);
 
 		Image corwnImage = null;
 
@@ -424,6 +484,7 @@ public class GameScene extends Scene {
 		}
 
 		ImageView crownImageView = null;
+		
 		if (corwnImage != null) {
 			crownImageView = new ImageView(corwnImage);
 			crownImageView.setX(0);
@@ -432,49 +493,129 @@ public class GameScene extends Scene {
 			crownImageView.setPreserveRatio(true);
 		}
 
-		scoreOnGameBox.setAlignment(Pos.CENTER);
-		scoreOnGameBox.getChildren().addAll(crownImageView, scoreOnGame);
+		GameScene.scoreOnGameBox.setAlignment(Pos.CENTER);
+		GameScene.scoreOnGameBox.getChildren().addAll(crownImageView, GameScene.scoreOnGame);
+		GameScene.scoreOnGameBox.setTranslateX(10);
+		GameScene.scoreOnGameBox.setTranslateY(10);
 
-		scoreOnGameBox.setTranslateX(10);
-		scoreOnGameBox.setTranslateY(10);
+		GameScene.pauseButton = new Button();
+		GameScene.pauseButton.getStyleClass().add("pauseBtn");
+		GameScene.pauseButton.setTranslateX(Main.getScenewidth() - 40);
+		GameScene.pauseButton.setTranslateY(Main.getSceneheight() - 40);
+		GameScene.gamePauseHandler = new GamePauseHandler();
+		GameScene.pauseButton.setOnAction(GameScene.gamePauseHandler);
 
-		pauseButton = new Button();
-		pauseButton.getStyleClass().add("pauseBtn");
-		pauseButton.setTranslateX(Main.getScenewidth() - 40);
-		pauseButton.setTranslateY(Main.getSceneheight() - 40);
+		GameScene.gameResumeHandler = new GameResumeHandler();
 
-		gamePauseHandler = new GamePauseHandler();
-		pauseButton.setOnAction(gamePauseHandler);
+		GameScene.root.getChildren().addAll(GameScene.scoreOnGameBox, GameScene.pauseButton);
 
-		gameResumeHandler = new GameResumeHandler();
-
-		root.getChildren().addAll(scoreOnGameBox, pauseButton);
-
-		magnetText = new Text("Magnet: Off");
-		magnetText.setFill(Color.WHITE);
-		magnetText.setFont(Font.font("Arial", 15));
-		magnetText.setX(310);
-		magnetText.setY(20);
-		root.getChildren().add(magnetText);
-		shieldText = new Text("Shield: Off");
-		shieldText.setFill(Color.WHITE);
-		shieldText.setFont(Font.font("Arial", 15));
-		shieldText.setX(230);
-		shieldText.setY(20);
-		root.getChildren().add(shieldText);
+		GameScene.magnetText = new Text("Magnet: Off");
+		GameScene.magnetText.setFill(Color.WHITE);
+		GameScene.magnetText.setFont(Font.font("Arial", 15));
+		GameScene.magnetText.setX(310);
+		GameScene.magnetText.setY(20);
+		GameScene.root.getChildren().add(GameScene.magnetText);
 		
-		userSnake = new Snake(10);
-		addSnake(userSnake);
-		mainFrameTimer.start();
-		populationTimer.start();
-		
-		return root;
+		GameScene.shieldText = new Text("Shield: Off");
+		GameScene.shieldText.setFill(Color.WHITE);
+		GameScene.shieldText.setFont(Font.font("Arial", 15));
+		GameScene.shieldText.setX(230);
+		GameScene.shieldText.setY(20);
+		GameScene.root.getChildren().add(GameScene.shieldText);
 
+		GameScene.userSnake = new Snake(10);
+		
+		GameScene.addSnake(GameScene.userSnake);
+		
+		GameScene.mainFrameTimer.start();
+		GameScene.populationTimer.start();
+
+		return GameScene.root;
+
+	}
+	
+	private static void resetGame() {
+		GameScene.userSnake = null;
+		GameScene.tokens = new ArrayList<>();
+		GameScene.blocks = new ArrayList<>();
+		GameScene.walls = new ArrayList<>();
+		GameScene.gameSpeed = 4.5;
+		GameScene.curGameScore = 0;
+		GameScene.collidingWithBlock = null;
+		GameScene.interactablesCount = 0;
+	}
+
+	private static void stopFallAnimation() {
+		for (GameObject token : GameScene.tokens) {
+			token.getFallDownTimer().stop();
+		}
+		for (Wall wall : GameScene.walls) {
+			wall.getFallDownTimer().stop();
+		}
+		for (Block block : GameScene.blocks) {
+			block.getFallDownTimer().stop();
+		}
+	}
+	
+	private static void stopPowerUps() {
+		if (GameScene.userSnake.hasMagnet) {
+			GameScene.userSnake.curMagnet.stopMagnetTimer();
+		}
+		if (GameScene.userSnake.hasShield) {
+			GameScene.userSnake.curShield.shieldTimer.stop();
+		}
+	}	
+
+	protected static void pauseGame() {
+		
+		GameScene.pauseTime = System.currentTimeMillis();
+		GameScene.stopFallAnimation();
+		GameScene.stopPowerUps();
+		GameScene.populationTimer.stop();
+		GameScene.userSnake.setSpeed(0);
+		GameScene.pausedMenu = new pauseScreen(GameScene.curGameScore);
+		GameScene.root.getChildren().add(GameScene.pausedMenu);
+	
+	}
+
+	private static void resumeFallAnimation() {
+		for (GameObject token : GameScene.tokens) {
+			token.getFallDownTimer().start();
+		}
+		for (Wall wall : GameScene.walls) {
+			wall.getFallDownTimer().start();
+		}
+		for (Block block : GameScene.blocks) {
+			block.getFallDownTimer().start();
+		}
+	}
+	
+	private static void resumePowerUps() {
+		if (GameScene.userSnake.hasMagnet) {
+			double addDuration = ((long) System.currentTimeMillis() - GameScene.pauseTime) / 1000;
+			GameScene.userSnake.curMagnet.addDuration(addDuration);
+			GameScene.userSnake.curMagnet.startMagnetTimer();
+		}
+		if (GameScene.userSnake.hasShield) {
+			double addDuration = ((long) System.currentTimeMillis() - GameScene.pauseTime) / 1000;
+			GameScene.userSnake.curShield.addDuration(addDuration);
+			GameScene.userSnake.curShield.shieldTimer.start();
+		}
+	}
+
+	protected static void resumeGame() {
+		
+		GameScene.resumeFallAnimation();
+		GameScene.resumePowerUps();
+		GameScene.populationTimer.start();
+		GameScene.userSnake.setSpeed(400);
+		GameScene.root.getChildren().remove(GameScene.pausedMenu);
+	
 	}
 
 	public static void gameOver() {
 		System.out.println("GAME OVER");
-//		TODO
+		// TODO
 		endGame();
 	}
 
@@ -487,114 +628,13 @@ public class GameScene extends Scene {
 		root.getChildren().add(endMenu);
 	}
 
-	private static void resetGame() {
-		userSnake = null;
-		tokens = new ArrayList<>();
-		blocks = new ArrayList<>();
-		walls = new ArrayList<>();
-		gameSpeed = 4.5;
-		curGameScore = 0;
-		collidingWithBlock = null;
-		openedPauseMenu = false;
-	}
-
-	private static void addSnake(Snake snake) {
-		root.getChildren().add(snake);
-		pauseButton.toFront();
-		scoreOnGameBox.toFront();
-	}
-
-	private static void addGameObject(GameObject object) {
-		root.getChildren().add(object.getView());
-		userSnake.toFront();
-		pauseButton.toFront();
-		scoreOnGameBox.toFront();
-	}
-
-	private static void updateEachFrame() {
-
-		for (GameObject token : tokens) {
-
-			if (token.isColliding(userSnake.getSnakeHead())) {
-				token.setAlive(false);
-				((Interactable) token).collide(userSnake);
-				root.getChildren().remove(token.getView());
-			}
-			if (token.isDead()) {
-				root.getChildren().remove(token.getView());
-			}
-		}
-
-		for (Block block : blocks) {
-			if (block.isColliding(userSnake.getSnakeHead())) {
-				Point2D rectPos = ((rectangleWithText) block.getView()).getRectCenter();
-				Point2D snakePos = userSnake.getSnakeHeadPosPoint2D();
-				Point2D trianglePoint = new Point2D(rectPos.getX(), snakePos.getY());
-				if (Math.atan(snakePos.distance(trianglePoint) / trianglePoint.distance(rectPos)) > 1
-						|| snakePos.getY() <= rectPos.getY()) {
-					userSnake.setSnakeCollideBlock(true);
-				} else {
-					if(collidingWithBlock != null && collidingWithBlock != block) {
-						collidingBlockTimer.stop();
-						collidingWithBlock = block;
-						collidingBlockTimer.start();
-						if(collidingWithBlock.isDead()) {
-							root.getChildren().remove(collidingWithBlock.getView());
-							resumeFallAnimation();
-							populationTimer.start();
-						}
-					}
-					if(collidingWithBlock == null) {
-						collidingWithBlock = block;
-						stopFallAnimation();
-						populationTimer.stop();
-						collidingBlockTimer.start();
-						if(collidingWithBlock.isDead()) {
-							root.getChildren().remove(collidingWithBlock.getView());
-							resumeFallAnimation();
-							populationTimer.start();
-						}
-					}
-				}
-			}
-			if (block.isDead()) {
-				root.getChildren().remove(block.getView());
-			}
-		}
-		
-		if(collidingWithBlock != null){
-			boolean notColliding = true;
-			for (Block block : blocks) {
-				if(userSnake.getSnakeHead().isColliding(block) && notColliding) {
-					notColliding = false;
-				}
-			}
-			
-			if(notColliding) {
-				resumeFallAnimation();
-				populationTimer.start();
-				collidingBlockTimer.stop();
-				collidingWithBlock = null;
-			}
-		}
-
-		for (Wall wall : walls) {
-			if (wall.isDead()) {
-				root.getChildren().remove(wall.getView());
-			}
-		}
-
-		tokens.removeIf(GameObject::isDead);
-		blocks.removeIf(GameObject::isDead);
-		walls.removeIf(GameObject::isDead);
-
-	}
-
 	static GameObject collideWall() {
-		for (GameObject wall : walls) {
-			if (wall.isColliding(userSnake.getSnakeHead())) {
+		for (GameObject wall : GameScene.walls) {
+			
+			if (wall.isColliding(GameScene.userSnake.getSnakeHead())) {
 				return wall;
 			}
+			
 		}
 		return null;
 	}
@@ -602,96 +642,99 @@ public class GameScene extends Scene {
 	public static void populateNewItems() {
 
 		Random posR = new Random();
-		for(int i = 0; i < 8; i++) {
-			Ball newBall = new Ball(posR.nextInt(360) + 20, -100 + posR.nextFloat()*-1*300, 1 + posR.nextInt(20), gameSpeed);
+		
+		for (int i = 0; i < 5; i++) {
+			Ball newBall = new Ball(posR.nextInt(360) + 10, -100 + posR.nextFloat() * -1 * 300, 1 + posR.nextInt(20), GameScene.gameSpeed);
 			if (isSafe(newBall)) {
-				tokens.add(newBall);
-				addGameObject(newBall);
-				interactablesCount++;
+				GameScene.tokens.add(newBall);
+				GameScene.addGameObject(newBall);
+				GameScene.interactablesCount++;
 			}
 		}
-		
-		DestroyBlocks newDestroyBlock = new DestroyBlocks(posR.nextInt(360) + 20, -50 + posR.nextFloat()*-1*300, gameSpeed);
-		if (isSafe(newDestroyBlock) && interactablesCount % 5 == 0) {
+
+		DestroyBlocks newDestroyBlock = new DestroyBlocks(posR.nextInt(360) + 20, -70 + posR.nextFloat() * -1 * 300, GameScene.gameSpeed);
+		if (isSafe(newDestroyBlock) && GameScene.interactablesCount % 5 == 0) {
 			tokens.add(newDestroyBlock);
 			addGameObject(newDestroyBlock);
 		}
-		
-		Magnet newMagnet = new Magnet(posR.nextInt(360) + 20, -50 + posR.nextFloat()*-1*300, gameSpeed);
-		if (isSafe(newMagnet) && interactablesCount % 4 == 0) {
-			tokens.add(newMagnet);
-			addGameObject(newMagnet);
+
+		Magnet newMagnet = new Magnet(posR.nextInt(360) + 20, -50 + posR.nextFloat() * -1 * 300, GameScene.gameSpeed);
+		if (isSafe(newMagnet) && GameScene.interactablesCount % 4 == 0) {
+			GameScene.tokens.add(newMagnet);
+			GameScene.addGameObject(newMagnet);
 		}
-		
-		Shield newShield = new Shield(posR.nextInt(360) + 20, -50 + posR.nextFloat()*-1*300, gameSpeed);
-		if (isSafe(newShield) && interactablesCount % 4 == 0) {
-			tokens.add(newShield);
-			addGameObject(newShield);
+
+		Shield newShield = new Shield(posR.nextInt(360) + 20, -50 + posR.nextFloat() * -1 * 300, GameScene.gameSpeed);
+		if (isSafe(newShield) && GameScene.interactablesCount % 4 == 0) {
+			GameScene.tokens.add(newShield);
+			GameScene.addGameObject(newShield);
 		}
 
 	}
 
 	private static void spawnBlockLayer() {
+		
 		Random r1 = new Random();
 		int howManyWallsFront = r1.nextInt(6);
 		ArrayList<Integer> usedPoolFront = new ArrayList<>();
 		for (int i = 0; i < howManyWallsFront; i++) {
-			int nextLocation = r1.nextInt(5)+1;
-			while(usedPoolFront.contains(nextLocation)) {
-				nextLocation = r1.nextInt(5)+1;
+			int nextLocation = r1.nextInt(5) + 1;
+			while (usedPoolFront.contains(nextLocation)) {
+				nextLocation = r1.nextInt(5) + 1;
 			}
-			Wall newWall = new Wall(1 + nextLocation*65, -202, 100 + r1.nextInt(100), gameSpeed);
-			walls.add(newWall);
-			addGameObject(newWall);
+			Wall newWall = new Wall(1 + nextLocation * 65, -202, 100 + r1.nextInt(100), GameScene.gameSpeed);
+			GameScene.walls.add(newWall);
+			GameScene.addGameObject(newWall);
 		}
-		
+
 		Random r2 = new Random();
-		int whichOneLess = (int)Math.floor(r2.nextInt(6));
-		int lessRange = (int)Math.floor(r2.nextInt(userSnake.getSnakeLength()));
+		int whichOneLess = (int) Math.floor(r2.nextInt(6));
+		int lessRange = (int) Math.floor(r2.nextInt(GameScene.userSnake.getSnakeLength()));
 		lessRange = lessRange > 60 ? 60 : lessRange;
-		if(lessRange >= 1) {
-			Block newBlock = new Block(6 + whichOneLess*65, -262, lessRange, gameSpeed);
-			blocks.add(newBlock);
-			addGameObject(newBlock);	
+		if (lessRange >= 1) {
+			Block newBlock = new Block(6 + whichOneLess * 65, -262, lessRange, GameScene.gameSpeed);
+			GameScene.blocks.add(newBlock);
+			GameScene.addGameObject(newBlock);
 		}
-		
+
 		for (int i = 0; i < 6; i++) {
-			if(i != whichOneLess) {
-				int randomValue = (int)Math.floor(Math.random()*56);
-				if(randomValue != 0) {
-					Block newBlock = new Block(6 + i*65, -262, randomValue, gameSpeed);
-					blocks.add(newBlock);
-					addGameObject(newBlock);	
+			if (i != whichOneLess) {
+				int randomValue = (int) Math.floor(Math.random() * 56);
+				if (randomValue != 0) {
+					Block newBlock = new Block(6 + i * 65, -262, randomValue, GameScene.gameSpeed);
+					GameScene.blocks.add(newBlock);
+					GameScene.addGameObject(newBlock);
 				}
 			}
 		}
-		Random r = new Random();
-		int howManyWallsBack = r.nextInt(6);
+		
+		Random r3 = new Random();
+		int howManyWallsBack = r3.nextInt(6);
 		ArrayList<Integer> usedPoolBack = new ArrayList<>();
 		for (int i = 0; i < howManyWallsBack; i++) {
-			int nextLocation = r.nextInt(5)+1;
-			while(usedPoolBack.contains(nextLocation)) {
-				nextLocation = r.nextInt(5)+1;
+			int nextLocation = r3.nextInt(5) + 1;
+			while (usedPoolBack.contains(nextLocation)) {
+				nextLocation = r3.nextInt(5) + 1;
 			}
-			Wall newWall = new Wall(1 + nextLocation*65, -262, 100 + r1.nextInt(200), gameSpeed);
-			walls.add(newWall);
-			addGameObject(newWall);
+			Wall newWall = new Wall(1 + nextLocation * 65, -262, 100 + r1.nextInt(200), GameScene.gameSpeed);
+			GameScene.walls.add(newWall);
+			GameScene.addGameObject(newWall);
 		}
 	}
 
 	static boolean isSafe(GameObject object) {
 
-		for (GameObject token : tokens) {
+		for (GameObject token : GameScene.tokens) {
 			if (token.isColliding(object)) {
 				return false;
 			}
 		}
-		for (GameObject wall : walls) {
+		for (GameObject wall : GameScene.walls) {
 			if (wall.isColliding(object)) {
 				return false;
 			}
 		}
-		for (GameObject block : blocks) {
+		for (GameObject block : GameScene.blocks) {
 			if (block.isColliding(object)) {
 				return false;
 			}
@@ -701,28 +744,26 @@ public class GameScene extends Scene {
 	}
 
 	public static void setGameSpeed() {
-		if(userSnake.getSnakeLength() <= 10) {
-			gameSpeed = 4.5;
-		}
-		else {
-			if(userSnake.getSnakeLength() >= 100) {
-				gameSpeed = 6;
-			}
-			else {
-				gameSpeed = 4.5 + 1.5/90 * (userSnake.getSnakeLength()-10);
+		if (GameScene.userSnake.getSnakeLength() <= 10) {
+			GameScene.gameSpeed = 4.5;
+		} else {
+			if (GameScene.userSnake.getSnakeLength() >= 100) {
+				GameScene.gameSpeed = 6;
+			} else {
+				GameScene.gameSpeed = 4.5 + 1.5 / 90 * (GameScene.userSnake.getSnakeLength() - 10);
 			}
 		}
-		
-		for (GameObject token : tokens) {
-			token.setSpeed(gameSpeed);
+
+		for (GameObject token : GameScene.tokens) {
+			token.setSpeed(GameScene.gameSpeed);
 		}
-		for (Wall wall : walls) {
-			wall.setSpeed(gameSpeed);
+		for (Wall wall : GameScene.walls) {
+			wall.setSpeed(GameScene.gameSpeed);
 		}
-		for (Block block : blocks) {
-			block.setSpeed(gameSpeed);
+		for (Block block : GameScene.blocks) {
+			block.setSpeed(GameScene.gameSpeed);
 		}
-		
+
 	}
 
 }
