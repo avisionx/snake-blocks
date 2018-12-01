@@ -12,13 +12,17 @@ import javafx.scene.shape.Circle;
 
 public class Magnet extends GameObject implements Token{
 	
-	private static final ImagePattern magnetImage;
-	private static final Color altColor = Color.ALICEBLUE; 
+	private static final ImagePattern MAGNET_IMAGE;
+	private static final Color ALT_COLOR = Color.ALICEBLUE; 
+	private static final int MAGNET_RANGE = 200;
+	
 	private double duration;
-	protected AnimationTimer magnetTimer;
+	private AnimationTimer magnetTimer;
 	
 	static{
+		
 		FileInputStream fileUrl = null;
+		
 		try {
 			fileUrl = new FileInputStream("./img/magnetImage.png");
 		}
@@ -26,25 +30,34 @@ public class Magnet extends GameObject implements Token{
 			fileUrl = null;
 		}
 		if(fileUrl != null)
-			magnetImage = new ImagePattern(new Image(fileUrl));
+			MAGNET_IMAGE = new ImagePattern(new Image(fileUrl));
 		else
-			magnetImage = null;
+			MAGNET_IMAGE = null;
+	
 	}
 	
 	public Magnet(double x, double y, double speed) {
 			
 		super(new Circle(x, y, 16), speed);
-		((Circle)this.getView()).setFill(magnetImage != null ? magnetImage : altColor);
+		((Circle)this.getView()).setFill(MAGNET_IMAGE != null ? MAGNET_IMAGE : ALT_COLOR);
 		this.getFallDownTimer().start();
 		this.duration = 5;
 		this.magnetTimer = null;
 		
 	}
 	
-	public void addDuration(double d) {
-		this.duration += d;
+	public void addDuration(double addDuration) {
+		this.duration += addDuration;
 	}
-
+	
+	public void startMagnetTimer() {
+		this.magnetTimer.start();
+	}
+	
+	public void stopMagnetTimer() {
+		this.magnetTimer.stop();
+	}
+	
 	@Override
 	public void collide(Snake snake) {
 		
@@ -52,12 +65,13 @@ public class Magnet extends GameObject implements Token{
 			snake.curMagnet.duration += 5;
 		}
 		else {
+			
 			snake.hasMagnet = true;
 			snake.curMagnet = this;
 			
 			GameScene.setMagnetOn();
 			
-			magnetTimer = new AnimationTimer() {
+			this.magnetTimer = new AnimationTimer() {
 				
 				double lastUpdateFrameTime = 0;
 				
@@ -75,11 +89,13 @@ public class Magnet extends GameObject implements Token{
 						}	
 						
 						for (Ball ball : GameScene.getBallList()) {
+							
 							Point2D snakePos = snake.getSnakeHeadPosPoint2D(); 
 							Point2D ballPos = ball.getPos2D();
-							if(snakePos.distance(ballPos) < 200) {
+							if(snakePos.distance(ballPos) < MAGNET_RANGE) {
 								ball.attract(snakePos);
 							}
+							
 						}
 						
 					}
@@ -90,7 +106,7 @@ public class Magnet extends GameObject implements Token{
 				
 			};
 			
-			magnetTimer.start();
+			this.magnetTimer.start();
 			
 		}
 		

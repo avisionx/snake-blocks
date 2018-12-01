@@ -350,7 +350,7 @@ public class GameScene extends Scene {
 
 	private static void stopPowerUps() {
 		if(userSnake.hasMagnet) {
-			userSnake.curMagnet.magnetTimer.stop();
+			userSnake.curMagnet.stopMagnetTimer();
 		}
 		if(userSnake.hasShield) {
 			userSnake.curShield.shieldTimer.stop();
@@ -381,7 +381,7 @@ public class GameScene extends Scene {
 	private static void resumePowerUps() {
 		if(userSnake.hasMagnet) {
 			userSnake.curMagnet.addDuration(((long)System.currentTimeMillis() - pauseTime)/1000);
-			userSnake.curMagnet.magnetTimer.start();
+			userSnake.curMagnet.startMagnetTimer();
 		}
 		if(userSnake.hasShield) {
 			userSnake.curShield.addDuration(((long)System.currentTimeMillis() - pauseTime)/1000);
