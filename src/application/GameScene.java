@@ -23,6 +23,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -205,6 +206,9 @@ public class GameScene extends Scene {
 	protected static Scene mainMenuScene;
 	private static long pauseTime;
 	protected static Block collidingWithBlock;
+	private static Text shieldText;
+	private static Text magnetText;
+	
 	protected static AnimationTimer collidingBlockTimer = new AnimationTimer() {
 		double lastUpdateTime = System.currentTimeMillis();
 		@Override
@@ -254,23 +258,23 @@ public class GameScene extends Scene {
 	}
 	
 	public static void setMagnetOn() {
-		System.out.println("Magnet On");
-//		TODO
+		magnetText.setText("Magnet: On");
+		magnetText.setFill(Color.RED);
 	}
 	
 	public static void setMagnetOff() {
-		System.out.println("Magnet Off");
-//		TODO
+		magnetText.setText("Magnet: Off");
+		magnetText.setFill(Color.WHITE);
 	}
 	
 	public static void setShieldOn() {
-		System.out.println("Shield On");
-//		TODO
+		shieldText.setText("Shield: On");
+		shieldText.setFill(Color.GREENYELLOW);
 	}
 	
 	public static void setShieldOff() {
-		System.out.println("Shield Off");
-//		TODO
+		shieldText.setText("Shield: Off");
+		shieldText.setFill(Color.WHITE);
 	}
 
 	private static AnimationTimer populationTimer = new AnimationTimer() {
@@ -446,11 +450,24 @@ public class GameScene extends Scene {
 
 		root.getChildren().addAll(scoreOnGameBox, pauseButton);
 
+		magnetText = new Text("Magnet: Off");
+		magnetText.setFill(Color.WHITE);
+		magnetText.setFont(Font.font("Arial", 15));
+		magnetText.setX(310);
+		magnetText.setY(20);
+		root.getChildren().add(magnetText);
+		shieldText = new Text("Shield: Off");
+		shieldText.setFill(Color.WHITE);
+		shieldText.setFont(Font.font("Arial", 15));
+		shieldText.setX(230);
+		shieldText.setY(20);
+		root.getChildren().add(shieldText);
+		
 		userSnake = new Snake(10);
 		addSnake(userSnake);
 		mainFrameTimer.start();
 		populationTimer.start();
-
+		
 		return root;
 
 	}
