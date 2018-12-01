@@ -253,16 +253,20 @@ public class GameScene extends Scene {
 	private static AnimationTimer populationTimer = new AnimationTimer() {
 
 		double lastPopulateTime = System.currentTimeMillis();
-
+		boolean checker = false;
+		
 		@Override
 		public void handle(long now) {
 			double elapsedTimeInSec = (now - lastPopulateTime) / 1_000_000_000.0;
-			if (elapsedTimeInSec >= 3) {
+			if(elapsedTimeInSec >= 1.5 && checker) {
+				populateNewItems();
+				lastPopulateTime = now;
+				checker = false;
+			}
+			else if (elapsedTimeInSec >= 1.5 && !checker) {
 				spawnBlockLayer();
 				lastPopulateTime = now;
-			}
-			else if(elapsedTimeInSec >= 1.5) {
-				populateNewItems();
+				checker = true;
 			}
 		}
 
@@ -523,18 +527,17 @@ public class GameScene extends Scene {
 
 	public static void populateNewItems() {
 
-		Ball newBall = new Ball(1 + Math.random() * (Main.getScenewidth() - 30), -50,
-				(int) (1 + Math.floor(Math.random() * 20)), gameSpeed);
-		DestroyBlocks newDestroyBlock = new DestroyBlocks(20 + Math.random() * (Main.getScenewidth() - 20), -40,
-				gameSpeed);
-		Magnet newMagnet = new Magnet(20 + Math.random() * (Main.getScenewidth() - 20), -40, gameSpeed);
-		Shield newShield = new Shield(20 + Math.random() * (Main.getScenewidth() - 20), -40, gameSpeed);
-
+		Random posR = new Random();
+		Ball newBall = new Ball(posR.nextInt(360) + 20, -362, (int) (1 + Math.floor(Math.random() * 20)), gameSpeed);
 		if (isSafe(newBall)) {
 			tokens.add(newBall);
 			addGameObject(newBall);
 			interactablesCount++;
 		}
+		DestroyBlocks newDestroyBlock = new DestroyBlocks(20 + Math.random() * (Main.getScenewidth() - 20), -40,
+				gameSpeed);
+		Magnet newMagnet = new Magnet(20 + Math.random() * (Main.getScenewidth() - 20), -40, gameSpeed);
+		Shield newShield = new Shield(20 + Math.random() * (Main.getScenewidth() - 20), -40, gameSpeed);
 
 		if (isSafe(newMagnet) && interactablesCount % 4 == 0) {
 			tokens.add(newMagnet);
