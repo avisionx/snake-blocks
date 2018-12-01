@@ -59,8 +59,6 @@ public class Main extends Application {
 	private Stage stage;
 	private Scene mainMenuScene;
 	
-	private backEventHandler backEventBtn = new backEventHandler();
-	
 	class backEventHandler implements EventHandler<ActionEvent>{
 
 		@Override
@@ -69,14 +67,15 @@ public class Main extends Application {
 		}
 		
 	}
+	private backEventHandler backEventBtn = new backEventHandler();
 
 //	Getter Setter For Width And Height
 	public static int getScenewidth() {
-		return sceneWidth;
+		return Main.sceneWidth;
 	}
 	
 	public static int getSceneheight() {
-		return sceneHeight;
+		return Main.sceneHeight;
 	}
 		
 //	Creates MainScene
@@ -92,7 +91,7 @@ public class Main extends Application {
 		Button exitBtn = new menuButton("Exit");
 		
 		playBtn.setOnAction(e -> {
-			stage.setScene(createGameScene(mainMenuScene));
+			stage.setScene(createGameScene(this.mainMenuScene));
 		});
 		
 		resumeBtn.setOnAction(e -> {
@@ -290,8 +289,8 @@ public class Main extends Application {
 		
 		try {
 			this.stage = primaryStage;
-			mainMenuScene = createMainScene();
-			primaryStage.setScene(mainMenuScene);
+			this.mainMenuScene = createMainScene();
+			primaryStage.setScene(this.mainMenuScene);
 	        primaryStage.setTitle("Sanke VS Blocks");
 			primaryStage.setResizable(false);
 			primaryStage.show();
