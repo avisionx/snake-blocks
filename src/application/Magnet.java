@@ -9,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
 
 public class Magnet extends GameObject implements Token{
 	
@@ -93,6 +94,9 @@ public class Magnet extends GameObject implements Token{
 			magnetTimer.start();
 			
 		}
+		
+		ParticleBurst burstAnimation = new ParticleBurst(this.getView().getTranslateX(), this.getView().getTranslateY(), Color.WHITE);
+		GameScene.root.getChildren().add(burstAnimation);
 		
 	}
 	

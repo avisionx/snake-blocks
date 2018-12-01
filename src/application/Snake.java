@@ -122,7 +122,7 @@ public class Snake extends Group {
 						moveHead(moveDistanceThisFrame);
 					}
 				}
-				else if(snakeCollideBlock) {
+				else if(snakeCollideBlock && GameScene.collidingWithBlock == null) {
 					moveDistanceThisFrame = 0;
 					moveHead(moveDistanceThisFrame);
 					snakeCollideBlock = false;
@@ -194,6 +194,7 @@ public class Snake extends Group {
 			if(oldLength < 8)
 				this.getChildren().addAll(snakeBody.subList(oldLength-1, Math.min(newLength-1, 7)));
 		}
+		GameScene.setGameSpeed();
 	}
 	
 	public int getSnakeLength() {

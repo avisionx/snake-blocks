@@ -86,6 +86,10 @@ public class Shield extends GameObject implements Token{
 			shieldTimer.start();
 			
 		}
+		
+		ParticleBurst burstAnimation = new ParticleBurst(this.getView().getTranslateX(), this.getView().getTranslateY(), Color.WHITE);
+		GameScene.root.getChildren().add(burstAnimation);
+		
 	}
 	
 }

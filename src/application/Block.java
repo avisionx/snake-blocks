@@ -69,6 +69,10 @@ public class Block extends GameObject implements Interactable{
 
 	private int value;
 	
+	public int getValue() {
+		return value;
+	}
+	
 	public Block(double x, double y, int value, double speed) {
 		
 		super(new rectangleWithText(x, y, value), speed);
@@ -80,18 +84,46 @@ public class Block extends GameObject implements Interactable{
 	@Override
 	public void collide(Snake snake) {
 		
-		if(snake.getSnakeLength() >= this.value)
-			GameScene.setGameScore(GameScene.getGameScore() + this.value);
-		else
-			GameScene.setGameScore(GameScene.getGameScore() + snake.getSnakeLength());
-		
-		if(!snake.hasShield)
-			snake.setSnakeLength(snake.getSnakeLength() - this.value);
+		if(snake.getSnakeLength() > 0)
+			if(!snake.hasShield) {
+				if(snake.getSnakeLength() >= this.value && this.value <= 5) {
+					GameScene.setGameScore(GameScene.getGameScore() + this.value);
+					snake.setSnakeLength(snake.getSnakeLength() - this.value);
+					changeValue(this.value);
+					ParticleBurst burstAnimation = new ParticleBurst(this.getView().getTranslateX(), this.getView().getTranslateY(), (Color) ((Rectangle)((rectangleWithText) this.getView()).getRectBody()).getFill());
+					GameScene.root.getChildren().add(burstAnimation);
+				}
+				else {
+					GameScene.setGameScore(GameScene.getGameScore() + 1);
+					changeValue(1);
+					snake.setSnakeLength(snake.getSnakeLength() - 1);
+				}
+			}
+			else {
+				GameScene.setGameScore(GameScene.getGameScore() + this.value);
+				this.value = 0;
+				ParticleBurst burstAnimation = new ParticleBurst(this.getView().getTranslateX(), this.getView().getTranslateY(), (Color) ((Rectangle)((rectangleWithText) this.getView()).getRectBody()).getFill());
+				GameScene.root.getChildren().add(burstAnimation);
+			}
+		else {
+			GameScene.gameOver();
+		}
 	}
 	
+	private void changeValue(int minus) {
+		if(minus > 1) {
+			ParticleBurst burstAnimation = new ParticleBurst(this.getView().getTranslateX(), this.getView().getTranslateY(), (Color) ((Rectangle)((rectangleWithText) this.getView()).getRectBody()).getFill());
+			GameScene.root.getChildren().add(burstAnimation);
+		}
+		this.value -= minus;
+		((rectangleWithText)(this.getView())).getRectText().setText(this.value + "");
+	}
+
 	public void destroy(Snake snake) {
 		GameScene.setGameScore(GameScene.getGameScore() + this.value);
 		setAlive(false);
+		ParticleBurst burstAnimation = new ParticleBurst(this.getView().getTranslateX(), this.getView().getTranslateY(), (Color) ((Rectangle)((rectangleWithText) this.getView()).getRectBody()).getFill());
+		GameScene.root.getChildren().add(burstAnimation);
 	}
 	
 }
