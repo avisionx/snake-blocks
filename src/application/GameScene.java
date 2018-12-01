@@ -614,18 +614,14 @@ public class GameScene extends Scene {
 	}
 
 	public static void gameOver() {
-		System.out.println("GAME OVER");
-		// TODO
-		endGame();
-	}
-
-	private static void endGame() {
-		stopFallAnimation();
-		populationTimer.stop();
-		stopPowerUps();
-		userSnake.setSpeed(0);
-		endMenu = new endScreen(curGameScore);
-		root.getChildren().add(endMenu);
+		
+		GameScene.stopFallAnimation();
+		GameScene.populationTimer.stop();
+		GameScene.stopPowerUps();
+		GameScene.userSnake.setSpeed(0);
+		GameScene.endMenu = new endScreen(curGameScore);
+		GameScene.root.getChildren().add(GameScene.endMenu);
+	
 	}
 
 	static GameObject collideWall() {
