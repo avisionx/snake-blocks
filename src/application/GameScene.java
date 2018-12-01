@@ -204,7 +204,28 @@ public class GameScene extends Scene {
 	protected static Stage primaryStage;
 	protected static Scene mainMenuScene;
 	private static long pauseTime;
-
+	protected static Block collidingWithBlock;
+	protected static AnimationTimer collidingBlockTimer = new AnimationTimer() {
+		double lastUpdateTime = System.currentTimeMillis();
+		@Override
+		public void handle(long now) {
+			double elapsedTime = (now - lastUpdateTime) / 1_000_000_000.0;
+			if(elapsedTime > 0.05) {
+				if(collidingWithBlock.getValue() <= 0) {
+					collidingWithBlock.setAlive(false);
+					collidingWithBlock = null;
+					this.stop();
+				}
+				else if(userSnake.getSnakeLength() <= 0) {
+					this.stop();
+				}
+				else {
+					collidingWithBlock.collide(userSnake);
+				}
+				lastUpdateTime = now;
+			}
+		}
+	};
 	private static int interactablesCount = 0;
 
 	private static AnimationTimer mainFrameTimer = new AnimationTimer() {
@@ -455,6 +476,7 @@ public class GameScene extends Scene {
 		walls = new ArrayList<>();
 		gameSpeed = 4.5;
 		curGameScore = 0;
+		collidingWithBlock = null;
 		openedPauseMenu = false;
 	}
 
@@ -483,7 +505,6 @@ public class GameScene extends Scene {
 			if (token.isDead()) {
 				root.getChildren().remove(token.getView());
 			}
-
 		}
 
 		for (Block block : blocks) {
@@ -491,17 +512,51 @@ public class GameScene extends Scene {
 				Point2D rectPos = ((rectangleWithText) block.getView()).getRectCenter();
 				Point2D snakePos = userSnake.getSnakeHeadPosPoint2D();
 				Point2D trianglePoint = new Point2D(rectPos.getX(), snakePos.getY());
-				if (Math.atan(snakePos.distance(trianglePoint) / trianglePoint.distance(rectPos)) > 0.77
+				if (Math.atan(snakePos.distance(trianglePoint) / trianglePoint.distance(rectPos)) > 1
 						|| snakePos.getY() <= rectPos.getY()) {
 					userSnake.setSnakeCollideBlock(true);
 				} else {
-					block.setAlive(false);
-					block.collide(userSnake);
-					root.getChildren().remove(block.getView());
+					if(collidingWithBlock != null && collidingWithBlock != block) {
+						collidingBlockTimer.stop();
+						collidingWithBlock = block;
+						collidingBlockTimer.start();
+						if(collidingWithBlock.isDead()) {
+							root.getChildren().remove(collidingWithBlock.getView());
+							resumeFallAnimation();
+							populationTimer.start();
+						}
+					}
+					if(collidingWithBlock == null) {
+						collidingWithBlock = block;
+						stopFallAnimation();
+						populationTimer.stop();
+						collidingBlockTimer.start();
+						if(collidingWithBlock.isDead()) {
+							root.getChildren().remove(collidingWithBlock.getView());
+							resumeFallAnimation();
+							populationTimer.start();
+						}
+					}
 				}
 			}
 			if (block.isDead()) {
 				root.getChildren().remove(block.getView());
+			}
+		}
+		
+		if(collidingWithBlock != null){
+			boolean notColliding = true;
+			for (Block block : blocks) {
+				if(userSnake.getSnakeHead().isColliding(block) && notColliding) {
+					notColliding = false;
+				}
+			}
+			
+			if(notColliding) {
+				resumeFallAnimation();
+				populationTimer.start();
+				collidingBlockTimer.stop();
+				collidingWithBlock = null;
 			}
 		}
 
@@ -559,7 +614,6 @@ public class GameScene extends Scene {
 	}
 
 	private static void spawnBlockLayer() {
-		
 		Random r1 = new Random();
 		int howManyWallsFront = r1.nextInt(6);
 		ArrayList<Integer> usedPoolFront = new ArrayList<>();

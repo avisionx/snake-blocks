@@ -122,7 +122,7 @@ public class Snake extends Group {
 						moveHead(moveDistanceThisFrame);
 					}
 				}
-				else if(snakeCollideBlock) {
+				else if(snakeCollideBlock && GameScene.collidingWithBlock == null) {
 					moveDistanceThisFrame = 0;
 					moveHead(moveDistanceThisFrame);
 					snakeCollideBlock = false;
