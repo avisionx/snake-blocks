@@ -11,13 +11,16 @@ import javafx.scene.shape.Circle;
 
 public class Shield extends GameObject implements Token{
 
-	private static final ImagePattern shieldImage;
-	private static final Color altColor = Color.BLANCHEDALMOND; 
+	private static final ImagePattern SHIELD_IMAGE;
+	private static final Color ALT_COLOR = Color.BLANCHEDALMOND; 
+	
 	private double duration;
 	protected AnimationTimer shieldTimer;
 	
 	static{
+		
 		FileInputStream fileUrl = null;
+		
 		try {
 			fileUrl = new FileInputStream("./img/shieldImage.png");
 		}
@@ -25,23 +28,24 @@ public class Shield extends GameObject implements Token{
 			fileUrl = null;
 		}
 		if(fileUrl != null)
-			shieldImage = new ImagePattern(new Image(fileUrl));
+			SHIELD_IMAGE = new ImagePattern(new Image(fileUrl));
 		else
-			shieldImage = null;
+			SHIELD_IMAGE = null;
 	}
 	
 	public Shield(double x, double y, double speed) {
 		
 		super(new Circle(x, y, 16, Color.MAGENTA), speed);
-		((Circle)this.getView()).setFill(shieldImage != null ? shieldImage : altColor);
+		((Circle)this.getView()).setFill(SHIELD_IMAGE != null ? SHIELD_IMAGE : ALT_COLOR);
+		
 		this.getFallDownTimer().start();
 		this.duration = 5;
 		this.shieldTimer = null;
 		
 	}
 	
-	public void addDuration(double d) {
-		this.duration += d;
+	public void addDuration(double addDuration) {
+		this.duration += addDuration;
 	}
 
 	@Override
@@ -57,7 +61,7 @@ public class Shield extends GameObject implements Token{
 			
 			GameScene.setShieldOn();
 			
-			shieldTimer = new AnimationTimer() {
+			this.shieldTimer = new AnimationTimer() {
 				
 				double lastUpdateFrameTime = 0;
 				
@@ -83,7 +87,7 @@ public class Shield extends GameObject implements Token{
 				
 			};
 			
-			shieldTimer.start();
+			this.shieldTimer.start();
 			
 		}
 		

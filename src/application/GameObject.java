@@ -6,15 +6,15 @@ import javafx.scene.Node;
 public class GameObject {
 
 	private Node view;
-	private double speed;
-	private AnimationTimer fallDownMotionTimer;
 	private boolean alive;
+	private AnimationTimer fallDownMotionTimer;
+	private double speed;
 	
 	public GameObject(Node view) {
 		this.view = view;
 		this.speed = 0;
 		this.alive = true;
-		fallDownMotionTimer = null;
+		this.fallDownMotionTimer = null;
 	}
 	
 	public GameObject(Node view, double speed) {
@@ -28,28 +28,29 @@ public class GameObject {
 			public void handle(long arg) {
 				update();
 			}
+			
 		};
 		
 	}	
 	
-	public void setSpeed(double speed) {
-		this.speed = speed;
-	}
-	
-	public AnimationTimer getFallDownTimer() {
-		return fallDownMotionTimer;
-	}
-	
 	public Node getView() {
-		return view;
+		return this.view;
 	}
 	
 	public boolean isDead() {
-		return !alive;
+		return !this.alive;
 	}
 	
 	public void setAlive(boolean alive) {
 		this.alive = alive;
+	}
+	
+	public AnimationTimer getFallDownTimer() {
+		return this.fallDownMotionTimer;
+	}
+	
+	public void setSpeed(double speed) {
+		this.speed = speed;
 	}
 	
 	public boolean isColliding(GameObject other) {
@@ -57,14 +58,17 @@ public class GameObject {
 	}
 	
 	public void update() {
+		double oldY = this.view.getTranslateY();
+		double newY = oldY + this.speed;
 		
-		view.setTranslateY(view.getTranslateY() + speed);
+		this.view.setTranslateY(newY);
+		
 		if(Wall.class == this.getClass()) {
-			if(view.getTranslateY() > 1400) {
+			if(newY > 1400) {
 				this.alive = false;
 			}
 		}
-		else if(view.getTranslateY() > 900) {
+		else if(newY > 900) {
 			this.alive = false;
 		}
 	}	

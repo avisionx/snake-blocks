@@ -29,15 +29,18 @@ class followingCircle extends Circle{
 				Point2D selfPos = new Point2D(self.getCenterX(), self.getCenterY());
 				
 				if(parentPos.distance(selfPos) > 18) {
+					
 					Point2D orientation = parentPos.subtract(selfPos);
 					self.setCenterX(selfPos.getX() + orientation.getX());
+				
 				}
-				else {
+				else {	
 					this.stop();
 				}
-				
+			
 			}
 		};
+		
 		moveAnimation.start();
 		
 	}
@@ -45,187 +48,252 @@ class followingCircle extends Circle{
 
 public class Snake extends Group {
 	
+	private int length;
 	private Text snakeText;
 	private GameObject snakeHead;
 	private List<followingCircle> snakeBody;
-	private int length;
+	private double snakeSpeed;
 	private double xVelocity;
-	private double xSpeed = 400;
-	private boolean snakeCollideBlock;
+	private boolean snakeSideCollideBlock;
+	private AnimationTimer snakeMotion;
+	
 	protected boolean hasMagnet;
 	protected Magnet curMagnet;
 	protected boolean hasShield;
 	protected Shield curShield;
 	
-	private AnimationTimer snakeMotion = new AnimationTimer() {
+	public void setSnakeCollideBlock(boolean snakeSideCollideBlock) {
+		this.snakeSideCollideBlock = snakeSideCollideBlock;
+	}
+	
+	public GameObject getSnakeHead() {
+		return this.snakeHead;
+	}
+	
+	public Point2D getSnakeHeadPosPoint2D() {
+		double x = ((Circle)this.snakeHead.getView()).getCenterX();
+		double y = ((Circle)this.snakeHead.getView()).getCenterY();
+		return new Point2D(x, y);
+	}
+	
+	public void moveLeft() {
+		this.xVelocity = -this.snakeSpeed;
+	}
+	
+	public void moveRight() {
+		this.xVelocity = +this.snakeSpeed;
+	}
+	
+	public void stopSnake() {
+		this.xVelocity = 0;
+	}
+	
+	public void setSpeed(double snakeSpeed) {
+		this.snakeSpeed = snakeSpeed;
+	}
+
+	public int getSnakeLength() {
+		return this.length;
+	}
+	
+	public Snake(int length) {
 		
-		double lastMotionTime;
+		super();
 		
-		@Override
-		public void handle(long now) {
+		this.length = length;
+		this.snakeSpeed = 400;
+		this.snakeSideCollideBlock = false;
+		this.hasMagnet = false;
+		this.curMagnet = null;
+		this.hasShield = false;
+		this.curShield = null;
+		
+		double sceneWidth = Main.getScenewidth();
+		double sceneHeight = Main.getSceneheight();
+		
+		this.snakeHead = new GameObject(new Circle(sceneWidth/2, sceneHeight*8/10, 9, Color.web("#fedc0f")));
+		
+		this.snakeText = new Text(this.length + "");
+		this.snakeText.setFill(Color.WHITE);
+		this.snakeText.getStyleClass().add("circleFont");
+		
+		this.snakeText.setTranslateX(sceneWidth / 2 - this.snakeText.getBoundsInLocal().getWidth()*2/3);
+		this.snakeText.setTranslateY(sceneHeight * 7.7 / 10);
+		this.snakeText.setTextOrigin(VPos.CENTER);
+		
+		this.getChildren().addAll(this.snakeText, this.snakeHead.getView());
+		
+		this.snakeBody = new ArrayList<>();
+		
+		for(int i = 1; i < Math.min(this.length, 8); i++) {
 			
-			if(lastMotionTime > 0) {
+			followingCircle nextCircle = new followingCircle(sceneWidth/2, sceneHeight*8/10 + 18*i, 9, Color.web("#fedc0f"));
+			this.snakeBody.add(nextCircle);
+			this.getChildren().add(nextCircle);
+		}
+		
+		
+		this.snakeMotion = new AnimationTimer() {
+			
+			double lastMotionTime;
+			
+			@Override
+			public void handle(long now) {
 				
-				double elapsedTimeInSec = (now-lastMotionTime)/1_000_000_000.0;
-				double moveDistanceThisFrame = elapsedTimeInSec * xVelocity;
-				double snakeHeadPos = ((Circle)snakeHead.getView()).getCenterX();
-				
-				GameObject collidingWall = GameScene.collideWall();
-				if(collidingWall != null){
+				if(lastMotionTime > 0) {
 					
-					Rectangle collidingRect = ((Rectangle)((Wall)collidingWall).getView());
-					double wallCenterX = collidingRect.getX() + 2.5;
-					boolean moved = false;
+					double elapsedTimeInSec = (now-lastMotionTime)/1_000_000_000.0;
+					double moveDistanceThisFrame = elapsedTimeInSec * xVelocity;
+					double snakeHeadPos = ((Circle)snakeHead.getView()).getCenterX();
 					
-					if(snakeHeadPos < wallCenterX - 2.5) {
-						if(moveDistanceThisFrame == 0) {
-							moveDistanceThisFrame = wallCenterX - 11.5 - snakeHeadPos;
+					GameObject collidingWall = GameScene.collideWall();
+					
+					if(collidingWall != null){
+						
+						Rectangle collidingRect = ((Rectangle)((Wall)collidingWall).getView());
+						
+						double wallCenterX = collidingRect.getX() + 2.5;
+						boolean moved = false;
+						
+						if(snakeHeadPos < wallCenterX - 2.5) {
+							
+							if(moveDistanceThisFrame == 0) {
+								
+								moveDistanceThisFrame = wallCenterX - 11.5 - snakeHeadPos;
+								moved = true;
+							
+							}else if(snakeHeadPos == wallCenterX - 11.5 && moveDistanceThisFrame > 0) {
+								
+								moveDistanceThisFrame = 0;
+								moved = true;
+							
+							}else if(snakeHeadPos + moveDistanceThisFrame >= wallCenterX - 2.5) {
+								
+								moveDistanceThisFrame = wallCenterX - 11.5 - snakeHeadPos;
+								moved = true;
+							
+							}
+						}
+						else if(snakeHeadPos > wallCenterX + 2.5) {
+							
+							if(moveDistanceThisFrame == 0) {
+								
+								moveDistanceThisFrame = wallCenterX + 11.5 - snakeHeadPos;
+								moved = true;
+							
+							}else if(snakeHeadPos == wallCenterX + 11.5  && moveDistanceThisFrame < 0) {
+								
+								moveDistanceThisFrame = 0;
+								moved = true;
+							
+							}
+							else if(snakeHeadPos + moveDistanceThisFrame <= wallCenterX + 2.5) {
+								
+								moveDistanceThisFrame = wallCenterX + 11.5 - snakeHeadPos;
+								moved = true;
+							
+							}
+						}
+						else {
+							
+							if(snakeHeadPos > wallCenterX) {
+								
+								moveDistanceThisFrame = wallCenterX + 11.5 - snakeHeadPos;
+							
+							}
+							else {
+								
+								moveDistanceThisFrame = wallCenterX - 11.5 - snakeHeadPos;
+							
+							}
+							
 							moved = true;
-						}else if(snakeHeadPos == wallCenterX - 11.5 && moveDistanceThisFrame > 0) {
+						
+						}
+						if(moved) {
+							
+							moveHead(moveDistanceThisFrame);
 							moveDistanceThisFrame = 0;
-							moved = true;
-						}else if(snakeHeadPos + moveDistanceThisFrame >= wallCenterX - 2.5) {
-							moveDistanceThisFrame = wallCenterX - 11.5 - snakeHeadPos;
-							moved = true;
+						
 						}
-					}else if(snakeHeadPos > wallCenterX + 2.5) {
-						if(moveDistanceThisFrame == 0) {
-							moveDistanceThisFrame = wallCenterX + 11.5 - snakeHeadPos;
-							moved = true;
-						}else if(snakeHeadPos == wallCenterX + 11.5  && moveDistanceThisFrame < 0) {
-							moveDistanceThisFrame = 0;
-							moved = true;
+						else {
+							
+							if(snakeHeadPos + moveDistanceThisFrame > 390) {
+								moveDistanceThisFrame = 390 - snakeHeadPos;
+							}
+							else if(snakeHeadPos + moveDistanceThisFrame < 10) {
+								moveDistanceThisFrame = 10 - snakeHeadPos;
+							}
+							
+							moveHead(moveDistanceThisFrame);
+						
 						}
-						else if(snakeHeadPos + moveDistanceThisFrame <= wallCenterX + 2.5) {
-							moveDistanceThisFrame = wallCenterX + 11.5 - snakeHeadPos;
-							moved = true;
-						}
-					}else {
-						if(snakeHeadPos > wallCenterX) {
-							moveDistanceThisFrame = wallCenterX + 11.5 - snakeHeadPos;
-						}else {
-							moveDistanceThisFrame = wallCenterX - 11.5 - snakeHeadPos;
-						}
-						moved = true;
 					}
-					if(moved) {
-						moveHead(moveDistanceThisFrame);
+					else if(snakeSideCollideBlock && GameScene.collidingWithBlock == null) {
+						
 						moveDistanceThisFrame = 0;
+						moveHead(moveDistanceThisFrame);
+						snakeSideCollideBlock = false;
+					
 					}
-					else {
+					else {					
+						
+						moveDistanceThisFrame = elapsedTimeInSec * xVelocity;
+						
 						if(snakeHeadPos + moveDistanceThisFrame > 390) {
 							moveDistanceThisFrame = 390 - snakeHeadPos;
 						}
 						else if(snakeHeadPos + moveDistanceThisFrame < 10) {
 							moveDistanceThisFrame = 10 - snakeHeadPos;
 						}
+						
 						moveHead(moveDistanceThisFrame);
+					
 					}
 				}
-				else if(snakeCollideBlock && GameScene.collidingWithBlock == null) {
-					moveDistanceThisFrame = 0;
-					moveHead(moveDistanceThisFrame);
-					snakeCollideBlock = false;
-				}
-				else {					
-					moveDistanceThisFrame = elapsedTimeInSec * xVelocity;
-					if(snakeHeadPos + moveDistanceThisFrame > 390) {
-						moveDistanceThisFrame = 390 - snakeHeadPos;
-					}
-					else if(snakeHeadPos + moveDistanceThisFrame < 10) {
-						moveDistanceThisFrame = 10 - snakeHeadPos;
-					}
-					moveHead(moveDistanceThisFrame);
-				}
+				
+				lastMotionTime = now;
+			
 			}
 			
-			lastMotionTime = now;
+		};
 		
-		}
+		this.snakeMotion.start();
 		
-	};
-	
-	public void setSnakeCollideBlock(boolean snakeCollideBlock) {
-		this.snakeCollideBlock = snakeCollideBlock;
-	}
-	
-	public GameObject getSnakeHead() {
-		return snakeHead;
-	}
-	
-	public Point2D getSnakeHeadPosPoint2D() {
-		double x = ((Circle)snakeHead.getView()).getCenterX();
-		double y = ((Circle)snakeHead.getView()).getCenterY();
-		return new Point2D(x, y);
-	}
-	
-	public void moveLeft() {
-		xVelocity = -xSpeed;
-	}
-	
-	public void moveRight() {
-		xVelocity = +xSpeed;
-	}
-	
-	public void stopSnake() {
-		xVelocity = 0;
-	}
-	
-	public void setSpeed(double speed) {
-		this.xSpeed = speed;
 	}
 	
 	public void setSnakeLength(int newLength) {
-		int oldLength = length;
-		length = newLength;
-		snakeText.setText(newLength + "");
-		if(length <= 0) {
-			length = 0;
+		
+		int oldLength = this.length;
+		this.length = newLength;
+		
+		this.snakeText.setText(newLength + "");
+		
+		if(this.length <= 0) {
+			
+			this.length = 0;
 			this.getChildren().remove(2, this.getChildren().size());
-			snakeText.setText("0");
+			this.snakeText.setText("0");
+			
 			GameScene.gameOver();
 			return;
+		
 		}
+		
 		if(oldLength > newLength) {
+			
 			if(newLength < 8)
 				this.getChildren().remove(newLength+1, this.getChildren().size());
 		}
 		else {
+			
 			if(oldLength < 8)
-				this.getChildren().addAll(snakeBody.subList(oldLength-1, Math.min(newLength-1, 7)));
+				this.getChildren().addAll(this.snakeBody.subList(oldLength-1, Math.min(newLength-1, 7)));
+		
 		}
+		
 		GameScene.setGameSpeed();
-	}
 	
-	public int getSnakeLength() {
-		return length;
-	}
-	
-	public Snake(int length) {
-		
-		super();
-		this.snakeHead = new GameObject(new Circle(Main.getScenewidth()/2, Main.getSceneheight()*8/10, 9, Color.web("#fedc0f")));
-		this.snakeText = new Text(length + "");
-		this.snakeText.setFill(Color.WHITE);
-		this.snakeText.getStyleClass().add("circleFont");
-		this.snakeText.setTranslateX(Main.getScenewidth()/2 - this.snakeText.getBoundsInLocal().getWidth()*2/3);
-		this.snakeText.setTranslateY(Main.getSceneheight() * 7.7/10);
-		this.snakeText.setTextOrigin(VPos.CENTER);
-		this.getChildren().addAll(snakeText, snakeHead.getView());
-		this.snakeBody = new ArrayList<>();
-		this.length = length;
-		this.hasMagnet = false;
-		this.curMagnet = null;
-		this.hasShield = false;
-		this.curShield = null;
-		this.snakeCollideBlock = false;
-		for(int i = 1; i < Math.min(this.length, 8); i++) {
-			followingCircle nextCircle = new followingCircle(Main.getScenewidth()/2, Main.getSceneheight()*8/10 + 18*i, 9, Color.web("#fedc0f"));
-			this.snakeBody.add(nextCircle);
-			this.getChildren().add(nextCircle);
-		}
-		snakeMotion.start();
-		
 	}
 	
 	public void moveHead(double deltaX) {
@@ -234,6 +302,7 @@ public class Snake extends Group {
 		double oldTextX = this.snakeText.getTranslateX();
 		double newHeadX = oldHeadX + deltaX;
 		double newHeadY = ((Circle)this.snakeHead.getView()).getCenterY();
+		
 		this.snakeText.setTranslateX(oldTextX + deltaX);
 		((Circle)this.snakeHead.getView()).setCenterX(newHeadX);
 		
@@ -242,6 +311,7 @@ public class Snake extends Group {
 			this.snakeBody.get(0).update(newHeadX, newHeadY, this.snakeBody.get(0));
 			
 			for(int i = 1; i < this.snakeBody.size(); i++) {
+				
 				followingCircle prevBodyElem = this.snakeBody.get(i-1);
 				followingCircle curBodyElem = this.snakeBody.get(i);
 				curBodyElem.update(prevBodyElem.getCenterX(), prevBodyElem.getCenterY(), curBodyElem);

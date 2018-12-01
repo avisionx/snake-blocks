@@ -15,11 +15,11 @@ public class Score implements Serializable{
     }
     
     public int getScore() {
-        return score;
+        return this.score;
     }
 
     public String getDate() {
-    	return date.toString().substring(0, 19);
+    	return this.date.toString().substring(0, 19);
     }
 
     public void setDate(Date date) {
