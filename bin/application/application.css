@@ -1,3 +1,7 @@
+.rootBg{
+	-fx-background-color: #161616;
+}
+
 .menuBtn {
 	-fx-font: 18px "Courier New";
     -fx-padding: 12;
@@ -7,6 +11,19 @@
     -fx-border-insets: 10px;
     -fx-background-insets: 10px;
     -fx-border-color: white;
+}
+
+.backBtn {
+    -fx-background-image: url("./../../img/backBtn.png") ;
+    -fx-background-repeat: no-repeat;   
+    -fx-background-size: 35px 35px;
+    -fx-min-height: 50px;
+    -fx-min-width: 50px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 0;
+    -fx-background-color: transparent;
+    -fx-background-position: center center; 
 }
 
 .pasueScreenBtn{
@@ -20,12 +37,12 @@
     -fx-background-insets: 8px;
 }
 
-.backBtn {
-    -fx-background-image: url("./../../img/backBtn.png") ;
+.pauseBtn {
+    -fx-background-image: url("./../../img/pauseBtn.png") ;
     -fx-background-repeat: no-repeat;   
-    -fx-background-size: 35px 35px;
-    -fx-min-height: 50px;
-    -fx-min-width: 50px;
+    -fx-background-size: 25px 25px;
+    -fx-min-height: 35px;
+    -fx-min-width: 35px;
     -fx-border-color: transparent;
     -fx-border-width: 0;
     -fx-background-radius: 0;
@@ -53,23 +70,6 @@
 	-fx-font-weight: 900;
 }
 
-.rootBg{
-	-fx-background-color: #161616;
-}
-
 .placeholderText {
 	-fx-font: 30px "Courier New";
-}
-
-.pauseBtn {
-    -fx-background-image: url("./../../img/pauseBtn.png") ;
-    -fx-background-repeat: no-repeat;   
-    -fx-background-size: 25px 25px;
-    -fx-min-height: 35px;
-    -fx-min-width: 35px;
-    -fx-border-color: transparent;
-    -fx-border-width: 0;
-    -fx-background-radius: 0;
-    -fx-background-color: transparent;
-    -fx-background-position: center center; 
 }
