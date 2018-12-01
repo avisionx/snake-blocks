@@ -3,6 +3,8 @@ package application;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
 import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -254,11 +256,13 @@ public class GameScene extends Scene {
 
 		@Override
 		public void handle(long now) {
-
 			double elapsedTimeInSec = (now - lastPopulateTime) / 1_000_000_000.0;
-			if (elapsedTimeInSec >= 1) {
-				populateNewItems();
+			if (elapsedTimeInSec >= 3) {
+				spawnBlockLayer();
 				lastPopulateTime = now;
+			}
+			else if(elapsedTimeInSec >= 1.5) {
+				populateNewItems();
 			}
 		}
 
@@ -547,19 +551,55 @@ public class GameScene extends Scene {
 			addGameObject(newShield);
 		}
 
-		Block newBlock = new Block(1 + Math.random() * (Main.getScenewidth() - 62), -61,
-				(int) (1 + Math.floor(Math.random() * 56)), gameSpeed);
-		if (isSafe(newBlock)) {
-			blocks.add(newBlock);
-			addGameObject(newBlock);
-		}
+	}
 
-		Wall newWall = new Wall(1 + Math.random() * (Main.getScenewidth() - 6), 80 + Math.random() * 200, gameSpeed);
-		if (isSafe(newWall)) {
+	private static void spawnBlockLayer() {
+		
+		Random r1 = new Random();
+		int howManyWallsFront = r1.nextInt(6);
+		ArrayList<Integer> usedPoolFront = new ArrayList<>();
+		for (int i = 0; i < howManyWallsFront; i++) {
+			int nextLocation = r1.nextInt(5)+1;
+			while(usedPoolFront.contains(nextLocation)) {
+				nextLocation = r1.nextInt(5)+1;
+			}
+			Wall newWall = new Wall(1 + nextLocation*65, -202, 100 + r1.nextInt(100), gameSpeed);
 			walls.add(newWall);
 			addGameObject(newWall);
 		}
-
+		
+		Random r2 = new Random();
+		int whichOneLess = (int)Math.floor(r2.nextInt(6));
+		int lessRange = (int)Math.floor(r2.nextInt(userSnake.getSnakeLength()));
+		lessRange = lessRange > 60 ? 60 : lessRange;
+		if(lessRange >= 1) {
+			Block newBlock = new Block(6 + whichOneLess*65, -262, lessRange, gameSpeed);
+			blocks.add(newBlock);
+			addGameObject(newBlock);	
+		}
+		
+		for (int i = 0; i < 6; i++) {
+			if(i != whichOneLess) {
+				int randomValue = (int)Math.floor(Math.random()*56);
+				if(randomValue != 0) {
+					Block newBlock = new Block(6 + i*65, -262, randomValue, gameSpeed);
+					blocks.add(newBlock);
+					addGameObject(newBlock);	
+				}
+			}
+		}
+		Random r = new Random();
+		int howManyWallsBack = r.nextInt(6);
+		ArrayList<Integer> usedPoolBack = new ArrayList<>();
+		for (int i = 0; i < howManyWallsBack; i++) {
+			int nextLocation = r.nextInt(5)+1;
+			while(usedPoolBack.contains(nextLocation)) {
+				nextLocation = r.nextInt(5)+1;
+			}
+			Wall newWall = new Wall(1 + nextLocation*65, -262, 100 + r1.nextInt(200), gameSpeed);
+			walls.add(newWall);
+			addGameObject(newWall);
+		}
 	}
 
 	static boolean isSafe(GameObject object) {

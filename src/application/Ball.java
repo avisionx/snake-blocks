@@ -12,14 +12,16 @@ import javafx.scene.text.TextBoundsType;
 
 class circleWithText extends VBox {
 	
+	Circle circleBody;
+	
 	public circleWithText(double x, double y, double radius, Color color, int value) {
 		super();
-		Circle circleBody = new Circle(x, y, radius, color);
+		this.circleBody = new Circle(x, y, radius, color);
 		Text circleText = new Text(value + "");
 		circleText.setFill(Color.WHITE);
 		circleText.getStyleClass().add("circleFont");
 		circleText .setBoundsType(TextBoundsType.VISUAL); 
-		this.getChildren().addAll(circleText, circleBody);
+		this.getChildren().addAll(circleText, this.circleBody);
 		this.setSpacing(5);
 		this.setAlignment(Pos.CENTER);
 		this.setTranslateX(x);

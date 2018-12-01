@@ -60,7 +60,7 @@ public class GameObject {
 		
 		view.setTranslateY(view.getTranslateY() + speed);
 		if(Wall.class == this.getClass()) {
-			if(view.getTranslateY() > 1000) {
+			if(view.getTranslateY() > 1400) {
 				this.alive = false;
 			}
 		}
