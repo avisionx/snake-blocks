@@ -47,6 +47,7 @@ public class Ball extends GameObject implements Token{
 		snake.setSnakeLength(snake.getSnakeLength() + this.value);
 		ParticleBurst burstAnimation = new ParticleBurst(this.getView().getTranslateX(), this.getView().getTranslateY(), Color.web("#ffdd0c"));
 		GameScene.root.getChildren().add(burstAnimation);
+		
 	}
 
 	public void attract(Point2D snakePos) {
