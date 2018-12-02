@@ -147,6 +147,10 @@ class pauseScreen extends StackPane {
 		displayItems.setAlignment(Pos.CENTER);
 		this.getChildren().addAll(background, displayItems);
 
+		GameScene.primaryStage.setOnCloseRequest(event -> {
+			GameScene.saveGame();
+		});
+		
 	}
 
 }
@@ -588,6 +592,10 @@ public class GameScene extends Scene {
 		GameScene.primaryStage = stage;
 		GameScene.mainMenuScene = mainScreen;
 
+		GameScene.primaryStage.setOnCloseRequest(event -> {
+			GameScene.saveGame();
+		});
+		
 	}
 	
 	public GameScene(Stage stage, Scene mainScreen, ContentSaver savedData) {
@@ -613,6 +621,11 @@ public class GameScene extends Scene {
 
 		GameScene.primaryStage = stage;
 		GameScene.mainMenuScene = mainScreen;
+		
+		GameScene.primaryStage.setOnCloseRequest(event -> {
+			GameScene.saveGame();
+		});
+		
 	}
 
 	private static Parent createPopulatedContent(ContentSaver savedData) {
@@ -680,9 +693,9 @@ public class GameScene extends Scene {
 		GameScene.shieldText.setY(20);
 		GameScene.root.getChildren().add(GameScene.shieldText);
 
-		GameScene.userSnake = new Snake(savedData.getSnakelength(), savedData.getSnakeX());
+		GameScene.userSnake = new Snake(10, savedData.getSnakeX());
 		GameScene.addSnake(GameScene.userSnake);
-		
+		GameScene.userSnake.setSnakeLength(savedData.getSnakelength());
 		resumeSavedGame(savedData);
 		
 		GameScene.mainFrameTimer.start();
@@ -710,18 +723,39 @@ public class GameScene extends Scene {
 		
 		GameScene.interactablesCount = savedData.getInteractablesCount();
 		
-//    	this.positionBlockX = positionBlockX;
-//    	this.positionBlockY = positionBlockY;
-//    	this.blockValue = blockValue;
-//    	this.positionWallX = positionWallX;
-//    	this.positionWallY = positionWallY;
-//    	this.wallLength = wallLength;
-//    	this.positionBallX = positionBallX;
-//    	this.positionBallY = positionBallY;
-//    	this.ballValue = ballValue;
-//    	this.positionPowerX = positionPowerX;
-//    	this.positionPowerY = positionPowerY;
-//    	this.powerUpType = powerUpType;
+		for(int i = 0; i < savedData.getPositionBlockX().size(); i++) {
+			Block b = new Block(savedData.getPositionBlockX().get(i), savedData.getPositionBlockY().get(i), savedData.getBlockValue().get(i), gameSpeed);
+			blocks.add(b);
+			GameScene.addGameObject(b);
+		}
+		
+		for(int i = 0; i < savedData.getPositionBallX().size(); i++) {
+			Ball b = new Ball(savedData.getPositionBallX().get(i), savedData.getPositionBallY().get(i), savedData.getBallValue().get(i), gameSpeed);
+			tokens.add(b);
+			GameScene.addGameObject(b);
+		}
+		
+		for(int i = 0; i < savedData.getPositionWallX().size(); i++) {
+			Wall w = new Wall(savedData.getPositionWallX().get(i), savedData.getPositionWallY().get(i), savedData.getWallLength().get(i), gameSpeed);
+			walls.add(w);
+			GameScene.addGameObject(w);
+		}
+		
+		for(int i = 0; i < savedData.getPowerUpType().size(); i++) {
+			String className = savedData.getPowerUpType().get(i);
+			GameObject o = null;
+			if(className == Shield.class.toString()) {
+				o = new Shield(savedData.getPositionPowerX().get(i), savedData.getPositionPowerY().get(i), gameSpeed);
+			}
+			else if(className == Magnet.class.toString()) {
+				o = new Magnet(savedData.getPositionPowerX().get(i), savedData.getPositionPowerY().get(i), gameSpeed);
+			}
+			else if(className == DestroyBlocks.class.toString()) {
+				o = new DestroyBlocks(savedData.getPositionPowerX().get(i), savedData.getPositionPowerY().get(i), gameSpeed);
+			}
+			tokens.add(o);
+			GameScene.addGameObject(o);
+		}
 		
 	}
 
