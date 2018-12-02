@@ -124,6 +124,11 @@ class pauseScreen extends StackPane {
 		});
 
 		newGameBtn.setOnAction(e -> {
+			try {
+				SaveManager.save(null, "./data/saveData.txt");
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 			GameScene gameScene = new GameScene(GameScene.primaryStage, GameScene.mainMenuScene);
 			GameScene.primaryStage.setScene(gameScene);
 			gameScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
@@ -450,6 +455,8 @@ public class GameScene extends Scene {
 		
 		Button resumeBtn = (Button) ((VBox)GameScene.mainMenuScene.getRoot()).getChildren().get(1);
 		resumeBtn.setVisible(true);
+		Main.savedData = saveData;
+		Main.oldGamePresent = true;
 		
 		return;
 	}
@@ -583,6 +590,141 @@ public class GameScene extends Scene {
 
 	}
 	
+	public GameScene(Stage stage, Scene mainScreen, ContentSaver savedData) {
+		super(new Pane(createPopulatedContent(savedData)), Main.getScenewidth(), Main.getSceneheight());
+
+		this.setOnKeyPressed(e -> {
+			
+			if (e.getCode() == KeyCode.A) {
+				userSnake.moveLeft();
+			} else if (e.getCode() == KeyCode.D) {
+				userSnake.moveRight();
+			}
+			
+		});
+
+		this.setOnKeyReleased(e -> {
+			
+			if (e.getCode() == KeyCode.A || e.getCode() == KeyCode.D) {
+				userSnake.stopSnake();
+			}
+			
+		});
+
+		GameScene.primaryStage = stage;
+		GameScene.mainMenuScene = mainScreen;
+	}
+
+	private static Parent createPopulatedContent(ContentSaver savedData) {
+		
+		GameScene.resetGame();
+
+		GameScene.root = new Pane();
+		
+		GameScene.root.setPrefSize(Main.getScenewidth(), Main.getSceneheight());
+		GameScene.root.getStyleClass().add("rootBg");
+		
+		GameScene.curGameScore = savedData.getGameScore();
+		GameScene.scoreOnGameBox = new HBox(7);
+		GameScene.scoreOnGame = new Text(GameScene.curGameScore + "");
+		GameScene.scoreOnGame.getStyleClass().add("scoreGameText");
+		GameScene.scoreOnGame.setFill(Color.WHITE);
+
+		Image corwnImage = null;
+
+		try {
+			String pathToImage = "./img/scoreCrown.png";
+			corwnImage = new Image(new FileInputStream(pathToImage));
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+
+		ImageView crownImageView = null;
+		
+		if (corwnImage != null) {
+			crownImageView = new ImageView(corwnImage);
+			crownImageView.setX(0);
+			crownImageView.setY(0);
+			crownImageView.setFitWidth(20);
+			crownImageView.setPreserveRatio(true);
+		}
+
+		GameScene.scoreOnGameBox.setAlignment(Pos.CENTER);
+		GameScene.scoreOnGameBox.getChildren().addAll(crownImageView, GameScene.scoreOnGame);
+		GameScene.scoreOnGameBox.setTranslateX(10);
+		GameScene.scoreOnGameBox.setTranslateY(10);
+
+		GameScene.pauseButton = new Button();
+		GameScene.pauseButton.setDefaultButton(false);
+		GameScene.pauseButton.getStyleClass().add("pauseBtn");
+		GameScene.pauseButton.setTranslateX(Main.getScenewidth() - 40);
+		GameScene.pauseButton.setTranslateY(Main.getSceneheight() - 40);
+		GameScene.gamePauseHandler = new GamePauseHandler();
+		GameScene.pauseButton.setOnAction(GameScene.gamePauseHandler);
+
+		GameScene.gameResumeHandler = new GameResumeHandler();
+
+		GameScene.root.getChildren().addAll(GameScene.scoreOnGameBox, GameScene.pauseButton);
+
+		GameScene.magnetText = new Text("Magnet: Off");
+		GameScene.magnetText.setFill(Color.WHITE);
+		GameScene.magnetText.setFont(Font.font("Arial", 15));
+		GameScene.magnetText.setX(310);
+		GameScene.magnetText.setY(20);
+		GameScene.root.getChildren().add(GameScene.magnetText);
+		
+		GameScene.shieldText = new Text("Shield: Off");
+		GameScene.shieldText.setFill(Color.WHITE);
+		GameScene.shieldText.setFont(Font.font("Arial", 15));
+		GameScene.shieldText.setX(230);
+		GameScene.shieldText.setY(20);
+		GameScene.root.getChildren().add(GameScene.shieldText);
+
+		GameScene.userSnake = new Snake(savedData.getSnakelength(), savedData.getSnakeX());
+		GameScene.addSnake(GameScene.userSnake);
+		
+		resumeSavedGame(savedData);
+		
+		GameScene.mainFrameTimer.start();
+		GameScene.populationTimer.start();
+		
+		return GameScene.root;
+	}
+
+	private static void resumeSavedGame(ContentSaver savedData) {
+		
+		GameScene.gameSpeed = savedData.getGameSpeed();
+		GameScene.userSnake.setSpeed(400);
+		if(savedData.getSnakeMagnet()) {
+			userSnake.hasMagnet = false;
+			Magnet m = new Magnet(savedData.getSnakeX(), savedData.getSnakeY(), gameSpeed);
+			m.collide(userSnake);
+			m.addDuration(-5+savedData.getMagnetDuration());
+		}
+		if(savedData.getSnakeShield()) {
+			userSnake.hasShield = false;
+			Shield s = new Shield(savedData.getSnakeX(), savedData.getSnakeY(), gameSpeed);
+			s.collide(userSnake);
+			s.addDuration(-5+savedData.getMagnetDuration());
+		}
+		
+		GameScene.interactablesCount = savedData.getInteractablesCount();
+		
+//    	this.positionBlockX = positionBlockX;
+//    	this.positionBlockY = positionBlockY;
+//    	this.blockValue = blockValue;
+//    	this.positionWallX = positionWallX;
+//    	this.positionWallY = positionWallY;
+//    	this.wallLength = wallLength;
+//    	this.positionBallX = positionBallX;
+//    	this.positionBallY = positionBallY;
+//    	this.ballValue = ballValue;
+//    	this.positionPowerX = positionPowerX;
+//    	this.positionPowerY = positionPowerY;
+//    	this.powerUpType = powerUpType;
+		
+	}
+
 	private static Parent createContent() {
 		
 		GameScene.resetGame();
@@ -647,7 +789,7 @@ public class GameScene extends Scene {
 		GameScene.shieldText.setY(20);
 		GameScene.root.getChildren().add(GameScene.shieldText);
 
-		GameScene.userSnake = new Snake(10);
+		GameScene.userSnake = new Snake(10, Main.getScenewidth()/2);
 		
 		GameScene.addSnake(GameScene.userSnake);
 		

@@ -60,8 +60,8 @@ public class Main extends Application {
 	
 	private Stage stage;
 	private Scene mainMenuScene;
-	protected boolean oldGamePresent;
-	protected ContentSaver savedData;
+	protected static boolean oldGamePresent;
+	protected static ContentSaver savedData;
 	
 	class backEventHandler implements EventHandler<ActionEvent>{
 
@@ -104,7 +104,7 @@ public class Main extends Application {
 		});
 		
 		resumeBtn.setOnAction(e -> {
-			stage.setScene(resumeGameScene());
+			stage.setScene(resumeGameScene(this.mainMenuScene));
 		});
 		
 		leaderBoardBtn.setOnAction(e -> {
@@ -115,13 +115,13 @@ public class Main extends Application {
 			System.exit(0);
 		});
 		
-		this.savedData = null;
+		savedData = null;
 		Object obj = null;
 		try {
 			obj = SaveManager.load("./data/saveData.txt");
 		} catch (EOFException e){
-			this.savedData = null;
-			this.oldGamePresent = false;
+			savedData = null;
+			oldGamePresent = false;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -129,10 +129,10 @@ public class Main extends Application {
 			savedData = (ContentSaver) obj;
 		}
 		if(savedData != null) {
-			this.oldGamePresent = true;
+			Main.oldGamePresent = true;
 		}
 		else {
-			this.oldGamePresent = false;
+			Main.oldGamePresent = false;
 		}
 
 		try {
@@ -156,7 +156,7 @@ public class Main extends Application {
 		else {
 			root.getChildren().addAll(resumeBtn, playBtn, leaderBoardBtn, exitBtn);
 		}
-		if(!this.oldGamePresent) {
+		if(!Main.oldGamePresent) {
 			resumeBtn.setVisible(false);
 		}
 		else {
@@ -198,6 +198,12 @@ public class Main extends Application {
 //	Plays the game creates gameScene
 	private Scene createGameScene(Scene mainScene) {
 		
+		try {
+			SaveManager.save(null, "./data/saveData.txt");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		Scene gameScene = new GameScene(stage, mainScene);
 		
 		gameScene.getStylesheets().add(
@@ -209,27 +215,15 @@ public class Main extends Application {
 	}
 	
 //	Resume previous any closed game creates gameScene
-	private Scene resumeGameScene() {
+	private Scene resumeGameScene(Scene mainScene) {
 		
-		Scene resumeScene = null;
 		
-		VBox root = new VBox();
-        
-		Button backBtn = new backButton();
-		backBtn.setOnAction(backEventBtn);
+		Scene resumeScene = new GameScene(stage, mainScene, Main.savedData);
 		
-		Text randomText = new Text("Game Will Resume!");
-		randomText.setFill(Color.WHITE);
-		randomText.getStyleClass().add("placeholderText");
-		
-		root.getChildren().addAll(backBtn, randomText);
-		root.getStyleClass().add("rootBg");
-        
-        resumeScene = new Scene(root, sceneWidth, sceneHeight);
-        resumeScene.getStylesheets().add(
+		resumeScene.getStylesheets().add(
         		getClass().getResource("application.css").toExternalForm()
         	);
-        		
+
         return resumeScene;
 	
 	}
