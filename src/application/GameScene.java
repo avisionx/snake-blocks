@@ -736,7 +736,7 @@ public class GameScene extends Scene {
 		}
 		
 		for(int i = 0; i < savedData.getPositionWallX().size(); i++) {
-			Wall w = new Wall(savedData.getPositionWallX().get(i), savedData.getPositionWallY().get(i), savedData.getWallLength().get(i), gameSpeed);
+			Wall w = new Wall(savedData.getPositionWallX().get(i), savedData.getPositionWallY().get(i), savedData.getWallLength().get(i), gameSpeed, true);
 			walls.add(w);
 			GameScene.addGameObject(w);
 		}
@@ -753,8 +753,10 @@ public class GameScene extends Scene {
 			else if(className == DestroyBlocks.class.toString()) {
 				o = new DestroyBlocks(savedData.getPositionPowerX().get(i), savedData.getPositionPowerY().get(i), gameSpeed);
 			}
-			tokens.add(o);
-			GameScene.addGameObject(o);
+			if(o != null) {
+				tokens.add(o);
+				GameScene.addGameObject(o);
+			}
 		}
 		
 	}
@@ -922,6 +924,8 @@ public class GameScene extends Scene {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		GameScene.gameSpeed = 0;
+		GameScene.setGameSpeed(0);
 		GameScene.pauseButton.setOnAction(null);
 		GameScene.stopFallAnimation();
 		GameScene.populationTimer.stop();
@@ -1009,7 +1013,7 @@ public class GameScene extends Scene {
 
 		Random r2 = new Random();
 		int whichOneLess = (int) Math.floor(r2.nextInt(6));
-		int lessRange = (int) Math.floor(r2.nextInt(GameScene.userSnake.getSnakeLength()));
+		int lessRange = (int) Math.floor(r2.nextInt(GameScene.userSnake.getSnakeLength() <= 0 ? 1 : GameScene.userSnake.getSnakeLength()));
 		lessRange = lessRange > 60 ? 60 : lessRange;
 		if (lessRange >= 1) {
 			Block newBlock = new Block(6 + whichOneLess * 65, -262, lessRange, GameScene.gameSpeed);
@@ -1082,6 +1086,19 @@ public class GameScene extends Scene {
 		}
 		for (Block block : GameScene.blocks) {
 			block.setSpeed(GameScene.gameSpeed);
+		}
+
+	}
+	
+	public static void setGameSpeed(double value) {
+		for (GameObject token : GameScene.tokens) {
+			token.setSpeed(value);
+		}
+		for (Wall wall : GameScene.walls) {
+			wall.setSpeed(value);
+		}
+		for (Block block : GameScene.blocks) {
+			block.setSpeed(value);
 		}
 
 	}

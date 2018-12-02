@@ -20,6 +20,16 @@ public class Wall extends GameObject implements Interactable{
 		
 	}
 	
+	public Wall(Double x, Double y, Double length, double speed, boolean b) {
+		super(new Rectangle(5, length, Color.WHITE), speed);
+		
+		((Rectangle)this.getView()).setArcHeight(7);
+		((Rectangle)this.getView()).setArcWidth(7);
+		((Rectangle)this.getView()).setX(x);
+		((Rectangle)this.getView()).setY(y);
+		this.getFallDownTimer().start();
+	}
+
 	public double getLength() {
 		return ((Rectangle)this.getView()).getHeight();
 	}
