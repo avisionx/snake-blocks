@@ -675,7 +675,7 @@ public class GameScene extends Scene {
 
 		Random posR = new Random();
 		
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 3; i++) {
 			Ball newBall = new Ball(posR.nextInt(360) + 10, -100 + posR.nextFloat() * -1 * 300, 1 + posR.nextInt(20), GameScene.gameSpeed);
 			if (isSafe(newBall)) {
 				GameScene.tokens.add(newBall);
