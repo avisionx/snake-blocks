@@ -1,7 +1,10 @@
 package application;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -29,13 +32,29 @@ import javafx.stage.Stage;
 
 class GamePauseHandler implements EventHandler<ActionEvent> {
 
+	private boolean openedPauseMenu = false;
+	
 	@Override
 	public void handle(ActionEvent e) {
-		GameScene.pauseGame();
+		if(!openedPauseMenu) {
+			GameScene.pauseGame();
+			openedPauseMenu = true;
+		}
+		else {
+			GameScene.resumeGame();
+			openedPauseMenu = false;
+		}
 	}
 
 	public void handle(KeyEvent e) {
-		GameScene.pauseGame();
+		if(!openedPauseMenu) {
+			GameScene.pauseGame();
+			openedPauseMenu = true;
+		}
+		else {
+			GameScene.resumeGame();
+			openedPauseMenu = false;
+		}
 	}
 
 }
@@ -499,6 +518,7 @@ public class GameScene extends Scene {
 		GameScene.scoreOnGameBox.setTranslateY(10);
 
 		GameScene.pauseButton = new Button();
+		GameScene.pauseButton.setDefaultButton(false);
 		GameScene.pauseButton.getStyleClass().add("pauseBtn");
 		GameScene.pauseButton.setTranslateX(Main.getScenewidth() - 40);
 		GameScene.pauseButton.setTranslateY(Main.getSceneheight() - 40);
@@ -615,11 +635,27 @@ public class GameScene extends Scene {
 
 	public static void gameOver() {
 		
+		GameScene.pauseButton.setOnAction(null);
 		GameScene.stopFallAnimation();
 		GameScene.populationTimer.stop();
 		GameScene.stopPowerUps();
 		GameScene.userSnake.setSpeed(0);
 		GameScene.endMenu = new endScreen(curGameScore);
+		Score newScore = new Score(curGameScore, new Date());
+		Leaderboard leaderboard = Main.getLeaderboard();
+		leaderboard.addScore(newScore);
+		ArrayList<Score> scoreList = leaderboard.getLeaderboard();
+		
+		ObjectOutputStream out = null;
+		 
+		try {
+			out = new ObjectOutputStream(new FileOutputStream("./data/leaderboard.txt"));
+			out.writeObject(scoreList);
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		GameScene.root.getChildren().add(GameScene.endMenu);
 	
 	}
