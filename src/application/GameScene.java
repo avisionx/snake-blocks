@@ -376,59 +376,76 @@ public class GameScene extends Scene {
 		System.exit(0);
 	}
 	
-	public static List<Block> getBlocks(){ return blocks; }
-	public static List<Wall> getWalls(){ return walls; }
-	public static int getsnakeLength(){ return userSnake.getSnakeLength(); }
-	public static double getgameSpeed(){ return gameSpeed; }
-	public static int getCurGameScore(){ return curGameScore; }
-	public static Snake getSnake() { return userSnake; }
-	
-	
 	protected static void saveGame() {
 		
-		ContentSaver save = new ContentSaver();
+		int snakeLength = GameScene.userSnake.getSnakeLength();
+	    double snakeX = GameScene.userSnake.getSnakeHeadPosPoint2D().getX();
+	    double snakeY = GameScene.userSnake.getSnakeHeadPosPoint2D().getY();
+	    double snakeSpeed = GameScene.userSnake.getSnakeSpeed();
+	    boolean snakeMagnet = GameScene.userSnake.hasMagnet;
+	    double magnetDuration = snakeMagnet ? GameScene.userSnake.curMagnet.getDuration() : 0;
+	    boolean snakeShield = GameScene.userSnake.hasShield;
+	    double shieldDuration = snakeShield ? GameScene.userSnake.curShield.getDuration() : 0;
+	    
+	    int gameScore = GameScene.curGameScore;
+	    double saveGameSpeed = GameScene.gameSpeed;
+	    int saveInteractablesCount = GameScene.interactablesCount;
+	    
+	    ArrayList<Double> positionBlockX = new ArrayList<>();
+	    ArrayList<Double> positionBlockY = new ArrayList<>();
+	    ArrayList<Integer> blockValue = new ArrayList<>();
+
+	    for(Block block : GameScene.blocks){
+			positionBlockX.add(block.getView().getTranslateX());
+			positionBlockY.add(block.getView().getTranslateY());
+			blockValue.add(block.getValue());
+		}
+	    
+	    ArrayList<Double> positionWallX = new ArrayList<>();
+	    ArrayList<Double> positionWallY = new ArrayList<>();
+	    ArrayList<Double> wallLength = new ArrayList<>();
+
+	    for(Wall wall : GameScene.walls){
+	    	positionWallX.add(wall.getView().getTranslateX());
+	    	positionWallY.add(wall.getView().getTranslateY());
+	    	wallLength.add(wall.getLength());
+		}
+	    
+	    ArrayList<Double> positionBallX = new ArrayList<>();
+	    ArrayList<Double> positionBallY = new ArrayList<>();
+	    ArrayList<Integer> ballValue = new ArrayList<>();
+
+	    for(Ball ball : GameScene.getBallList()){
+	    	positionBallX.add(ball.getView().getTranslateX());
+	    	positionBallY.add(ball.getView().getTranslateY());
+	    	ballValue.add(ball.getValue());
+		}
+	    
+	    ArrayList<Double> positionPowerX = new ArrayList<>();
+	    ArrayList<Double> positionPowerY = new ArrayList<>();
+	    ArrayList<String> powerUpType = new ArrayList<>();
+
+	    for(GameObject token : GameScene.getTokenExceptBallList()){
+	    	positionPowerX.add(token.getView().getTranslateX());
+	    	positionPowerY.add(token.getView().getTranslateY());
+	    	powerUpType.add(token.getClass().toString());
+		}
 		
-		int Snakelength = GameScene.getsnakeLength();
-		double snakeX = GameScene.getSnake().getSnakeHeadPosPoint2D().getX();
-		double snakeY = GameScene.getSnake().getSnakeHeadPosPoint2D().getY();
-		double snakeSpeed = GameScene.getSnake().getSnakeSpeed();
-		int score = GameScene.getCurGameScore();
-		ArrayList<Double> positionBlockX = new ArrayList<>();
-		ArrayList<Double> positionBlockY = new ArrayList<>();
-		ArrayList<Integer> blockValue = new ArrayList<>();
-		ArrayList<Double> positionWallX = new ArrayList<>();
-		ArrayList<Double> positionWallY = new ArrayList<>();
-		double gameSpeed = GameScene.getgameSpeed();
-		ArrayList<Double> wallLength = new ArrayList<>();
-
-		for(Block ele : GameScene.getBlocks()){
-			positionBlockX.add(ele.getView().getTranslateX());
-			positionBlockY.add(ele.getView().getTranslateY());
-			blockValue.add(ele.getValue());
-		}
-
-		for(Wall ele : GameScene.getWalls()){
-			positionWallX.add(ele.getView().getTranslateX());
-			positionWallY.add(ele.getView().getTranslateY());
-			wallLength.add(ele.getLength());
-		}
-
-		save.setBlockValue(blockValue);
-		save.setPositionBlockX(positionBlockX);
-		save.setPositionBlockY(positionBlockY);
-		save.setPositionWallX(positionWallX);
-		save.setPositionWallY(positionWallY);
-		save.setSnakelength(Snakelength);
-		save.setWallLength(wallLength);
-		save.setScore(score);
-		save.setSnakeX(snakeX);
-		save.setSnakeY(snakeY);
-		save.setSnakeSpeed(snakeSpeed);
+	    ContentSaver saveData = new ContentSaver(
+	    		snakeLength, snakeX, snakeY, snakeSpeed, 
+	    		snakeMagnet, magnetDuration, snakeShield, 
+	    		shieldDuration, gameScore, saveGameSpeed, 
+	    		saveInteractablesCount, positionBlockX, 
+	    		positionBlockY, blockValue, positionWallX, 
+	    		positionWallY, wallLength, positionBallX, 
+	    		positionBallY, ballValue, positionPowerX,
+	    		positionPowerY, powerUpType
+	    	);
 
 		try{
-			SaveManager.save(save, "./data/saveData.txt");
+			SaveManager.save(saveData, "./data/saveData.txt");
 		} catch (Exception e){
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 		
 		return;
@@ -467,6 +484,26 @@ public class GameScene extends Scene {
 			
 		}	
 		return ballList;
+	}
+	
+	public static List<GameObject> getTokenExceptBallList() {
+		List<GameObject> tokenList = new ArrayList<>();
+		for (GameObject object : GameScene.tokens) {
+			
+			if (object.getClass() != Ball.class) {
+				if(object.getClass() == Shield.class) {
+					tokenList.add((Shield)object);
+				}
+				else if(object.getClass() == DestroyBlocks.class) {
+					tokenList.add((DestroyBlocks)object);
+				}
+				else if(object.getClass() == Magnet.class) {
+					tokenList.add((Magnet)object);
+				}
+			}
+			
+		}	
+		return tokenList;
 	}
 	
 	public static void setMagnetOn() {

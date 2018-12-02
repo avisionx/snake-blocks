@@ -50,6 +50,10 @@ public class Magnet extends GameObject implements Token{
 		this.duration += addDuration;
 	}
 	
+	public double getDuration() {
+		return this.duration;
+	}
+	
 	public void startMagnetTimer() {
 		this.magnetTimer.start();
 	}

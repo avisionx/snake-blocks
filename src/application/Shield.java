@@ -47,6 +47,11 @@ public class Shield extends GameObject implements Token{
 	public void addDuration(double addDuration) {
 		this.duration += addDuration;
 	}
+	
+
+	public double getDuration() {
+		return this.duration;
+	}
 
 	@Override
 	public void collide(Snake snake) {

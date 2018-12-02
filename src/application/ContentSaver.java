@@ -31,14 +31,48 @@ public class ContentSaver implements Serializable {
 
     private ArrayList<Double> positionBallX;
     private ArrayList<Double> positionBallY;
-    private ArrayList<Double> ballValue;
+    private ArrayList<Integer> ballValue;
 
     private ArrayList<Double> positionPowerX;
     private ArrayList<Double> positionPowerY;
     private ArrayList<String> powerUpType;
     
     
-    public void setSnakelength(int snakelength) {
+    public ContentSaver(int snakeLength, double snakeX, double snakeY, double snakeSpeed, boolean snakeMagnet,
+			double magnetDuration, boolean snakeShield, double shieldDuration, int gameScore, double gameSpeed,
+			int interactablesCount, ArrayList<Double> positionBlockX, ArrayList<Double> positionBlockY,
+			ArrayList<Integer> blockValue, ArrayList<Double> positionWallX, ArrayList<Double> positionWallY,
+			ArrayList<Double> wallLength, ArrayList<Double> positionBallX, ArrayList<Double> positionBallY,
+			ArrayList<Integer> ballValue, ArrayList<Double> positionPowerX, ArrayList<Double> positionPowerY,
+			ArrayList<String> powerUpType) {
+		
+    	this.snakeLength = snakeLength;
+    	this.snakeX = snakeX;
+    	this.snakeY = snakeY;
+    	this.snakeSpeed = snakeSpeed;
+    	this.snakeMagnet = snakeMagnet;
+    	this.magnetDuration = magnetDuration;
+    	this.snakeShield = snakeShield;
+    	this.shieldDuration = shieldDuration;
+    	this.gameScore = gameScore;
+    	this.gameSpeed = gameSpeed;
+    	this.interactablesCount = interactablesCount;
+    	this.positionBlockX = positionBlockX;
+    	this.positionBlockY = positionBlockY;
+    	this.blockValue = blockValue;
+    	this.positionWallX = positionWallX;
+    	this.positionWallY = positionWallY;
+    	this.wallLength = wallLength;
+    	this.positionBallX = positionBallX;
+    	this.positionBallY = positionBallY;
+    	this.ballValue = ballValue;
+    	this.positionPowerX = positionPowerX;
+    	this.positionPowerY = positionPowerY;
+    	this.powerUpType = powerUpType;
+    	
+	}
+
+	public void setSnakelength(int snakelength) {
         this.snakeLength = snakelength;
     }
 
@@ -183,7 +217,7 @@ public class ContentSaver implements Serializable {
         return this.positionBallY;
     }
    
-    public ArrayList<Double> getBallValue() {
+    public ArrayList<Integer> getBallValue() {
         return this.ballValue;
     }
     
@@ -195,7 +229,7 @@ public class ContentSaver implements Serializable {
         this.positionBallY = positionBallY;
     }
 
-    public void setBallValue(ArrayList<Double> ballValue) {
+    public void setBallValue(ArrayList<Integer> ballValue) {
         this.ballValue = ballValue;
     }
 
