@@ -9,8 +9,19 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 
+/**
+ * This class describes the Animation for bursting of particles.
+ * extends Group
+ */
+
 public class ParticleBurst extends Group {
 
+	/**
+	 * Constructor which creates the ParticleBurst Object which creates the burst animation using methods of java.util.Random.
+	 * @param x - x coordinate of the particle to be burst
+	 * @param y - y coordinate of the particle to be burst
+	 * @param c - Color of the particle to be burst.
+	 */
 	public ParticleBurst(double x, double y, Color c) {
 		
 		super();

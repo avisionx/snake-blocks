@@ -9,6 +9,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 
+/**
+ * DestroyBlocks class describes the powerup which destroys all the blocks on the screen at that moment.
+ * Extends GameObject and implements Token interface
+ * extends GameObject, implements Token
+ */
 public class DestroyBlocks extends GameObject implements Token{
 	
 	private static final ImagePattern DESTROY_IMAGE;
@@ -30,7 +35,13 @@ public class DestroyBlocks extends GameObject implements Token{
 			DESTROY_IMAGE = null;
 	
 	}
-	
+
+	/**
+	 * DestroyBlocks Constructor, creates the powerup at the desired position and given speed
+	 * @param x - x coordinate of the powerup
+	 * @param y - y coordinate of the powerup
+	 * @param speed - speed of the gameplay
+	 */
 	public DestroyBlocks(double x, double y, double speed) {
 		
 		super(new Circle(x, y, 16), speed);
@@ -38,7 +49,12 @@ public class DestroyBlocks extends GameObject implements Token{
 		this.getFallDownTimer().start();
 		
 	}
-	
+
+	/**
+	 * collide method describes the collision of the powerup with a snake i.e. destroys all the block at the moment and add the value to the score
+	 * @param snake - Current User Snake
+	 */
+
 	@Override
 	public void collide(Snake snake) {
 		

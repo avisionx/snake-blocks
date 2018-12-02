@@ -1,9 +1,13 @@
+.rootBg{
+	-fx-background-color: #161616;
+}
+
 .menuBtn {
 	-fx-font: 18px "Courier New";
-    -fx-padding: 15;
-    -fx-pref-width: 300px;
+    -fx-padding: 12;
+    -fx-pref-width: 280px;
     -fx-text-fill: #fff;
-    -fx-background-color: #000;
+    -fx-background-color: #161616;
     -fx-border-insets: 10px;
     -fx-background-insets: 10px;
     -fx-border-color: white;
@@ -22,8 +26,48 @@
     -fx-background-position: center center; 
 }
 
-.rootBg{
-	-fx-background-color: #000;
+.pasueScreenBtn{
+	-fx-font: 25px "Courier New";
+    -fx-padding: 4;
+    -fx-font-weight: 900;
+    -fx-pref-width: 200px;
+    -fx-text-fill: #fff;
+    -fx-background-color: transparent;
+    -fx-border-insets: 8px;
+    -fx-background-insets: 8px;
+}
+
+.pauseBtn {
+    -fx-background-image: url("./../../img/pauseBtn.png") ;
+    -fx-background-repeat: no-repeat;   
+    -fx-background-size: 25px 25px;
+    -fx-min-height: 35px;
+    -fx-min-width: 35px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 0;
+    -fx-background-color: transparent;
+    -fx-background-position: center center; 
+}
+
+.boxFont {
+	-fx-font: 20px "San Serif";
+	-fx-font-weight: 700;
+}
+
+.circleFont {
+	-fx-font: 15px "Helvetica";
+	-fx-font-weight: 900;
+}
+
+.pauseScoreText{
+	-fx-font: 50px "Helvetica";
+	-fx-font-weight: 900;
+}
+
+.scoreGameText{
+	-fx-font: 20px "Helvetica";
+	-fx-font-weight: 900;
 }
 
 .placeholderText {

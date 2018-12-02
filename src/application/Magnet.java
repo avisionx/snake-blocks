@@ -2,7 +2,6 @@ package application;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
@@ -10,6 +9,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 
+/**
+ * Magnet class to represent Magnet in game
+ * Fields -
+ * duration - duration for which the magnet lasts
+ */
 public class Magnet extends GameObject implements Token{
 	
 	private static final ImagePattern MAGNET_IMAGE;
@@ -35,7 +39,13 @@ public class Magnet extends GameObject implements Token{
 			MAGNET_IMAGE = null;
 	
 	}
-	
+
+	/**
+	 * Constructor for Magnet
+	 * @param x - x coordinate of magnet
+	 * @param y - y coordinate of magnet
+	 * @param speed - speed of game
+	 */
 	public Magnet(double x, double y, double speed) {
 			
 		super(new Circle(x, y, 16), speed);
@@ -45,23 +55,40 @@ public class Magnet extends GameObject implements Token{
 		this.magnetTimer = null;
 		
 	}
-	
+
+	/**
+	 * method to increase duration
+	 * @param addDuration - value to be added to duration
+	 */
 	public void addDuration(double addDuration) {
 		this.duration += addDuration;
 	}
-	
+
+	/**
+	 * getter for duration
+	 * @return double type value i.e. duration
+	 */
 	public double getDuration() {
 		return this.duration;
 	}
-	
+
+	/**
+	 * method to start the magnetTimer i.e. AnimationTimer for magnet
+	 */
 	public void startMagnetTimer() {
 		this.magnetTimer.start();
 	}
-	
+	/**
+	 * method to stop the magnetTimer i.e. AnimationTimer for magnet
+	 */
 	public void stopMagnetTimer() {
 		this.magnetTimer.stop();
 	}
-	
+
+	/**
+	 * method to handle collision with snake
+	 * @param snake - current user snake
+	 */
 	@Override
 	public void collide(Snake snake) {
 		

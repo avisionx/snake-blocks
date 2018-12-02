@@ -22,17 +22,33 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
+/**
+ * ImageNotFound custom exception class.
+ * extends Exception
+ */
 @SuppressWarnings("serial")
 class ImageNotFound extends Exception{
-	
+
+	/**
+	 * constructor for custom exception ImageNotFound
+	 * @param pathToImage - denotes the path to image
+	 */
 	public ImageNotFound(String pathToImage) {
 		super("ImageNotFound! Path: " + pathToImage);
 	}
 	
 }
 
+/**
+ * menuButton class for creation of Menu Button
+ * extends Button
+ */
 class menuButton extends Button{
-	
+
+	/**
+	 * constructor for the menuButton class
+	 * @param name - Text for Menu Button
+	 */
 	public menuButton(String name){
 		super(name);
 		this.getStyleClass().add("menuBtn");
@@ -40,8 +56,15 @@ class menuButton extends Button{
 	
 }
 
+/**
+ * backButton class for creation of back button
+ * extends Button
+ */
 class backButton extends Button{
-	
+
+	/**
+	 * constructor for backButton
+	 */
 	public backButton(){
 		super("");
 		this.getStyleClass().add("backBtn");
@@ -50,10 +73,23 @@ class backButton extends Button{
 }
 
 // Public Main Class Definition
+
+/**
+ * Main class which initiates the entire application.
+ * extends Application
+ * Fields -
+ * sceneWidth - width of the scene
+ * sceneHeight - height of the scene
+ * leaderboard - Leaderboard object for the Leaderboard of the game
+ * stage - Stage Object for the primary stage
+ * mainMenuScene - Scene for main menu
+ * oldGamePresent - boolean for checking whether previous data exist to be loaded
+ * savedData - ContentSaver Object to saved the game data
+ */
 public class Main extends Application {
 	
 //	Variable Definitions
-	
+
 	private static final int sceneWidth = 400;
 	private static final int sceneHeight = 600;
 	private static Leaderboard leaderboard;
@@ -62,7 +98,10 @@ public class Main extends Application {
 	private Scene mainMenuScene;
 	protected static boolean oldGamePresent;
 	protected static ContentSaver savedData;
-	
+
+	/**
+	 * backEventHandler class handles the event when user
+	 */
 	class backEventHandler implements EventHandler<ActionEvent>{
 
 		@Override
@@ -74,19 +113,37 @@ public class Main extends Application {
 	private backEventHandler backEventBtn = new backEventHandler();
 
 //	Getter Setter For Width And Height
+
+	/**
+	 * getter for scene width
+	 * @return integer value i.e. the width of the scene
+	 */
 	public static int getScenewidth() {
 		return Main.sceneWidth;
 	}
-	
+
+	/**
+	 * getter for height of the scene
+	 * @return integer value i.e. the height of the scene
+	 */
 	public static int getSceneheight() {
 		return Main.sceneHeight;
 	}
-	
+
+	/**
+	 * getter for leaderboard
+	 * @return Leaderboard object i.e. the leaderboard for the game
+	 */
 	public static Leaderboard getLeaderboard() {
 		return Main.leaderboard;
 	}
 		
 //	Creates MainScene
+
+	/**
+	 * Creates the MainScene i.e. the main menu of the applicaton, which includes play, resume [depends on if there is data to load], leaderboard and exit
+	 * @return Scene
+	 */
 	@SuppressWarnings("unchecked")
 	private Scene createMainScene() {
 		
@@ -196,6 +253,12 @@ public class Main extends Application {
 	}
 	
 //	Plays the game creates gameScene
+
+	/**
+	 * creates the gameScene i.e. new game
+	 * @param mainScene - main scene
+	 * @return Scene i.e. the game scene
+	 */
 	private Scene createGameScene(Scene mainScene) {
 		
 		try {
@@ -215,6 +278,12 @@ public class Main extends Application {
 	}
 	
 //	Resume previous any closed game creates gameScene
+
+	/**
+	 * creates the resum game scene which shows on resuming the game
+	 * @param mainScene - main scene
+	 * @return Scene i.e. the resume scene
+	 */
 	private Scene resumeGameScene(Scene mainScene) {
 		
 		
@@ -229,6 +298,11 @@ public class Main extends Application {
 	}
 
 //	Display Leaderboard
+
+	/**
+	 * showLeaderBoardScene method is used to display the leaderboard, which consists of the top 10 scores of the game
+	 * @return Scene i.e. the leaderboard scene
+	 */
 	private Scene showLeaderboardScene() {
 
 		Scene leaderboardScene = null;
@@ -320,6 +394,11 @@ public class Main extends Application {
 	}
 	
 //	Start method overridden
+
+	/**
+	 * overridden start method to initiate the application
+	 * @param primaryStage - Stage for the application
+	 */
 	@Override
 	public void start(Stage primaryStage) {
 		
@@ -336,7 +415,11 @@ public class Main extends Application {
 		}
 	}
 
-//	Main method to run the app calls start() method
+
+	/**
+	 * Main method to run the app which thereby calls start() method
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		launch(args);
 	}
