@@ -135,7 +135,7 @@ public class Block extends GameObject implements Interactable{
 	 * <p>
 	 *     Collision depends on the presence of shield by the snake, decrementing block value corresponds to incrementing the same value to the score.
 	 *     In case of Shield the block is destroyed without any change in length of snake,
-	 *     otherwise the snake's length and block value are decremented gradually by one step at a time, if the block's value is <= 5.
+	 *     otherwise the snake's length and block value are decremented gradually by one step at a time, if the block's value is less than equal to 5.
 	 * </p>
 	 * @param snake
 	 */
