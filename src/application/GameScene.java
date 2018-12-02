@@ -30,6 +30,10 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+/**
+ * Class for handling pause event during gameplay using EventHandler
+ */
+
 class GamePauseHandler implements EventHandler<ActionEvent> {
 
 	private boolean openedPauseMenu = false;
@@ -59,6 +63,9 @@ class GamePauseHandler implements EventHandler<ActionEvent> {
 
 }
 
+/**
+ * Class for handling resume game event using EventHandler
+ */
 class GameResumeHandler implements EventHandler<ActionEvent> {
 
 	@Override
@@ -72,6 +79,9 @@ class GameResumeHandler implements EventHandler<ActionEvent> {
 
 }
 
+/**
+ * pauseScreenButton creates a buttons for the pause screen, extends Button
+ */
 class pauseScreenButton extends Button {
 
 	public pauseScreenButton(String name) {
@@ -81,8 +91,16 @@ class pauseScreenButton extends Button {
 
 }
 
+/**
+ * Class for showing the pause screen, extends StackPane
+ */
 class pauseScreen extends StackPane {
 
+	/**
+	 * Constructor for displaying the menu when the game is paused which includes Resume, New Game, Main Menu and Exit.
+	 * Actions include saving game in case of exiting the game or system crash are also handled in the same.
+	 * @param scoreToDisplay - Current score of the player
+	 */
 	public pauseScreen(int scoreToDisplay) {
 
 		super();
@@ -155,8 +173,16 @@ class pauseScreen extends StackPane {
 
 }
 
+/**
+ * Class for the screen displayed after the game ends, extends StackPane
+ */
 class endScreen extends StackPane {
 
+	/**
+	 * Constructor for displaying the menu when the game gets over which includes New Game, Main Menu and Exit.
+	 * Player's score is added to the leaderboard
+	 * @param scoreToDisplay - Current score of the player
+	 */
 	public endScreen(int scoreToDisplay) {
 
 		super();
@@ -214,6 +240,19 @@ class endScreen extends StackPane {
 
 }
 
+/**
+ * GameScene is the scene during the gameplay, extends Scene
+ * Fields -
+ * root - root Pane
+ * userSnake - snake of the current user
+ * tokens - list of GameoObject in the game
+ * blocks - List of Blocks in the game
+ * walls - list of walls in the game
+ * gameSpeed - speed of the game
+ * interableCount - integer count for the interactables
+ * Button pauseButton
+ * curGameScore - Integer current score
+ */
 public class GameScene extends Scene {
 
 	protected static Pane root;
@@ -246,6 +285,9 @@ public class GameScene extends Scene {
 	private static Text shieldText;
 	private static Text magnetText;
 
+	/**
+	 * collidingBlockTimer - timer for the each block collision.
+	 */
 	protected static AnimationTimer collidingBlockTimer = new AnimationTimer() {
 		
 		double lastUpdateTime = System.currentTimeMillis();
@@ -253,7 +295,7 @@ public class GameScene extends Scene {
 		@Override
 		public void handle(long now) {
 			double elapsedTime = (now - lastUpdateTime) / 1_000_000_000.0;
-			if (elapsedTime > 0.05) {
+			if (elapsedTime > 0.005) {
 				if (collidingWithBlock != null) {
 					
 					if (collidingWithBlock.getValue() <= 0) {
@@ -277,7 +319,10 @@ public class GameScene extends Scene {
 		}
 		
 	};
-	
+
+	/**
+	 * mainFrameTimer - timer for the game's frame
+	 */
 	private static AnimationTimer mainFrameTimer = new AnimationTimer() {
 
 		@Override
@@ -286,7 +331,10 @@ public class GameScene extends Scene {
 		}
 
 	};
-	
+
+	/**
+	 * checks for collisions and update each frame accordingly
+	 */
 	private static void updateEachFrame() {
 
 		for (GameObject token : GameScene.tokens) {
@@ -380,11 +428,17 @@ public class GameScene extends Scene {
 
 	}
 
+	/**
+	 * saves and exit game
+	 */
 	protected static void exit() {
 		GameScene.saveGame();
 		System.exit(0);
 	}
-	
+
+	/**
+	 *  method for saving game
+	 */
 	protected static void saveGame() {
 		
 		int snakeLength = GameScene.userSnake.getSnakeLength();
@@ -465,6 +519,9 @@ public class GameScene extends Scene {
 		return;
 	}
 
+	/**
+	 * Timer for populating the game with tokens etc.
+	 */
 	private static AnimationTimer populationTimer = new AnimationTimer() {
 		double lastPopulateTime = System.currentTimeMillis();
 		boolean checker = false;
@@ -483,11 +540,19 @@ public class GameScene extends Scene {
 			}
 		}
 	};
-	
+
+	/**
+	 * getter for list of blocks
+	 * @return List of Block object
+	 */
 	public static List<Block> getBlockList() {
 		return GameScene.blocks;
 	}
-	
+
+	/**
+	 * getter for the list of balls
+	 * @return List of Ball object
+	 */
 	public static List<Ball> getBallList() {
 		List<Ball> ballList = new ArrayList<>();
 		for (GameObject object : GameScene.tokens) {
@@ -499,7 +564,11 @@ public class GameScene extends Scene {
 		}	
 		return ballList;
 	}
-	
+
+	/**
+	 * getter for token list which excluding any ball
+	 * @return List of GameObject
+	 */
 	public static List<GameObject> getTokenExceptBallList() {
 		List<GameObject> tokenList = new ArrayList<>();
 		for (GameObject object : GameScene.tokens) {
@@ -519,36 +588,60 @@ public class GameScene extends Scene {
 		}	
 		return tokenList;
 	}
-	
+
+	/**
+	 * sets the Magnet on
+	 */
 	public static void setMagnetOn() {
 		GameScene.magnetText.setText("Magnet: On");
 		GameScene.magnetText.setFill(Color.RED);
 	}
 
+	/**
+	 * sets the magnet off
+	 */
 	public static void setMagnetOff() {
 		GameScene.magnetText.setText("Magnet: Off");
 		GameScene.magnetText.setFill(Color.WHITE);
 	}
 
+	/**
+	 * sets the shield on
+	 */
 	public static void setShieldOn() {
 		GameScene.shieldText.setText("Shield: On");
 		GameScene.shieldText.setFill(Color.GREENYELLOW);
 	}
 
+	/**
+	 * sets the shield off
+	 */
 	public static void setShieldOff() {
 		GameScene.shieldText.setText("Shield: Off");
 		GameScene.shieldText.setFill(Color.WHITE);
 	}
-	
+
+	/**
+	 * setter for GameScore
+	 * @param newScore - score to be updated to
+	 */
 	public static void setGameScore(int newScore) {
 		GameScene.curGameScore = newScore;
 		GameScene.scoreOnGame.setText(newScore + "");
 	}
 
+	/**
+	 * getter for GameScore
+	 * @return integer game score
+	 */
 	public static int getGameScore() {
 		return GameScene.curGameScore;
 	}
-	
+
+	/**
+	 * adds snake to the GameScene
+	 * @param snake - Snake Object to be added
+	 */
 	private static void addSnake(Snake snake) {
 		
 		GameScene.root.getChildren().add(snake);
@@ -557,6 +650,10 @@ public class GameScene extends Scene {
 	
 	}
 
+	/**
+	 * adds GameObject to the GameScene
+	 * @param object GameObject to be added
+	 */
 	private static void addGameObject(GameObject object) {
 		
 		GameScene.root.getChildren().add(object.getView());
@@ -566,7 +663,11 @@ public class GameScene extends Scene {
 	
 	}
 
-	
+	/**
+	 * Constructor for GameScene
+	 * @param stage - Stage for the Application
+	 * @param mainScreen -  mainScreen Scene
+	 */
 	public GameScene(Stage stage, Scene mainScreen) {
 
 		super(new Pane(createContent()), Main.getScenewidth(), Main.getSceneheight());
@@ -597,7 +698,13 @@ public class GameScene extends Scene {
 		});
 		
 	}
-	
+
+	/**
+	 * Constructor for the GameScene
+	 * @param stage - Stage for the Application
+	 * @param mainScreen -  mainScreen Scene
+	 * @param savedData - ContentSaver Object, for resuming to any previous game
+	 */
 	public GameScene(Stage stage, Scene mainScreen, ContentSaver savedData) {
 		super(new Pane(createPopulatedContent(savedData)), Main.getScenewidth(), Main.getSceneheight());
 
@@ -628,6 +735,11 @@ public class GameScene extends Scene {
 		
 	}
 
+	/**
+	 *  createPopulatedContent - method for creating populated content in case for resuming game
+	 * @param savedData - ContentSaver Object i.e. data for resuming back to game
+	 * @return Parent object i.e. root of the GameScene
+	 */
 	private static Parent createPopulatedContent(ContentSaver savedData) {
 		
 		GameScene.resetGame();
@@ -704,6 +816,10 @@ public class GameScene extends Scene {
 		return GameScene.root;
 	}
 
+	/**
+	 * resumeSavedGame method for resuming back to the saved game
+	 * @param savedData - ContentSaver Object i.e. data for resuming game
+	 */
 	private static void resumeSavedGame(ContentSaver savedData) {
 		
 		GameScene.gameSpeed = savedData.getGameSpeed();
@@ -761,6 +877,10 @@ public class GameScene extends Scene {
 		
 	}
 
+	/**
+	 * creates contents of the gameplay
+	 * @return Parent object i.e. the root of the GameScene
+	 */
 	private static Parent createContent() {
 		
 		GameScene.resetGame();
@@ -835,7 +955,10 @@ public class GameScene extends Scene {
 		return GameScene.root;
 
 	}
-	
+
+	/**
+	 * resetGame - method used to reset the game i.e. new game
+	 */
 	private static void resetGame() {
 		GameScene.userSnake = null;
 		GameScene.tokens = new ArrayList<>();
@@ -847,6 +970,9 @@ public class GameScene extends Scene {
 		GameScene.interactablesCount = 0;
 	}
 
+	/**
+	 * stops the game i.e. falling down animation
+	 */
 	private static void stopFallAnimation() {
 		for (GameObject token : GameScene.tokens) {
 			token.getFallDownTimer().stop();
@@ -858,7 +984,10 @@ public class GameScene extends Scene {
 			block.getFallDownTimer().stop();
 		}
 	}
-	
+
+	/**
+	 * stops the powerups downward motion while pausing the game
+	 */
 	private static void stopPowerUps() {
 		if (GameScene.userSnake.hasMagnet) {
 			GameScene.userSnake.curMagnet.stopMagnetTimer();
@@ -866,8 +995,11 @@ public class GameScene extends Scene {
 		if (GameScene.userSnake.hasShield) {
 			GameScene.userSnake.curShield.shieldTimer.stop();
 		}
-	}	
+	}
 
+	/**
+	 * method for pausing game
+	 */
 	protected static void pauseGame() {
 		
 		GameScene.pauseTime = System.currentTimeMillis();
@@ -880,6 +1012,9 @@ public class GameScene extends Scene {
 	
 	}
 
+	/**
+	 * method to resume back the Fall Animation of tokens, walls and block i.e. restarting the game
+	 */
 	private static void resumeFallAnimation() {
 		for (GameObject token : GameScene.tokens) {
 			token.getFallDownTimer().start();
@@ -891,7 +1026,10 @@ public class GameScene extends Scene {
 			block.getFallDownTimer().start();
 		}
 	}
-	
+
+	/**
+	 * method to resume the motion of powerUps
+	 */
 	private static void resumePowerUps() {
 		if (GameScene.userSnake.hasMagnet) {
 			double addDuration = ((long) System.currentTimeMillis() - GameScene.pauseTime) / 1000;
@@ -905,6 +1043,9 @@ public class GameScene extends Scene {
 		}
 	}
 
+	/**
+	 * method to resume the game
+	 */
 	protected static void resumeGame() {
 		
 		GameScene.resumeFallAnimation();
@@ -915,6 +1056,9 @@ public class GameScene extends Scene {
 	
 	}
 
+	/**
+	 * method called when the game gets over
+	 */
 	public static void gameOver() {
 		
 		Button resumeBtn = (Button) ((VBox)GameScene.mainMenuScene.getRoot()).getChildren().get(1);
@@ -951,6 +1095,10 @@ public class GameScene extends Scene {
 	
 	}
 
+	/**
+	 * collideWall method returns the wall colliding else null
+	 * @return the wall colliding the snake else null
+	 */
 	static GameObject collideWall() {
 		for (GameObject wall : GameScene.walls) {
 			
@@ -962,6 +1110,9 @@ public class GameScene extends Scene {
 		return null;
 	}
 
+	/**
+	 * method to populate the game with new items i.e. tokens, balls, wall, magnet etc
+	 */
 	public static void populateNewItems() {
 
 		Random posR = new Random();
@@ -996,6 +1147,9 @@ public class GameScene extends Scene {
 
 	}
 
+	/**
+	 * generates a new block layer with at least one block with value less than snake's length
+	 */
 	private static void spawnBlockLayer() {
 		
 		Random r1 = new Random();
@@ -1046,6 +1200,11 @@ public class GameScene extends Scene {
 		}
 	}
 
+	/**
+	 * isSafe returns true if no GameObject collides with the one in parameter
+	 * @param object - GameObject with which the collision is to be checkde
+	 * @return boolean value, true if any object collides
+	 */
 	static boolean isSafe(GameObject object) {
 
 		for (GameObject token : GameScene.tokens) {
@@ -1067,6 +1226,9 @@ public class GameScene extends Scene {
 		return true;
 	}
 
+	/**
+	 * changes GameSpeed for every token and object according to its type
+	 */
 	public static void setGameSpeed() {
 		if (GameScene.userSnake.getSnakeLength() <= 10) {
 			GameScene.gameSpeed = 4.5;
@@ -1089,7 +1251,11 @@ public class GameScene extends Scene {
 		}
 
 	}
-	
+
+	/**
+	 * sets the game speed to value
+	 * @param value - double value to which game speed is to be set on.
+	 */
 	public static void setGameSpeed(double value) {
 		for (GameObject token : GameScene.tokens) {
 			token.setSpeed(value);

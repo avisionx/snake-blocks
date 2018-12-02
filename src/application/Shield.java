@@ -9,6 +9,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 
+/**
+ * Shield Class is used to represent shield powerup objects in game
+ * extends GameObject
+ * implements Token
+ * Field - Duration - Duration of shield
+ */
 public class Shield extends GameObject implements Token{
 
 	private static final ImagePattern SHIELD_IMAGE;
@@ -32,6 +38,13 @@ public class Shield extends GameObject implements Token{
 		else
 			SHIELD_IMAGE = null;
 	}
+
+	/**
+	 * Constructor for Shield
+	 * @param x - x coordinate for shield
+	 * @param y - y coordinate for shield
+	 * @param speed - speed of game
+	 */
 	
 	public Shield(double x, double y, double speed) {
 		
@@ -43,16 +56,27 @@ public class Shield extends GameObject implements Token{
 		this.shieldTimer = null;
 		
 	}
-	
+
+	/**
+	 * increases the duration by delta
+	 * @param addDuration - value to be added to duration
+	 */
 	public void addDuration(double addDuration) {
 		this.duration += addDuration;
 	}
-	
 
+	/**
+	 * getter for Duration
+	 * @return - double value i.e. the duration
+	 */
 	public double getDuration() {
 		return this.duration;
 	}
 
+	/**
+	 * handles collision with snake
+	 * @param snake - current user snake
+	 */
 	@Override
 	public void collide(Snake snake) {
 		

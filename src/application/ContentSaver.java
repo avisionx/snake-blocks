@@ -3,6 +3,32 @@ package application;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+/**
+ * ContentSaver is a class which describes the object which is being saved with serialization and contains the information of the snake and game so that it can be resumed to later.
+ * implements Serializable
+ * Fields -
+ * [Snake Data]
+ * snakeLength - Length of Snake
+ * snakeX and snakeY - X and Y coordinate position of snake respectively
+ * snakeSpeed - speed of snake
+ * snakeMagnet - boolean , true if snake had magnet and false otherwise
+ * magnetDuration - duration left for which the magnet remains, if snakeMagnet is true.
+ * snakeShield  - boolean , true if snake had shield and false otherwise
+ * shieldDuration - duration left for which the shield remains, if snakeShield is true.
+ * [Game Data]
+ * gameScore - integer score of the game previously
+ * gameSpeed - speed(pace) of the game
+ * interactableCount - count for the number of interactable objects
+ * positionBlockX and positionBlockY - Arraylist with X and Y coordinate of each block. (i'th block info corresponds to X[i] and Y[i])
+ * blockValue - ArrayList where value of i'th block corresponds to the i'th index of the ArrayList
+ * positionWallX and positionWallY - Arraylist with X and Y coordinate of each wall. (i'th wall info corresponds to X[i] and Y[i])
+ * wallLength - ArrayList where length of i'th wall corresponds to the i'th index of the ArrayList
+ * positionBallX and positionBallY - Arraylist with X and Y coordinate of each ball. (i'th ball info corresponds to X[i] and Y[i])
+ * ballValue - ArrayList where value of i'th ball corresponds to the i'th index of the ArrayList
+ * positionPowerX and positionPowerY - ArrayList with X and Y coordinate positions of the powerUps.
+ * powerUpType - ArrayList where i'th index indicate the type of powerUp.
+ */
+
 @SuppressWarnings("serial")
 public class ContentSaver implements Serializable {
 	

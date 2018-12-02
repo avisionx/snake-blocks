@@ -12,12 +12,29 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
+/**
+ * followingCircle is used to describe the remaining body of the snake excluding the head
+ * extends Circle
+ */
 class followingCircle extends Circle{
-	
+
+	/**
+	 * constructor for followingCircle
+	 * @param x - x coordinate of the center of circle
+	 * @param y - y coordinate of the center of circle
+	 * @param radius - radius of circle
+	 * @param color - color of the circle
+	 */
 	public followingCircle(double x, double y, double radius, Color color) {
 		super(x,y,radius, color);
 	}
-	
+
+	/**
+	 * updates the position of each circle to get smooth motion by following the path of the parent circle
+	 * @param parentX - X coordinate of parent circle (next circle towards the head of snake)
+	 * @param parentY - Y coordinate of the parent circle
+	 * @param self - followingCircle object for self
+	 */
 	public void update(double parentX, double parentY, followingCircle self) {
 		
 		AnimationTimer moveAnimation = new AnimationTimer() {
@@ -46,6 +63,23 @@ class followingCircle extends Circle{
 	}
 }
 
+/**
+ * Snake Class to describe the snake in the game
+ * extends Group
+ * Fields -
+ * length - length of snake
+ * snakeText - text on top of the snake denoting the length of it
+ * snakeHead - points to the head of the snake
+ * snakeBody - List of followingCircle which forms the body of Snake
+ * snakeSpeed - speed of snake
+ * xVelocity - velocity across x direction of snake
+ * snakeSideCollideBlock - boolean true if snake's side collides with block
+ * snakeMotion AnimationTimer
+ * hasMagnet - boolean
+ * curMagnet - Magnet object for the current Magnet
+ * hasShield - boolean
+ * curShield - Shield object for the current Shield
+ */
 public class Snake extends Group {
 	
 	private int length;
@@ -61,45 +95,83 @@ public class Snake extends Group {
 	protected Magnet curMagnet;
 	protected boolean hasShield;
 	protected Shield curShield;
-	
+
+	/**
+	 * setter for snakeSideCollideBlock
+	 * @param snakeSideCollideBlock - boolean value to set on.
+	 */
 	public void setSnakeCollideBlock(boolean snakeSideCollideBlock) {
 		this.snakeSideCollideBlock = snakeSideCollideBlock;
 	}
-	
+
+	/**
+	 * returns the head of snake
+	 * @return GameObject i.e. the head of snake
+	 */
 	public GameObject getSnakeHead() {
 		return this.snakeHead;
 	}
-	
+
+	/**
+	 * getter for SnakeSpeed
+	 * @return double value denoting snake speed
+	 */
 	public double getSnakeSpeed() {
 		return this.snakeSpeed;
 	}
 
+	/**
+	 * gives the current position of the snake head
+	 * @return Point2D object having the current x and y coordinate for the snake
+	 */
 	public Point2D getSnakeHeadPosPoint2D() {
 		double x = ((Circle)this.snakeHead.getView()).getCenterX();
 		double y = ((Circle)this.snakeHead.getView()).getCenterY();
 		return new Point2D(x, y);
 	}
-	
+
+	/**
+	 * move left
+	 */
 	public void moveLeft() {
 		this.xVelocity = -this.snakeSpeed;
 	}
-	
+
+	/**
+	 * move right
+	 */
 	public void moveRight() {
 		this.xVelocity = +this.snakeSpeed;
 	}
-	
+
+	/**
+	 * stops the motion of snake
+	 */
 	public void stopSnake() {
 		this.xVelocity = 0;
 	}
-	
+
+	/**
+	 * setter for snake speed
+	 * @param snakeSpeed - double value denoting the speed of snake to be set to
+	 */
 	public void setSpeed(double snakeSpeed) {
 		this.snakeSpeed = snakeSpeed;
 	}
 
+	/**
+	 * getter for length of  snake
+	 * @return integer denoting length of snake
+	 */
 	public int getSnakeLength() {
 		return this.length;
 	}
-	
+
+	/**
+	 * constructor for snake
+	 * @param length - length of snake
+	 * @param x - x coordinate of the snake
+	 */
 	public Snake(int length, double x) {
 		
 		super();
@@ -264,7 +336,11 @@ public class Snake extends Group {
 		this.snakeMotion.start();
 		
 	}
-	
+
+	/**
+	 * setter for snake length
+	 * @param newLength - value to which the snake's length is to be changed to
+	 */
 	public void setSnakeLength(int newLength) {
 		
 		int oldLength = this.length;
@@ -298,7 +374,11 @@ public class Snake extends Group {
 		GameScene.setGameSpeed();
 	
 	}
-	
+
+	/**
+	 * method responsible for the movement of the head of snake
+	 * @param deltaX - change in the X coordinate of the snake
+	 */
 	public void moveHead(double deltaX) {
 		
 		double oldHeadX = ((Circle)this.snakeHead.getView()).getCenterX();
