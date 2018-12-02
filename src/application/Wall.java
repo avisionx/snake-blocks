@@ -19,6 +19,10 @@ public class Wall extends GameObject implements Interactable{
 		this.getFallDownTimer().start();
 		
 	}
+	
+	public double getLength() {
+		return ((Rectangle)this.getView()).getHeight();
+	}
 
 	@Override
 	public void collide(Snake snake) {

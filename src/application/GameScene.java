@@ -130,11 +130,12 @@ class pauseScreen extends StackPane {
 		});
 
 		goToMenuBtn.setOnAction(e -> {
+			GameScene.saveGame();
 			GameScene.primaryStage.setScene(GameScene.mainMenuScene);
 		});
 
 		exitBtn.setOnAction(e -> {
-			System.exit(0);
+			GameScene.exit();
 		});
 
 		displayItems.getChildren().addAll(scoreWithCrown, resumeBtn, newGameBtn, goToMenuBtn, exitBtn);
@@ -369,7 +370,70 @@ public class GameScene extends Scene {
 		GameScene.walls.removeIf(GameObject::isDead);
 
 	}
+
+	protected static void exit() {
+		GameScene.saveGame();
+		System.exit(0);
+	}
 	
+	public static List<Block> getBlocks(){ return blocks; }
+	public static List<Wall> getWalls(){ return walls; }
+	public static int getsnakeLength(){ return userSnake.getSnakeLength(); }
+	public static double getgameSpeed(){ return gameSpeed; }
+	public static int getCurGameScore(){ return curGameScore; }
+	public static Snake getSnake() { return userSnake; }
+	
+	
+	protected static void saveGame() {
+		
+		ContentSaver save = new ContentSaver();
+		
+		int Snakelength = GameScene.getsnakeLength();
+		double snakeX = GameScene.getSnake().getSnakeHeadPosPoint2D().getX();
+		double snakeY = GameScene.getSnake().getSnakeHeadPosPoint2D().getY();
+		double snakeSpeed = GameScene.getSnake().getSnakeSpeed();
+		int score = GameScene.getCurGameScore();
+		ArrayList<Double> positionBlockX = new ArrayList<>();
+		ArrayList<Double> positionBlockY = new ArrayList<>();
+		ArrayList<Integer> blockValue = new ArrayList<>();
+		ArrayList<Double> positionWallX = new ArrayList<>();
+		ArrayList<Double> positionWallY = new ArrayList<>();
+		double gameSpeed = GameScene.getgameSpeed();
+		ArrayList<Double> wallLength = new ArrayList<>();
+
+		for(Block ele : GameScene.getBlocks()){
+			positionBlockX.add(ele.getView().getTranslateX());
+			positionBlockY.add(ele.getView().getTranslateY());
+			blockValue.add(ele.getValue());
+		}
+
+		for(Wall ele : GameScene.getWalls()){
+			positionWallX.add(ele.getView().getTranslateX());
+			positionWallY.add(ele.getView().getTranslateY());
+			wallLength.add(ele.getLength());
+		}
+
+		save.setBlockValue(blockValue);
+		save.setPositionBlockX(positionBlockX);
+		save.setPositionBlockY(positionBlockY);
+		save.setPositionWallX(positionWallX);
+		save.setPositionWallY(positionWallY);
+		save.setSnakelength(Snakelength);
+		save.setWallLength(wallLength);
+		save.setScore(score);
+		save.setSnakeX(snakeX);
+		save.setSnakeY(snakeY);
+		save.setSnakeSpeed(snakeSpeed);
+
+		try{
+			SaveManager.save(save, "./data/saveData.txt");
+		} catch (Exception e){
+			System.out.println(e.getMessage());
+		}
+		
+		return;
+	}
+
 	private static AnimationTimer populationTimer = new AnimationTimer() {
 		double lastPopulateTime = System.currentTimeMillis();
 		boolean checker = false;
@@ -681,6 +745,7 @@ public class GameScene extends Scene {
 				GameScene.tokens.add(newBall);
 				GameScene.addGameObject(newBall);
 				GameScene.interactablesCount++;
+				interactablesCount %= 1000;
 			}
 		}
 

@@ -70,6 +70,10 @@ public class Snake extends Group {
 		return this.snakeHead;
 	}
 	
+	public double getSnakeSpeed() {
+		return this.snakeSpeed;
+	}
+
 	public Point2D getSnakeHeadPosPoint2D() {
 		double x = ((Circle)this.snakeHead.getView()).getCenterX();
 		double y = ((Circle)this.snakeHead.getView()).getCenterY();
