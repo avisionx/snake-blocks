@@ -1,7 +1,8 @@
 package application;
 	
+import java.io.EOFException;
 import java.io.FileInputStream;
-
+import java.io.ObjectInputStream;
 import java.util.*;
 
 import javafx.application.Application;
@@ -55,6 +56,7 @@ public class Main extends Application {
 	
 	private static final int sceneWidth = 400;
 	private static final int sceneHeight = 600;
+	private static Leaderboard leaderboard;
 	
 	private Stage stage;
 	private Scene mainMenuScene;
@@ -77,8 +79,13 @@ public class Main extends Application {
 	public static int getSceneheight() {
 		return Main.sceneHeight;
 	}
+	
+	public static Leaderboard getLeaderboard() {
+		return Main.leaderboard;
+	}
 		
 //	Creates MainScene
+	@SuppressWarnings("unchecked")
 	private Scene createMainScene() {
 		
 		Scene menuScene = null;
@@ -135,6 +142,28 @@ public class Main extends Application {
 				getClass().getResource("application.css").toExternalForm()
 			);
 		
+		leaderboard = new Leaderboard();
+		
+		ArrayList<Score> retrieveScore = null;
+		ObjectInputStream in = null;
+		Object obj = null;
+		try {
+			in = new ObjectInputStream(new FileInputStream("./data/leaderboard.txt"));	
+			obj = in.readObject();
+			if(obj != null){
+				if(obj instanceof ArrayList)
+					retrieveScore = (ArrayList<Score>) obj;
+				for(int i = 0; i < retrieveScore.size(); i++) {
+					leaderboard.addScore(retrieveScore.get(i));
+				}
+			}
+			in.close();
+		} catch (EOFException e) {
+			leaderboard = new Leaderboard();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		return menuScene;
 	}
 	
@@ -184,7 +213,6 @@ public class Main extends Application {
 		VBox root = new VBox();
 		HBox headingWrapper = new HBox();
 		HBox backBtnWrapper = new HBox();
-		Leaderboard leaderboard = new Leaderboard();
 		ArrayList<Score> leaderboardList = null;
 		Button backBtn = new backButton();
 		Text heading = new Text("LEADERBOARD");
@@ -192,21 +220,7 @@ public class Main extends Application {
 		VBox scores = new VBox();
 		VBox dates = new VBox();
 		HBox leadTable = new HBox();
-		
-//		Some Static Random LeaderBoard Data
-		Score s1 = new Score(6, new Date());
-		Score s2 = new Score(2, new Date());
-		Score s3 = new Score(7, new Date());
-		Score s4 = new Score(9, new Date());
-		Score s5 = new Score(10, new Date());
-		leaderboard.addScore(s1);
-		leaderboard.addScore(s2);
-		leaderboard.addScore(s3);
-		leaderboard.addScore(s4);
-		leaderboard.addScore(s5);
-		
-//		Final LeaderBoard Array
-		
+				
 		leaderboardList = leaderboard.getLeaderboard();		
 		
 		backBtn.setOnAction(backEventBtn);
