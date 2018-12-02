@@ -60,6 +60,8 @@ public class Main extends Application {
 	
 	private Stage stage;
 	private Scene mainMenuScene;
+	protected boolean oldGamePresent;
+	protected ContentSaver savedData;
 	
 	class backEventHandler implements EventHandler<ActionEvent>{
 
@@ -112,6 +114,26 @@ public class Main extends Application {
 		exitBtn.setOnAction(e -> {
 			System.exit(0);
 		});
+		
+		this.savedData = null;
+		Object obj = null;
+		try {
+			obj = SaveManager.load("./data/saveData.txt");
+		} catch (EOFException e){
+			this.savedData = null;
+			this.oldGamePresent = false;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(obj != null) {
+			savedData = (ContentSaver) obj;
+		}
+		if(savedData != null) {
+			this.oldGamePresent = true;
+		}
+		else {
+			this.oldGamePresent = false;
+		}
 
 		try {
 			String pathToImage = "./img/logo.jpg";
@@ -129,10 +151,16 @@ public class Main extends Application {
 		}
 				
 		if(menuImage != null) {
-			root.getChildren().addAll(menuImageView, playBtn, resumeBtn, leaderBoardBtn, exitBtn);
+			root.getChildren().addAll(menuImageView, resumeBtn, playBtn, leaderBoardBtn, exitBtn);
 		}
 		else {
-			root.getChildren().addAll(playBtn, resumeBtn, leaderBoardBtn, exitBtn);
+			root.getChildren().addAll(resumeBtn, playBtn, leaderBoardBtn, exitBtn);
+		}
+		if(!this.oldGamePresent) {
+			resumeBtn.setVisible(false);
+		}
+		else {
+			resumeBtn.setVisible(true);
 		}
 		
 		root.setAlignment(Pos.CENTER);
@@ -146,7 +174,7 @@ public class Main extends Application {
 		
 		ArrayList<Score> retrieveScore = null;
 		ObjectInputStream in = null;
-		Object obj = null;
+		obj = null;
 		try {
 			in = new ObjectInputStream(new FileInputStream("./data/leaderboard.txt"));	
 			obj = in.readObject();

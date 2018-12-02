@@ -448,6 +448,9 @@ public class GameScene extends Scene {
 			e.printStackTrace();
 		}
 		
+		Button resumeBtn = (Button) ((VBox)GameScene.mainMenuScene.getRoot()).getChildren().get(1);
+		resumeBtn.setVisible(true);
+		
 		return;
 	}
 
@@ -736,6 +739,13 @@ public class GameScene extends Scene {
 
 	public static void gameOver() {
 		
+		Button resumeBtn = (Button) ((VBox)GameScene.mainMenuScene.getRoot()).getChildren().get(1);
+		resumeBtn.setVisible(false);
+		try {
+			SaveManager.save(null, "./data/saveData.txt");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		GameScene.pauseButton.setOnAction(null);
 		GameScene.stopFallAnimation();
 		GameScene.populationTimer.stop();
