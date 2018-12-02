@@ -70,6 +70,10 @@ public class Snake extends Group {
 		return this.snakeHead;
 	}
 	
+	public double getSnakeSpeed() {
+		return this.snakeSpeed;
+	}
+
 	public Point2D getSnakeHeadPosPoint2D() {
 		double x = ((Circle)this.snakeHead.getView()).getCenterX();
 		double y = ((Circle)this.snakeHead.getView()).getCenterY();
@@ -96,7 +100,7 @@ public class Snake extends Group {
 		return this.length;
 	}
 	
-	public Snake(int length) {
+	public Snake(int length, double x) {
 		
 		super();
 		
@@ -108,16 +112,15 @@ public class Snake extends Group {
 		this.hasShield = false;
 		this.curShield = null;
 		
-		double sceneWidth = Main.getScenewidth();
 		double sceneHeight = Main.getSceneheight();
 		
-		this.snakeHead = new GameObject(new Circle(sceneWidth/2, sceneHeight*8/10, 9, Color.web("#fedc0f")));
+		this.snakeHead = new GameObject(new Circle(x, sceneHeight*8/10, 9, Color.web("#fedc0f")));
 		
 		this.snakeText = new Text(this.length + "");
 		this.snakeText.setFill(Color.WHITE);
 		this.snakeText.getStyleClass().add("circleFont");
 		
-		this.snakeText.setTranslateX(sceneWidth / 2 - this.snakeText.getBoundsInLocal().getWidth()*2/3);
+		this.snakeText.setTranslateX(x - this.snakeText.getBoundsInLocal().getWidth()*2/3);
 		this.snakeText.setTranslateY(sceneHeight * 7.7 / 10);
 		this.snakeText.setTextOrigin(VPos.CENTER);
 		
@@ -127,7 +130,7 @@ public class Snake extends Group {
 		
 		for(int i = 1; i < Math.min(this.length, 8); i++) {
 			
-			followingCircle nextCircle = new followingCircle(sceneWidth/2, sceneHeight*8/10 + 18*i, 9, Color.web("#fedc0f"));
+			followingCircle nextCircle = new followingCircle(x, sceneHeight*8/10 + 18*i, 9, Color.web("#fedc0f"));
 			this.snakeBody.add(nextCircle);
 			this.getChildren().add(nextCircle);
 		}
