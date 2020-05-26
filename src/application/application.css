@@ -14,7 +14,7 @@
 }
 
 .backBtn {
-    -fx-background-image: url("./../../img/backBtn.png") ;
+    -fx-background-image: url("./../backBtn.png") ;
     -fx-background-repeat: no-repeat;   
     -fx-background-size: 35px 35px;
     -fx-min-height: 50px;
@@ -38,7 +38,7 @@
 }
 
 .pauseBtn {
-    -fx-background-image: url("./../../img/pauseBtn.png") ;
+    -fx-background-image: url("./../pauseBtn.png") ;
     -fx-background-repeat: no-repeat;   
     -fx-background-size: 25px 25px;
     -fx-min-height: 35px;
